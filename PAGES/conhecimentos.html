@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conhecimentos</title>
+    <link rel="icon" type="image/png" href="../MEDIA/logo.png">
+    <link rel="stylesheet" href="../CSS/style.css">
+    <style>
+        .galeria-aprendizados {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: center;
+            margin-top: 36px;
+            position: relative;
+        }
+
+        .aprendizado-card {
+            width: 320px;
+            height: 420px;
+            perspective: 1200px;
+            background: none;
+            border: none;
+            box-shadow: none;
+            margin-bottom: 0;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(.4,2.08,.55,.44);
+            transform-style: preserve-3d;
+        }
+
+        .aprendizado-card:hover .card-inner,
+        .aprendizado-card:focus-within .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(101,0,0,0.08);
+            background: var(--card-bg, #fff);
+            border: 2px solid var(--primary-dark, #a00);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            transition: background 0.3s, color 0.3s;
+            overflow: hidden;
+        }
+
+        .card-front {
+            z-index: 2;
+            padding-left: 2%;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            z-index: 3;
+            background: #fff;
+            color: var(--primary-dark);
+            text-align: left;
+            font-size: 0.98rem;
+            overflow-y: auto;
+            padding-left: 2%;
+        }
+
+        .card-foto {
+            width: 100%;
+            max-width: 260px;
+            aspect-ratio: 1/1;
+            height: auto;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 14px;
+            border: 3px solid var(--primary-dark, #a00);
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: border 0.3s;
+            display: block;
+        }
+
+        .card-front p {
+            margin: 0;
+            color: var(--primary-dark, #a00);
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding-left: 7px;
+        }
+
+        .aprendizado-card:hover .card-foto,
+        .aprendizado-card:focus-within .card-foto {
+            border: 3px solid var(--accent, #e00);
+        }
+        .aprendizado-card:hover .card-front p,
+        .aprendizado-card:focus-within .card-front p {
+            color: #fff;
+        }
+        .aprendizado-card:hover .card-front,
+        .aprendizado-card:focus-within .card-front {
+            background: var(--primary-light, #a00);
+            color: #fff;
+        }
+
+        .card-back .popup-titulo {
+            font-weight: bold;
+            margin-top: 8px;
+            margin-bottom: 2px;
+            color: var(--accent, #a00);
+            font-size: 1rem;
+        }
+        .card-back ul {
+            margin: 8px 0 0 16px;
+            padding: 0;
+            font-size: 0.95rem;
+        }
+        .card-back li {
+            margin-bottom: 2px;
+        }
+
+        /* Dark mode */
+        .dark-mode .card-front,
+        .dark-mode .card-back {
+            background: var(--card-bg-dark, #222);
+            color: var(--text-light, #fff);
+            border-color: var(--primary-darkmode-dark, #fff);
+        }
+        .dark-mode .card-front p {
+            color: var(--text-light, #fff);
+        }
+        .dark-mode .aprendizado-card:hover .card-front,
+        .dark-mode .aprendizado-card:focus-within .card-front {
+            background: var(--primary-darkmode-dark, #111);
+            color: #fff;
+        }
+        .dark-mode .card-foto {
+            border: 3px solid var(--primary-darkmode-dark, #fff);
+            background: var(--primary-darkmode-dark, #111);
+        }
+        .dark-mode .aprendizado-card:hover .card-foto,
+        .dark-mode .aprendizado-card:focus-within .card-foto {
+            border: 3px solid var(--accent, #e00);
+        }
+        .dark-mode .card-back .popup-titulo {
+            color: var(--accent, #ffb3b3);
+        }
+
+        .toggle-dark-switch {
+            position: fixed;
+            top: 22px;
+            right: 32px;
+            z-index: 1001;
+            background: none;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .switch-bg {
+            width: 70px;
+            height: 32px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(90deg, #ffb300 60%, #ffd600 100%);
+            box-shadow: 0 2px 8px rgba(160,0,0,0.10);
+            transition: background 0.4s;
+        }
+        .switch-knob {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+            left: 4px;
+            top: 2px;
+            transition: left 0.4s cubic-bezier(.4,2.08,.55,.44), background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            overflow: hidden;
+        }
+        .switch-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3em;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .switch-icon.sun {
+            color: #ffffff;
+            opacity: 1;
+        }
+        .switch-icon.moon {
+            color: #002ca5;
+            opacity: 0;
+        }
+        .dark-mode .switch-icon.sun {
+            opacity: 0;
+        }
+        .dark-mode .switch-icon.moon {
+            opacity: 1;
+        }
+        .dark-mode .switch-knob {
+            left: 38px;
+            background: #f3f3f3;
+        }
+        .dark-mode .switch-bg {
+            background: linear-gradient(90deg, #1e3a8a 60%, #2563eb 100%);
+        }
+        .toggle-dark-switch:hover,
+        .toggle-dark-switch:focus,
+        .toggle-dark-switch:active,
+        .dark-mode .toggle-dark-switch:hover,
+        .dark-mode .toggle-dark-switch:focus,
+        .dark-mode .toggle-dark-switch:active {
+            background: none;
+            outline: none;
+            box-shadow: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">SESI Salto</div>
+        <nav>
+            <a href="conselho-classe.html">Apresentando</a>
+            <a href="conhecimentos.html" class="active">Conhecimentos</a>
+            <a href="escola.html">A Escola</a>
+        </nav>
+        <div class="hamburger" id="sidebar-hamburger" aria-label="Abrir menu" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </aside>
+    <button class="toggle-dark-switch" id="toggle-dark-btn" title="Alternar modo escuro" aria-label="Alternar modo escuro">
+        <span class="switch-bg">
+            <span class="switch-icon sun">&#9728;</span>
+            <span class="switch-icon moon">&#9790;</span>
+            <span class="switch-knob"></span>
+        </span>
+    </button>
+    <div class="main-content">
+        <h1 id="titulo">Conhecimentos - 3º Ano SESI Salto</h1>
+        <p id="intro">Aqui você encontra registros de aprendizados, projetos e conquistas do nosso 3º Ano do SESI Salto.<br>
+        Confira alguns dos nossos melhores momentos de aprendizado!</p>
+        <div class="galeria-aprendizados">
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/ida_totvs.jpg" alt="Projeto de Ciências" class="card-foto" />
+                        <p>Ida a TOTVS</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Resolução de problemas, pensamento crítico e criatividade.</li>
+                            <li><b>Interpessoal:</b> Trabalho em equipe, comunicação e colaboração.</li>
+                            <li><b>Intrapessoal:</b> Autonomia, autoconhecimento e responsabilidade.</li>
+                            <li><b>Cidadania Global:</b> Compreensão do papel da tecnologia na sociedade e respeito à diversidade.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/desbrava.jpg" alt="Desbrava ENEM" class="card-foto" />
+                        <p>Desbrava ENEM: Simulado imersivo</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Gestão do tempo, interpretação de textos e raciocínio lógico.</li>
+                            <li><b>Interpessoal:</b> Compartilhamento de estratégias e apoio mútuo.</li>
+                            <li><b>Intrapessoal:</b> Controle emocional e autoconfiança.</li>
+                            <li><b>Cidadania Global:</b> Respeito às regras e ética durante avaliações.</li>
+                            <li><b>Ambiente Escolar:</b> Promove disciplina e espírito de superação coletiva.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/enem.jpg" alt="Aulão Enem" class="card-foto" />
+                        <p>Aulão Enem: Aula de redação</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Argumentação, escrita e análise crítica.</li>
+                            <li><b>Interpessoal:</b> Troca de ideias e respeito à opinião do outro.</li>
+                            <li><b>Intrapessoal:</b> Expressão de sentimentos e autodesenvolvimento.</li>
+                            <li><b>Cidadania Global:</b> Discussão de temas sociais e empatia.</li>
+                            <li><b>Ambiente Escolar:</b> Incentiva o protagonismo e a participação ativa.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/Sem nome (500 x 350 px) (1) (1).png" alt="Festa Junina" class="card-foto" />
+                        <p>Festa Junina: Arraiá terceirão</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Planejamento e organização de eventos.</li>
+                            <li><b>Interpessoal:</b> Cooperação, liderança e respeito às diferenças.</li>
+                            <li><b>Intrapessoal:</b> Senso de pertencimento e autoestima.</li>
+                            <li><b>Cidadania Global:</b> Valorização da cultura e tradição.</li>
+                            <li><b>Ambiente Escolar:</b> Fortalece vínculos e promove integração entre turmas.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/intersesi.jpg" alt="Copa Intersesi" class="card-foto" />
+                        <p>Copa Intersesi: Evento esportivo</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Estratégia, tomada de decisão e foco.</li>
+                            <li><b>Interpessoal:</b> Trabalho em equipe, respeito e liderança.</li>
+                            <li><b>Intrapessoal:</b> Resiliência, disciplina e autossuperação.</li>
+                            <li><b>Cidadania Global:</b> Espírito esportivo e respeito às diferenças.</li>
+                            <li><b>Ambiente Escolar:</b> Estimula a convivência saudável e o respeito mútuo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/atividade_sensorial.jpeg" alt="Atividade Sensorial" class="card-foto" />
+                        <p>Atividade Sensorial: Escrita de poemas</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Estímulo à criatividade, interpretação sensorial e expressão artística.</li>
+                            <li><b>Interpessoal:</b> Compartilhamento de experiências, empatia e escuta ativa.</li>
+                            <li><b>Intrapessoal:</b> Autoconhecimento, sensibilidade e desenvolvimento emocional.</li>
+                            <li><b>Cidadania Global:</b> Valorização da diversidade de sentimentos e respeito às diferentes formas de expressão.</li>
+                            <li><b>Ambiente Escolar:</b> Torna o ambiente mais acolhedor, incentivando a livre expressão e o respeito mútuo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/a_vida_n_e_util.jpeg" alt="Roda de Leitura" class="card-foto" />
+                        <p>Roda de Leitura: "A Vida Não É Útil", de Airton Krenak</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Observação, análise crítica e interpretação de textos.</li>
+                            <li><b>Interpessoal:</b> Troca de experiências, respeito mútuo e escuta ativa.</li>
+                            <li><b>Intrapessoal:</b> Autonomia, autoconfiança e desenvolvimento do pensamento próprio.</li>
+                            <li><b>Cidadania Global:</b> Consciência social, respeito à diversidade e empatia.</li>
+                            <li><b>Ambiente Escolar:</b> Incentiva o protagonismo estudantil e o diálogo construtivo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/olhos_dagua.jpeg" alt="Roda de Leitura" class="card-foto" />
+                        <p>Roda de Leitura: "Olhos d'Água", de Conceição Evaristo</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Aplicação de conhecimentos teóricos.</li>
+                            <li><b>Interpessoal:</b> Colaboração e empatia.</li>
+                            <li><b>Intrapessoal:</b> Reflexão e autodesenvolvimento.</li>
+                            <li><b>Cidadania Global:</b> Visão crítica sobre o mundo.</li>
+                            <li><b>Ambiente Escolar:</b> Aproxima teoria e prática, tornando o aprendizado mais significativo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/camisas].jpg" alt="Terceirão" class="card-foto" />
+                        <p>Momentos Terceirão</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Pesquisa e investigação.</li>
+                            <li><b>Interpessoal:</b> Compartilhamento de descobertas.</li>
+                            <li><b>Intrapessoal:</b> Motivação para aprender.</li>
+                            <li><b>Cidadania Global:</b> Respeito à diversidade cultural e social.</li>
+                            <li><b>Ambiente Escolar:</b> Estimula a curiosidade e o engajamento dos alunos.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/jornal.png" alt="Jornal" class="card-foto" />
+                        <p>Jornal Escolar</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Escrita, pesquisa e síntese de informações.</li>
+                            <li><b>Interpessoal:</b> Colaboração e comunicação entre colegas.</li>
+                            <li><b>Intrapessoal:</b> Organização e responsabilidade.</li>
+                            <li><b>Cidadania Global:</b> Respeito à diversidade de opiniões.</li>
+                            <li><b>Ambiente Escolar:</b> Incentiva protagonismo e participação ativa.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/roda_leitura_escrivãos.jpeg" alt="Escrivãos" class="card-foto" />
+                        <p>Roda de Leitura: Escribas</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Interpretação e análise crítica de textos.</li>
+                            <li><b>Interpessoal:</b> Troca de ideias e respeito ao outro.</li>
+                            <li><b>Intrapessoal:</b> Expressão de opiniões e autoconfiança.</li>
+                            <li><b>Cidadania Global:</b> Valorização da diversidade cultural.</li>
+                            <li><b>Ambiente Escolar:</b> Incentiva o diálogo e o protagonismo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="aprendizado-card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <img src="../MEDIA/Fuvest (2).jpeg" alt="Seminário" class="card-foto" />
+                        <p>Seminário de Obras da Lista Fuvest</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="popup-titulo">Competências e Habilidades Desenvolvidas:</div>
+                        <ul>
+                            <li><b>Cognição:</b> Leitura crítica, análise literária e argumentação oral.</li>
+                            <li><b>Interpessoal:</b> Trabalho colaborativo e desenvolvimento da oratória.</li>
+                            <li><b>Intrapessoal:</b> Superação de desafios e construção de autoconfiança.</li>
+                            <li><b>Cidadania Global:</b> Discussão de contextos históricos e sociais das obras.</li>
+                            <li><b>Ambiente Escolar:</b> Estimula a pesquisa, o debate e a participação ativa.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Sidebar hamburger menu (mobile)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarHamburger = document.getElementById('sidebar-hamburger');
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+        }
+        if (sidebarHamburger) {
+            sidebarHamburger.addEventListener('click', toggleSidebar);
+            sidebarHamburger.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    toggleSidebar();
+                }
+            });
+        }
+
+        // Fecha sidebar ao clicar fora (mobile)
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // Modo escuro
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Switch dark/light com persistência no localStorage
+        const toggleBtn = document.getElementById('toggle-dark-btn');
+        function setDarkMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('dark-mode', '1');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('dark-mode', '0');
+            }
+        }
+        function updateSwitchBtn() {
+            // Só anima via CSS, nada a fazer aqui
+        }
+        // Inicializa modo escuro se já estava ativado
+        if (localStorage.getItem('dark-mode') === '1') {
+            document.body.classList.add('dark-mode');
+        }
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                localStorage.setItem('dark-mode', isDark ? '1' : '0');
+                updateSwitchBtn();
+            });
+            updateSwitchBtn();
+        }
+    </script>
+</body>
+</html>
