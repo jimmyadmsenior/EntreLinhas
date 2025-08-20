@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Artigo - EntreLinhas</title>
+    <meta name="description" content="Envie seu artigo para publicação no EntreLinhas.">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/jornal.png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .error {
+            border-color: var(--error) !important;
+        }
+        .form-container {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html">EntreLinhas</a>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="artigos.html">Artigos</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="escola.html">A Escola</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+            
+            <div class="nav-buttons">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="form-container fade-in">
+            <h1 class="form-title">Enviar Artigo</h1>
+            
+            <p class="mb-4">
+                Compartilhe seu conhecimento, ideias e histórias com a comunidade. Depois de enviar, seu artigo será revisado pela nossa equipe editorial antes de ser publicado.
+            </p>
+            
+            <form id="submit-article-form">
+                <div class="form-group">
+                    <label for="title">Título do Artigo</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Categoria</label>
+                    <select id="category" name="category" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="educacao">Educação</option>
+                        <option value="cultura">Cultura</option>
+                        <option value="esporte">Esporte</option>
+                        <option value="tecnologia">Tecnologia</option>
+                        <option value="comunidade">Comunidade</option>
+                        <option value="eventos">Eventos</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">Conteúdo</label>
+                    <textarea id="content" name="content" rows="12" required></textarea>
+                    <small style="color: var(--primary-light); display: block; margin-top: 0.3rem;">Dica: você pode usar formatação básica como negrito (*texto*), itálico (_texto_) e listas (- item)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">Imagem (opcional)</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <small style="color: var(--primary-light); display: block; margin-top: 0.3rem;">Tamanho máximo: 2MB. Formatos aceitos: JPG, PNG</small>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <input type="checkbox" id="terms" name="terms" required style="margin-top: 4px;">
+                        <span>Confirmo que este conteúdo é original ou possuo os direitos necessários para sua publicação, e concordo com os <a href="termos.html" target="_blank">termos de publicação</a>.</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full">Enviar para revisão</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>EntreLinhas</h3>
+                <p>Um jornal digital colaborativo onde vozes diversas se encontram para compartilhar conhecimento, histórias e experiências.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="artigos.html">Artigos</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="escola.html">A Escola</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> jimmycastilho555@gmail.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Av. Marechal Rondon, 3000 - Jardim Bandeirantes, Salto - SP</li>
+                    <li><i class="fas fa-phone"></i> (11) 4029-1234</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 EntreLinhas - SESI Salto. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initSubmitPage();
+        });
+    </script>
+</body>
+</html>

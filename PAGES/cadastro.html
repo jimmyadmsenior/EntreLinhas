@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - EntreLinhas</title>
+    <meta name="description" content="Cadastre-se no EntreLinhas para começar a compartilhar seus textos e artigos.">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/jornal.png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .error {
+            border-color: var(--error) !important;
+        }
+        .form-container {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html">EntreLinhas</a>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="artigos.html">Artigos</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="escola.html">A Escola</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+            
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-secondary">Entrar</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="form-container fade-in">
+            <h1 class="form-title">Cadastre-se no EntreLinhas</h1>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="name">Nome completo</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                    <small style="color: var(--primary-light); display: block; margin-top: 0.3rem;">A senha deve ter pelo menos 6 caracteres</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">Confirmar senha</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="terms" name="terms" required>
+                        Li e concordo com os <a href="termos.html" target="_blank">termos de uso</a> e a <a href="privacidade.html" target="_blank">política de privacidade</a>.
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full">Cadastrar</button>
+            </form>
+            
+            <p class="text-center mt-3">
+                Já possui uma conta? <a href="login.html">Entrar</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>EntreLinhas</h3>
+                <p>Um jornal digital colaborativo onde vozes diversas se encontram para compartilhar conhecimento, histórias e experiências.</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="artigos.html">Artigos</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="escola.html">A Escola</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> jimmycastilho555@gmail.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Av. Marechal Rondon, 3000 - Jardim Bandeirantes, Salto - SP</li>
+                    <li><i class="fas fa-phone"></i> (11) 4029-1234</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 EntreLinhas - SESI Salto. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const registerForm = document.getElementById('register-form');
+            
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                if (!validateForm(registerForm)) return;
+                
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Check if passwords match
+                if (password !== confirmPassword) {
+                    displayError(document.getElementById('confirm-password'), 'As senhas não coincidem');
+                    return;
+                }
+                
+                // Prepare form data
+                const formData = {
+                    name: document.getElementById('name').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    password: password
+                };
+                
+                // Show loading state
+                const submitBtn = registerForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Cadastrando...';
+                submitBtn.disabled = true;
+                
+                // Simulate registration
+                setTimeout(() => {
+                    console.log('User registration:', formData);
+                    
+                    // In a real app, you would send this to your backend
+                    
+                    // Redirect to success page or login
+                    window.location.href = 'cadastro-sucesso.html';
+                    
+                    // Reset button (in case redirect fails)
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
