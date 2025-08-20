@@ -1,14 +1,15 @@
 <?php
 // Funções para processamento de artigos
+require_once 'imagens_artigos.php';
 
 /**
- * Função para enviar um artigo
+ * Função para enviar um artigo com suporte a múltiplas imagens
  * @param mysqli $conn Conexão com o banco de dados
  * @param array $artigo Dados do artigo (titulo, conteudo, categoria, id_usuario)
- * @param array $imagem Dados da imagem (opcional)
+ * @param array $imagens Dados das imagens (opcional)
  * @return array Resultado do envio com status e mensagem
  */
-function enviarArtigo($conn, $artigo, $imagem = null) {
+function enviarArtigo($conn, $artigo, $imagens = null) {
     $resultado = [
         'status' => false,
         'mensagem' => '',
@@ -21,49 +22,81 @@ function enviarArtigo($conn, $artigo, $imagem = null) {
         return $resultado;
     }
     
-    // Processar upload de imagem, se houver
-    $nome_imagem = '';
-    if ($imagem && $imagem['name']) {
-        $upload_resultado = processarUploadImagem($imagem);
-        
-        if (!$upload_resultado['status']) {
-            $resultado['mensagem'] = $upload_resultado['mensagem'];
-            return $resultado;
-        }
-        
-        $nome_imagem = $upload_resultado['nome_arquivo'];
-    }
+    // Iniciar transação
+    mysqli_begin_transaction($conn);
     
-    // Preparar a inserção no banco de dados
-    $sql = "INSERT INTO artigos (titulo, conteudo, categoria, imagem, id_usuario, data_criacao, status) 
-            VALUES (?, ?, ?, ?, ?, NOW(), 'pendente')";
-    
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // Vincular parâmetros
-        mysqli_stmt_bind_param($stmt, "ssssi", 
-            $artigo['titulo'], 
-            $artigo['conteudo'], 
-            $artigo['categoria'], 
-            $nome_imagem, 
-            $artigo['id_usuario']
-        );
+    try {
+        // Preparar a inserção no banco de dados (sem imagem inicialmente)
+        $sql = "INSERT INTO artigos (titulo, conteudo, categoria, imagem, id_usuario, data_criacao, status) 
+                VALUES (?, ?, ?, '', ?, NOW(), 'pendente')";
         
-        // Executar a instrução
-        if (mysqli_stmt_execute($stmt)) {
-            $resultado['status'] = true;
-            $resultado['mensagem'] = "Artigo enviado com sucesso! Aguarde a aprovação.";
-            $resultado['artigo_id'] = mysqli_insert_id($conn);
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            // Vincular parâmetros
+            mysqli_stmt_bind_param($stmt, "sssi", 
+                $artigo['titulo'], 
+                $artigo['conteudo'], 
+                $artigo['categoria'],
+                $artigo['id_usuario']
+            );
             
-            // Enviar notificação por email para o administrador
-            enviarNotificacaoNovoArtigo($conn, $resultado['artigo_id']);
+            // Executar a instrução
+            if (mysqli_stmt_execute($stmt)) {
+                $resultado['artigo_id'] = mysqli_insert_id($conn);
+                
+                // Processar imagens, se houver
+                if ($imagens && !empty($imagens['name'][0])) {
+                    $upload_resultado = processarMultiplasImagens($imagens);
+                    
+                    if (!$upload_resultado['status']) {
+                        // Reverter em caso de erro
+                        mysqli_rollback($conn);
+                        $resultado['mensagem'] = $upload_resultado['mensagem'];
+                        return $resultado;
+                    }
+                    
+                    // Associar imagens ao artigo
+                    if (!associarImagensAoArtigo($conn, $resultado['artigo_id'], $upload_resultado['caminhos'])) {
+                        // Reverter em caso de erro
+                        mysqli_rollback($conn);
+                        $resultado['mensagem'] = "Erro ao associar imagens ao artigo.";
+                        return $resultado;
+                    }
+                    
+                    // Atualizar campo imagem na tabela artigos com o caminho da primeira imagem
+                    $sql_update = "UPDATE artigos SET imagem = ? WHERE id = ?";
+                    if ($stmt_update = mysqli_prepare($conn, $sql_update)) {
+                        $primeira_imagem = $upload_resultado['caminhos'][0];
+                        mysqli_stmt_bind_param($stmt_update, "si", $primeira_imagem, $resultado['artigo_id']);
+                        mysqli_stmt_execute($stmt_update);
+                        mysqli_stmt_close($stmt_update);
+                    }
+                }
+                
+                // Confirmar transação
+                mysqli_commit($conn);
+                
+                $resultado['status'] = true;
+                $resultado['mensagem'] = "Artigo enviado com sucesso! Aguarde a aprovação.";
+                
+                // Enviar notificação por email para o administrador
+                enviarNotificacaoNovoArtigo($conn, $resultado['artigo_id']);
+            } else {
+                // Reverter em caso de erro
+                mysqli_rollback($conn);
+                $resultado['mensagem'] = "Erro ao enviar artigo. Por favor, tente novamente.";
+            }
+            
+            // Fechar a instrução
+            mysqli_stmt_close($stmt);
         } else {
-            $resultado['mensagem'] = "Erro ao enviar artigo. Por favor, tente novamente.";
+            // Reverter em caso de erro
+            mysqli_rollback($conn);
+            $resultado['mensagem'] = "Erro no sistema. Por favor, tente novamente mais tarde.";
         }
-        
-        // Fechar a instrução
-        mysqli_stmt_close($stmt);
-    } else {
-        $resultado['mensagem'] = "Erro no sistema. Por favor, tente novamente mais tarde.";
+    } catch (Exception $e) {
+        // Em caso de exceção, reverter transação
+        mysqli_rollback($conn);
+        $resultado['mensagem'] = "Erro: " . $e->getMessage();
     }
     
     return $resultado;
@@ -393,7 +426,7 @@ function listarArtigos($conn, $filtros = [], $limite = 10, $pagina = 1) {
 }
 
 /**
- * Obter detalhes de um artigo específico
+ * Obter detalhes de um artigo específico com suas imagens
  * @param mysqli $conn Conexão com o banco de dados
  * @param int $artigo_id ID do artigo
  * @return array|bool Dados do artigo ou false se não encontrado
@@ -411,6 +444,10 @@ function obterArtigo($conn, $artigo_id) {
         
         if ($artigo = mysqli_fetch_assoc($result)) {
             mysqli_stmt_close($stmt);
+            
+            // Buscar imagens associadas ao artigo
+            $artigo['imagens'] = obterImagensArtigo($conn, $artigo_id);
+            
             return $artigo;
         }
         
@@ -421,14 +458,14 @@ function obterArtigo($conn, $artigo_id) {
 }
 
 /**
- * Editar um artigo existente
+ * Editar um artigo existente com suporte a múltiplas imagens
  * @param mysqli $conn Conexão com o banco de dados
  * @param int $artigo_id ID do artigo
  * @param array $dados Novos dados do artigo
- * @param array $imagem Dados da nova imagem (opcional)
+ * @param array $imagens Dados das novas imagens (opcional)
  * @return array Resultado da edição com status e mensagem
  */
-function editarArtigo($conn, $artigo_id, $dados, $imagem = null) {
+function editarArtigo($conn, $artigo_id, $dados, $imagens = null) {
     $resultado = [
         'status' => false,
         'mensagem' => ''
@@ -450,81 +487,100 @@ function editarArtigo($conn, $artigo_id, $dados, $imagem = null) {
         return $resultado;
     }
     
-    // Processar upload de imagem, se houver
-    $nome_imagem = $artigo_atual['imagem']; // Manter a imagem atual se não for enviada uma nova
-    if ($imagem && $imagem['name']) {
-        $upload_resultado = processarUploadImagem($imagem);
-        
-        if (!$upload_resultado['status']) {
-            $resultado['mensagem'] = $upload_resultado['mensagem'];
-            return $resultado;
-        }
-        
-        $nome_imagem = $upload_resultado['nome_arquivo'];
-        
-        // Remover a imagem antiga, se existir
-        if (!empty($artigo_atual['imagem'])) {
-            $caminho_imagem = "../assets/images/artigos/" . $artigo_atual['imagem'];
-            if (file_exists($caminho_imagem)) {
-                unlink($caminho_imagem);
+    // Iniciar transação
+    mysqli_begin_transaction($conn);
+    
+    try {
+        // Processar upload de novas imagens, se houver
+        if ($imagens && !empty($imagens['name'][0])) {
+            $upload_resultado = processarMultiplasImagens($imagens);
+            
+            if (!$upload_resultado['status']) {
+                $resultado['mensagem'] = $upload_resultado['mensagem'];
+                return $resultado;
+            }
+            
+            // Associar novas imagens ao artigo
+            if (!associarImagensAoArtigo($conn, $artigo_id, $upload_resultado['caminhos'])) {
+                mysqli_rollback($conn);
+                $resultado['mensagem'] = "Erro ao associar imagens ao artigo.";
+                return $resultado;
+            }
+            
+            // Atualizar campo imagem na tabela artigos com o caminho da primeira imagem nova
+            $sql_update_img = "UPDATE artigos SET imagem = ? WHERE id = ?";
+            if ($stmt_update = mysqli_prepare($conn, $sql_update_img)) {
+                $primeira_imagem = $upload_resultado['caminhos'][0];
+                mysqli_stmt_bind_param($stmt_update, "si", $primeira_imagem, $artigo_id);
+                mysqli_stmt_execute($stmt_update);
+                mysqli_stmt_close($stmt_update);
             }
         }
-    }
-    
-    // Preparar a atualização no banco de dados
-    $sql = "UPDATE artigos SET 
-            titulo = ?, 
-            conteudo = ?, 
-            categoria = ?, 
-            imagem = ?, 
-            status = ?
-            WHERE id = ?";
-    
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        // Definir o status com base em quem está editando
-        $status = 'pendente'; // Por padrão, volta para pendente
         
-        if ($is_admin) {
-            // Se for admin, mantém o status atual
-            $status = $artigo_atual['status'];
-        }
+        // Preparar a atualização dos dados do artigo
+        $sql = "UPDATE artigos SET 
+                titulo = ?, 
+                conteudo = ?, 
+                categoria = ?, 
+                status = ?
+                WHERE id = ?";
         
-        // Vincular parâmetros
-        mysqli_stmt_bind_param($stmt, "sssssi", 
-            $dados['titulo'], 
-            $dados['conteudo'], 
-            $dados['categoria'], 
-            $nome_imagem, 
-            $status,
-            $artigo_id
-        );
-        
-        // Executar a instrução
-        if (mysqli_stmt_execute($stmt)) {
-            $resultado['status'] = true;
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            // Definir o status com base em quem está editando
+            $status = 'pendente'; // Por padrão, volta para pendente
             
             if ($is_admin) {
-                $resultado['mensagem'] = "Artigo atualizado com sucesso!";
-            } else {
-                $resultado['mensagem'] = "Artigo atualizado com sucesso! Ele será revisado novamente.";
-                // Notificar o administrador sobre a edição
-                enviarNotificacaoNovoArtigo($conn, $artigo_id);
+                // Se for admin, mantém o status atual
+                $status = $artigo_atual['status'];
             }
+            
+            // Vincular parâmetros
+            mysqli_stmt_bind_param($stmt, "ssssi", 
+                $dados['titulo'], 
+                $dados['conteudo'], 
+                $dados['categoria'], 
+                $status,
+                $artigo_id
+            );
+            
+            // Executar a instrução
+            if (mysqli_stmt_execute($stmt)) {
+                // Confirmar transação
+                mysqli_commit($conn);
+                
+                $resultado['status'] = true;
+                
+                if ($is_admin) {
+                    $resultado['mensagem'] = "Artigo atualizado com sucesso!";
+                } else {
+                    $resultado['mensagem'] = "Artigo atualizado com sucesso! Ele será revisado novamente.";
+                    // Notificar o administrador sobre a edição
+                    enviarNotificacaoNovoArtigo($conn, $artigo_id);
+                }
+            } else {
+                // Reverter em caso de erro
+                mysqli_rollback($conn);
+                $resultado['mensagem'] = "Erro ao atualizar artigo. Por favor, tente novamente.";
+            }
+            
+            // Fechar a instrução
+            mysqli_stmt_close($stmt);
         } else {
-            $resultado['mensagem'] = "Erro ao atualizar artigo. Por favor, tente novamente.";
+            // Reverter em caso de erro
+            mysqli_rollback($conn);
+            $resultado['mensagem'] = "Erro no sistema. Por favor, tente novamente mais tarde.";
         }
-        
-        // Fechar a instrução
-        mysqli_stmt_close($stmt);
-    } else {
-        $resultado['mensagem'] = "Erro no sistema. Por favor, tente novamente mais tarde.";
+    } catch (Exception $e) {
+        // Em caso de exceção, reverter transação
+        mysqli_rollback($conn);
+        $resultado['mensagem'] = "Erro: " . $e->getMessage();
     }
     
     return $resultado;
 }
 
 /**
- * Excluir um artigo
+ * Excluir um artigo e todas suas imagens associadas
  * @param mysqli $conn Conexão com o banco de dados
  * @param int $artigo_id ID do artigo
  * @return bool Resultado da exclusão
@@ -536,27 +592,76 @@ function excluirArtigo($conn, $artigo_id) {
         return false;
     }
     
-    // Remover a imagem do artigo, se existir
-    if (!empty($artigo['imagem'])) {
-        $caminho_imagem = "../assets/images/artigos/" . $artigo['imagem'];
-        if (file_exists($caminho_imagem)) {
-            unlink($caminho_imagem);
+    // Iniciar transação
+    mysqli_begin_transaction($conn);
+    
+    try {
+        // Remover todas as imagens associadas ao artigo
+        if (!empty($artigo['imagens'])) {
+            foreach ($artigo['imagens'] as $imagem) {
+                removerImagemArtigo($conn, $imagem['id']);
+            }
         }
+        
+        // Excluir o artigo do banco de dados
+        $sql = "DELETE FROM artigos WHERE id = ?";
+        
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "i", $artigo_id);
+            
+            $resultado = mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+            
+            if ($resultado) {
+                mysqli_commit($conn);
+                return true;
+            } else {
+                mysqli_rollback($conn);
+                return false;
+            }
+        } else {
+            mysqli_rollback($conn);
+            return false;
+        }
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        return false;
+    }
+}
+
+/**
+ * Contar o total de artigos para paginação
+ * @param mysqli $conn Conexão com o banco de dados
+ * @param array $filtros Filtros de busca
+ * @return int Total de artigos
+ */
+function contarArtigos($conn, $filtros = []) {
+    // Construir a consulta SQL base
+    $sql = "SELECT COUNT(*) as total FROM artigos a WHERE 1=1";
+    
+    // Adicionar filtros à consulta
+    if (isset($filtros['categoria']) && !empty($filtros['categoria'])) {
+        $sql .= " AND a.categoria = '" . mysqli_real_escape_string($conn, $filtros['categoria']) . "'";
     }
     
-    // Excluir o artigo do banco de dados
-    $sql = "DELETE FROM artigos WHERE id = ?";
-    
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "i", $artigo_id);
-        
-        $resultado = mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-        
-        return $resultado;
+    if (isset($filtros['status']) && !empty($filtros['status'])) {
+        $sql .= " AND a.status = '" . mysqli_real_escape_string($conn, $filtros['status']) . "'";
     }
     
-    return false;
+    if (isset($filtros['id_usuario']) && !empty($filtros['id_usuario'])) {
+        $sql .= " AND a.id_usuario = " . intval($filtros['id_usuario']);
+    }
+    
+    if (isset($filtros['busca']) && !empty($filtros['busca'])) {
+        $busca = mysqli_real_escape_string($conn, $filtros['busca']);
+        $sql .= " AND (a.titulo LIKE '%$busca%' OR a.conteudo LIKE '%$busca%')";
+    }
+    
+    // Executar a consulta
+    $resultado = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($resultado);
+    
+    return $row['total'];
 }
 
 // Outras funções relacionadas a artigos podem ser adicionadas conforme necessário
