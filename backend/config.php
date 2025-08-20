@@ -74,6 +74,21 @@ if (mysqli_query($conn, $sql)) {
     if (!mysqli_query($conn, $sql_comments)) {
         echo "ERRO: Não foi possível criar a tabela de comentários. " . mysqli_error($conn);
     }
+    
+    // Criar tabela de imagens de artigos se não existir
+    $sql_images = "CREATE TABLE IF NOT EXISTS imagens_artigos (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        artigo_id INT NOT NULL,
+        caminho VARCHAR(255) NOT NULL,
+        ordem INT DEFAULT 0,
+        descricao TEXT,
+        data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (artigo_id) REFERENCES artigos(id) ON DELETE CASCADE
+    )";
+    
+    if (!mysqli_query($conn, $sql_images)) {
+        echo "ERRO: Não foi possível criar a tabela de imagens de artigos. " . mysqli_error($conn);
+    }
 } else {
     echo "ERRO: Não foi possível criar o banco de dados. " . mysqli_error($conn);
 }
