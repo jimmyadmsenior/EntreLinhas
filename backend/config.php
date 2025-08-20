@@ -1,6 +1,6 @@
 <?php
 // Arquivo de configuração do banco de dados
-define('DB_SERVER', 'localhost');
+define('DB_SERVER', 'localhost'); // Usando o MySQL já instalado no sistema na porta padrão 3306
 define('DB_USERNAME', 'root');  // Altere para o seu usuário do MySQL
 define('DB_PASSWORD', '');      // Altere para a sua senha do MySQL
 define('DB_NAME', 'entrelinhas');
