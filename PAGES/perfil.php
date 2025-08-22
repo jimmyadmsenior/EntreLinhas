@@ -370,6 +370,67 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
             </div>
             
             <div class="profile-section">
+                <h2><i class="fas fa-image"></i> Foto de Perfil</h2>
+                
+                <?php 
+                // Verificar se há mensagens de erro ou sucesso
+                if (isset($_SESSION['foto_erro'])) {
+                    echo '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ' . $_SESSION['foto_erro'] . '</div>';
+                    unset($_SESSION['foto_erro']);
+                }
+                if (isset($_SESSION['foto_sucesso'])) {
+                    echo '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' . $_SESSION['foto_sucesso'] . '</div>';
+                    unset($_SESSION['foto_sucesso']);
+                }
+                
+                // Verificar se o usuário já tem uma foto de perfil
+                $foto_perfil = null;
+                $sql_foto = "SELECT imagem_base64 FROM fotos_perfil WHERE id_usuario = ?";
+                if ($stmt_foto = mysqli_prepare($conn, $sql_foto)) {
+                    mysqli_stmt_bind_param($stmt_foto, "i", $_SESSION["id"]);
+                    mysqli_stmt_execute($stmt_foto);
+                    mysqli_stmt_bind_result($stmt_foto, $imagem_base64);
+                    if (mysqli_stmt_fetch($stmt_foto)) {
+                        $foto_perfil = $imagem_base64;
+                    }
+                    mysqli_stmt_close($stmt_foto);
+                }
+                ?>
+                
+                <div class="profile-image-container" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                    <div class="profile-image" style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; margin-bottom: 15px; border: 3px solid var(--primary); background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
+                        <?php if ($foto_perfil): ?>
+                            <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil" style="width: 100%; height: 100%; object-fit: cover;">
+                        <?php else: ?>
+                            <i class="fas fa-user" style="font-size: 4rem; color: #888;"></i>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <form action="../backend/processar_foto_perfil.php" method="post" enctype="multipart/form-data" style="text-align: center;">
+                        <div style="margin-bottom: 15px;">
+                            <input type="file" id="foto_perfil" name="foto_perfil" accept="image/jpeg, image/png, image/gif" style="display: none;">
+                            <label for="foto_perfil" class="btn btn-secondary" style="cursor: pointer; display: inline-block;">
+                                <i class="fas fa-upload"></i> Selecionar imagem
+                            </label>
+                            <small style="display: block; margin-top: 8px; color: var(--text-secondary);">JPG, PNG ou GIF (máx. 2MB)</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <?php echo $foto_perfil ? 'Atualizar foto' : 'Enviar foto'; ?>
+                        </button>
+                    </form>
+                </div>
+                
+                <script>
+                    // Mostrar nome do arquivo selecionado
+                    document.getElementById('foto_perfil').addEventListener('change', function() {
+                        const fileName = this.files[0] ? this.files[0].name : 'Nenhum arquivo selecionado';
+                        const label = this.nextElementSibling;
+                        label.innerHTML = '<i class="fas fa-file-image"></i> ' + (fileName.length > 20 ? fileName.substring(0, 17) + '...' : fileName);
+                    });
+                </script>
+            </div>
+            
+            <div class="profile-section">
                 <h2><i class="fas fa-newspaper"></i> Meus Artigos</h2>
                 <p>Gerencie todos os artigos que você enviou para o EntreLinhas.</p>
                 <a href="meus-artigos.php" class="btn btn-secondary">Ver Meus Artigos</a>

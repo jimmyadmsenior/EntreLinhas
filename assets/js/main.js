@@ -1,21 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado - main.js executando');
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
     
+    console.log('Elemento theme-toggle:', themeToggle);
+    console.log('Elemento body:', body);
+    
     // Check for saved theme preference or use preferred color scheme
     const savedTheme = localStorage.getItem('theme');
+    console.log('Tema salvo:', savedTheme);
+    
     if (savedTheme === 'dark') {
         body.classList.add('dark-mode');
-        updateThemeIcon(true);
+        if (themeToggle) updateThemeIcon(true);
+        console.log('Modo escuro aplicado');
     } else if (savedTheme === 'light') {
         body.classList.remove('dark-mode');
-        updateThemeIcon(false);
+        if (themeToggle) updateThemeIcon(false);
+        console.log('Modo claro aplicado');
     } else {
         // Check if user prefers dark mode at OS level
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             body.classList.add('dark-mode');
-            updateThemeIcon(true);
+            if (themeToggle) updateThemeIcon(true);
+            console.log('Preferência do sistema: modo escuro');
         }
     }
     

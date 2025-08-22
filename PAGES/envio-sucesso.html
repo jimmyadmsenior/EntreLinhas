@@ -32,7 +32,8 @@
                 <li><a href="contato.html">Contato</a></li>
             </ul>
             
-            <div class="nav-buttons">
+            <div class="nav-buttons" id="nav-user-section">
+                <!-- O JavaScript vai preencher esta seção -->
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -103,5 +104,44 @@
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
+    <script>
+        // Verificar se o usuário está logado
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSection = document.getElementById('nav-user-section');
+            
+            // Tentar obter dados do usuário do localStorage
+            const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userName = localStorage.getItem('userName');
+            
+            if (userLoggedIn && userName) {
+                // Usuário está logado
+                const dropdownHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle">
+                            <i class="fas fa-user"></i> ${userName}
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="perfil.php">Meu Perfil</a>
+                            <a href="meus-artigos.php">Meus Artigos</a>
+                            <a href="enviar-artigo.php">Enviar Artigo</a>
+                            <a href="../backend/logout.php">Sair</a>
+                        </div>
+                    </div>
+                `;
+                
+                // Inserir o dropdown antes dos botões de tema e menu
+                userSection.innerHTML = dropdownHTML + userSection.innerHTML;
+            } else {
+                // Usuário não está logado
+                const loginHTML = `
+                    <a href="login.php" class="btn btn-secondary">Entrar</a>
+                    <a href="cadastro.html" class="btn btn-primary">Cadastrar</a>
+                `;
+                
+                // Inserir os botões de login antes dos botões de tema e menu
+                userSection.innerHTML = loginHTML + userSection.innerHTML;
+            }
+        });
+    </script>
 </body>
 </html>
