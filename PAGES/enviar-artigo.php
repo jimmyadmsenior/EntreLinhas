@@ -1,5 +1,18 @@
-<?php
-// Iniciar sessão
+<// Iniciar sessão
+session_start();
+
+// Verificar se o usuário está logado
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: login.php");
+    exit;
+}
+
+// Incluir arquivo de configuração e helper de usuário
+require_once "../backend/config.php";
+require_once "../backend/usuario_helper.php";
+
+// Obter a foto de perfil do usuário
+$foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);iciar sessão
 session_start();
 
 // Verificar se o usuário está logado, senão redirecionar para a página de login
@@ -201,38 +214,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <a href="index.html">EntreLinhas</a>
-            </div>
-            
-            <ul class="nav-links">
-                <li><a href="index.html">Início</a></li>
-                <li><a href="artigos.html">Artigos</a></li>
-                <li><a href="sobre.html">Sobre</a></li>
-                <li><a href="escola.html">A Escola</a></li>
-                <li><a href="contato.html">Contato</a></li>
-            </ul>
-            
-            <div class="nav-buttons">
-                <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle">
-                            <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION["nome"]); ?>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a href="perfil.php">Meu Perfil</a>
-                            <a href="meus-artigos.php">Meus Artigos</a>
-                            <a href="enviar-artigo.php">Enviar Artigo</a>
-                            <a href="../backend/logout.php">Sair</a>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <a href="login.php" class="btn btn-secondary">Entrar</a>
-                    <a href="cadastro.php" class="btn btn-primary">Cadastrar</a>
-                <?php endif; ?>
+    <?php include 'includes/header.php'; ?>
                 
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
                     <i class="fas fa-moon"></i>
@@ -370,5 +352,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
     </script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

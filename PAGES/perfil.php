@@ -8,13 +8,17 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit;
 }
 
-// Incluir arquivo de configuração
+// Incluir arquivo de configuração e helper de usuário
 require_once "../backend/config.php";
+require_once "../backend/usuario_helper.php";
 
 // Definir variáveis
 $nome = $email = "";
 $nome_err = $email_err = $senha_atual_err = $nova_senha_err = $confirmar_senha_err = "";
 $senha_atualizada = false;
+
+// Obter a foto de perfil do usuário
+$foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
 
 // Processar dados do formulário quando o formulário é enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -256,37 +260,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <a href="index.html">EntreLinhas</a>
-            </div>
-            
-            <ul class="nav-links">
-                <li><a href="index.html">Início</a></li>
-                <li><a href="artigos.html">Artigos</a></li>
-                <li><a href="sobre.html">Sobre</a></li>
-                <li><a href="escola.html">A Escola</a></li>
-                <li><a href="contato.html">Contato</a></li>
-            </ul>
-            
-            <div class="nav-buttons">
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle">
-                        <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION["nome"]); ?>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="perfil.php" class="active">Meu Perfil</a>
-                        <a href="meus-artigos.php">Meus Artigos</a>
-                        <a href="enviar-artigo.php">Enviar Artigo</a>
-                        <a href="../backend/logout.php">Sair</a>
-                    </div>
-                </div>
-                
-                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
-                    <i class="fas fa-moon"></i>
-                </button>
+    <?php include 'includes/header.php'; ?>
                 <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -438,41 +412,11 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>EntreLinhas</h3>
-                <p>Um jornal digital colaborativo onde vozes diversas se encontram para compartilhar conhecimento, histórias e experiências.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Links Rápidos</h3>
-                <ul class="footer-links">
-                    <li><a href="index.html">Início</a></li>
-                    <li><a href="artigos.html">Artigos</a></li>
-                    <li><a href="sobre.html">Sobre</a></li>
-                    <li><a href="escola.html">A Escola</a></li>
-                    <li><a href="contato.html">Contato</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contato</h3>
-                <ul class="footer-links">
-                    <li><i class="fas fa-envelope"></i> jimmycastilho555@gmail.com</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Av. Marechal Rondon, 3000 - Jardim Bandeirantes, Salto - SP</li>
-                    <li><i class="fas fa-phone"></i> (11) 4029-1234</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 EntreLinhas - SESI Salto. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <!-- JavaScript -->
-    <script src="../assets/js/main.js"></script>
+    <!-- Incluir o rodapé comum -->
+    <?php 
+    $root_path = "..";
+    include 'includes/footer.php'; 
+    ?>
 </body>
 </html>
 
