@@ -6,7 +6,7 @@
     <title>Cadastro - EntreLinhas</title>
     <meta name="description" content="Cadastre-se no EntreLinhas para começar a compartilhar seus textos e artigos.">
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/images/jornal.png">
+    <link rel="icon" type="image/png" href="../assets/images/jornal.png">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts -->
@@ -15,12 +15,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/alerts.css">
     <style>
         .error {
             border-color: var(--error) !important;
         }
         .form-container {
             margin-top: 2rem;
+        }
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .form-group.has-error .error-message {
+            display: block;
         }
     </style>
 </head>
@@ -57,26 +67,32 @@
         <div class="form-container fade-in">
             <h1 class="form-title">Cadastre-se no EntreLinhas</h1>
             
-            <form id="register-form">
+            <div id="alert-container" class="alert hidden"></div>
+            
+            <form id="register-form" method="post">
                 <div class="form-group">
                     <label for="name">Nome completo</label>
                     <input type="text" id="name" name="name" required>
+                    <span class="error-message" id="name-error"></span>
                 </div>
                 
                 <div class="form-group">
                     <label for="email">E-mail</label>
                     <input type="email" id="email" name="email" required>
+                    <span class="error-message" id="email-error"></span>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Senha</label>
                     <input type="password" id="password" name="password" required minlength="6">
                     <small style="color: var(--primary-light); display: block; margin-top: 0.3rem;">A senha deve ter pelo menos 6 caracteres</small>
+                    <span class="error-message" id="password-error"></span>
                 </div>
                 
                 <div class="form-group">
                     <label for="confirm-password">Confirmar senha</label>
                     <input type="password" id="confirm-password" name="confirm-password" required>
+                    <span class="error-message" id="confirm-password-error"></span>
                 </div>
                 
                 <div class="form-group">
@@ -97,7 +113,6 @@
 
     <!-- Footer -->
     <footer>
-        <div class="footer-container">
             <div class="footer-section">
                 <h3>EntreLinhas</h3>
                 <p>Um jornal digital colaborativo onde vozes diversas se encontram para compartilhar conhecimento, histórias e experiências.</p>
@@ -108,7 +123,6 @@
                 <ul class="footer-links">
                     <li><a href="index.html">Início</a></li>
                     <li><a href="artigos.html">Artigos</a></li>
-                    <li><a href="sobre.html">Sobre</a></li>
                     <li><a href="escola.html">A Escola</a></li>
                     <li><a href="contato.html">Contato</a></li>
                 </ul>
@@ -119,7 +133,7 @@
                 <ul class="footer-links">
                     <li><i class="fas fa-envelope"></i> jimmycastilho555@gmail.com</li>
                     <li><i class="fas fa-map-marker-alt"></i> Av. Marechal Rondon, 3000 - Jardim Bandeirantes, Salto - SP</li>
-                    <li><i class="fas fa-phone"></i> (11) 4029-1234</li>
+                    <li><i class="fas fa-phone"></i> (11) 9 4166 - 5545</li>
                 </ul>
             </div>
         </div>
@@ -129,53 +143,112 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="assets/js/main.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/debug.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const registerForm = document.getElementById('register-form');
-            
-            registerForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                if (!validateForm(registerForm)) return;
-                
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-                
-                // Check if passwords match
-                if (password !== confirmPassword) {
-                    displayError(document.getElementById('confirm-password'), 'As senhas não coincidem');
-                    return;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Garantir que o modo escuro esteja aplicado corretamente
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.setAttribute('aria-label', 'Mudar para modo claro');
+            }
+        }
+        
+        const registerForm = document.getElementById('register-form');
+        const alertContainer = document.getElementById('alert-container');
+        //if (!registerForm) return;
+
+        function showAlert(message, type) {
+            alertContainer.textContent = message;
+            alertContainer.className = `alert ${type}`;
+            alertContainer.style.display = 'block';
+            alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                alertContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearFormErrors() {
+            const formGroups = registerForm.querySelectorAll('.form-group');
+            formGroups.forEach(group => group.classList.remove('has-error'));
+            const errorMessages = registerForm.querySelectorAll('.error-message');
+            errorMessages.forEach(message => { message.textContent = ''; });
+        }
+
+        function displayFieldError(fieldId, errorMessage) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            if (field && errorElement) {
+                field.parentElement.classList.add('has-error');
+                errorElement.textContent = errorMessage;
+                field.focus();
+            }
+        }
+
+        console.log('Adicionando evento de submit ao formulário');
+        registerForm.addEventListener('submit', function(e) {
+            console.log('Formulário submetido!');
+            e.preventDefault();
+            clearFormErrors();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            if (password !== confirmPassword) {
+                displayFieldError('confirm-password', 'As senhas não coincidem');
+                return;
+            }
+            if (!document.getElementById('terms').checked) {
+                showAlert('Você precisa aceitar os termos para continuar', 'error');
+                return;
+            }
+            const formData = new FormData(registerForm);
+            formData.delete('confirm-password');
+            const submitBtn = registerForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Cadastrando...';
+            submitBtn.disabled = true;
+            console.log('Enviando cadastro...');
+            console.log('URL do backend:', '../backend/process_registro.php');
+            fetch('../backend/process_registro.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                console.log('Resposta recebida:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Dados recebidos:', data);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    console.log('Redirecionando para:', data.redirect);
+                    setTimeout(() => {
+                        // Usar um caminho absoluto na página para evitar problemas de redirecionamento
+                        window.location.href = 'cadastro-sucesso.html';
+                    }, 1500);
+                } else {
+                    showAlert(data.message || 'Erro ao processar o cadastro', 'error');
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            displayFieldError(field, data.errors[field]);
+                        });
+                    }
                 }
-                
-                // Prepare form data
-                const formData = {
-                    name: document.getElementById('name').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    password: password
-                };
-                
-                // Show loading state
-                const submitBtn = registerForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Cadastrando...';
-                submitBtn.disabled = true;
-                
-                // Simulate registration
-                setTimeout(() => {
-                    console.log('User registration:', formData);
-                    
-                    // In a real app, you would send this to your backend
-                    
-                    // Redirect to success page or login
-                    window.location.href = 'cadastro-sucesso.html';
-                    
-                    // Reset button (in case redirect fails)
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                showAlert('Erro ao conectar com o servidor. Tente novamente mais tarde.', 'error');
             });
         });
+    });
     </script>
 </body>
 </html>

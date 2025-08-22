@@ -19,7 +19,7 @@ if (ini_get("session.use_cookies")) {
 // Destruir a sessão
 session_destroy();
 
-// Redirecionar para a página inicial
-header("location: ../PAGES/index.html");
+// Redirecionar para a página de logout personalizada
+header("location: ../PAGES/logout.php");
 exit;
 ?>

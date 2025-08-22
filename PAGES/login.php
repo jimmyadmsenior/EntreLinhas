@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validar credenciais
     if(empty($email_err) && empty($senha_err)){
         // Preparar uma declaração select
-        $sql = "SELECT id, nome, email, senha FROM usuarios WHERE email = ?";
+        $sql = "SELECT id, nome, email, senha, tipo FROM usuarios WHERE email = ?";
         
         if($stmt = mysqli_prepare($conn, $sql)){
             // Vincular variáveis à declaração preparada como parâmetros
@@ -52,7 +52,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 // Verificar se o e-mail existe, se sim, verificar a senha
                 if(mysqli_stmt_num_rows($stmt) == 1){                    
                     // Vincular variáveis de resultado
-                    mysqli_stmt_bind_result($stmt, $id, $nome, $email, $hashed_password);
+                    mysqli_stmt_bind_result($stmt, $id, $nome, $email, $hashed_password, $tipo);
                     
                     if(mysqli_stmt_fetch($stmt)){
                         if(password_verify($senha, $hashed_password)){
@@ -63,10 +63,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
                             $_SESSION["nome"] = $nome;
-                            $_SESSION["email"] = $email;                            
+                            $_SESSION["email"] = $email;
+                            $_SESSION["tipo"] = $tipo;
                             
-                            // Redirecionar usuário para página de boas-vindas
-                            header("location: index.html");
+                            // Redirecionar usuário com base no tipo de conta
+                            if ($tipo === "admin") {
+                                header("location: admin_dashboard.php");
+                            } else {
+                                header("location: index.html");
+                            }
                         } else{
                             // Senha não é válida, exibir mensagem de erro genérica
                             $login_err = "E-mail ou senha inválidos.";
@@ -171,21 +176,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             }        
             ?>
             
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" id="login-form">
+            <form id="login-form">
+                <div class="alert hidden" id="alert-container"></div>
+                
                 <div class="form-group">
                     <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" value="<?php echo $email; ?>" class="<?php echo (!empty($email_err)) ? 'error' : ''; ?>">
-                    <?php if (!empty($email_err)) { ?>
-                        <div class="error-message"><?php echo $email_err; ?></div>
-                    <?php } ?>
+                    <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
+                    <div class="error-message" id="email-error"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="senha" class="<?php echo (!empty($senha_err)) ? 'error' : ''; ?>">
-                    <?php if (!empty($senha_err)) { ?>
-                        <div class="error-message"><?php echo $senha_err; ?></div>
-                    <?php } ?>
+                    <input type="password" id="senha" name="senha" required>
+                    <div class="error-message" id="senha-error"></div>
                 </div>
                 
                 <div class="form-group">
@@ -195,7 +198,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     </label>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-full">Entrar</button>
+                <button type="submit" class="btn btn-primary w-full" id="login-btn">Entrar</button>
             </form>
             
             <p class="text-center mt-3">
@@ -243,5 +246,81 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <link rel="stylesheet" href="../assets/css/alerts.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            const alertContainer = document.getElementById('alert-container');
+            const loginBtn = document.getElementById('login-btn');
+            
+            function showAlert(message, type) {
+                alertContainer.textContent = message;
+                alertContainer.className = `alert ${type}`;
+                
+                // Scroll to alert
+                alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    alertContainer.className = 'alert hidden';
+                }, 5000);
+            }
+            
+            function clearFormErrors() {
+                document.getElementById('email-error').textContent = '';
+                document.getElementById('senha-error').textContent = '';
+            }
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    clearFormErrors();
+                    
+                    // Obter dados do formulário
+                    const formData = new FormData(loginForm);
+                    formData.set('senha', document.getElementById('senha').value);
+                    
+                    // Alterar estado do botão
+                    loginBtn.disabled = true;
+                    loginBtn.textContent = 'Entrando...';
+                    
+                    // Fazer requisição AJAX
+                    fetch('../backend/process_login.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Login bem-sucedido
+                            showAlert(data.message || 'Login realizado com sucesso!', 'success');
+                            
+                            // Salvar dados do usuário no localStorage
+                            if (data.user) {
+                                saveUserData(data.user);
+                            }
+                            
+                            // Redirecionar após um breve delay
+                            setTimeout(() => {
+                                window.location.href = data.redirect || 'index.html';
+                            }, 1000);
+                        } else {
+                            // Login falhou
+                            showAlert(data.message || 'Erro ao realizar login', 'error');
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = 'Entrar';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        showAlert('Erro ao conectar com o servidor', 'error');
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Entrar';
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
