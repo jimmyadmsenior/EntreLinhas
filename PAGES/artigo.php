@@ -2,10 +2,16 @@
 // Página de exibição de artigo
 session_start();
 
-// Incluir arquivo de configuração
+// Incluir arquivo de configuração e auxiliares
 require_once "../backend/config.php";
 require_once "../backend/artigos.php";
 require_once "../backend/comentarios.php";
+require_once "../backend/usuario_helper.php";
+
+// Obter a foto de perfil do usuário logado (se existir)
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+}
 
 // Verificar se o ID do artigo foi fornecido
 if(!isset($_GET["id"]) || empty($_GET["id"])){
@@ -269,29 +275,7 @@ mysqli_close($conn);
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <h1>EntreLinhas</h1>
-            <p>O jornal da SESI Salto</p>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="../index.php">Início</a></li>
-                <li><a href="escola.html">Nossa Escola</a></li>
-                <li><a href="conhecimentos.html">Conhecimentos</a></li>
-                <li><a href="conselho-classe.html">Conselho de Classe</a></li>
-                <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
-                    <li><a href="perfil.php">Meu Perfil</a></li>
-                    <li><a href="enviar-artigo.php">Enviar Artigo</a></li>
-                    <?php if(isAdmin($conn, $_SESSION["id"])): ?>
-                        <li><a href="admin.php">Administração</a></li>
-                    <?php endif; ?>
-                    <li><a href="logout.php">Sair</a></li>
-                <?php else: ?>
-                    <li><a href="login.php">Login</a></li>
-                    <li><a href="registro.php">Cadastre-se</a></li>
-                <?php endif; ?>
-            </ul>
+    <?php include 'includes/header.php'; ?>
         </nav>
     </header>
     
@@ -374,8 +358,6 @@ mysqli_close($conn);
         </div>
     </main>
     
-    <footer>
-        <p>&copy; <?php echo date("Y"); ?> EntreLinhas - O jornal da SESI Salto. Todos os direitos reservados.</p>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

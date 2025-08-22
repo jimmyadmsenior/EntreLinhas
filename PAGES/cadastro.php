@@ -137,32 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <a href="index.html">EntreLinhas</a>
-            </div>
-            
-            <ul class="nav-links">
-                <li><a href="index.html">Início</a></li>
-                <li><a href="artigos.html">Artigos</a></li>
-                <li><a href="sobre.html">Sobre</a></li>
-                <li><a href="escola.html">A Escola</a></li>
-                <li><a href="contato.html">Contato</a></li>
-            </ul>
-            
-            <div class="nav-buttons">
-                <a href="login.php" class="btn btn-secondary">Entrar</a>
-                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </nav>
-    </header>
+    <?php include 'includes/header.php'; ?>
 
     <!-- Main Content -->
     <main class="container">
@@ -254,5 +229,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
+    
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
