@@ -6,8 +6,10 @@
  * e precisa acessar páginas que usam autenticação via sessões do PHP.
  */
 
-// Iniciar ou retomar a sessão
-session_start();
+// Iniciar ou retomar a sessão apenas se ainda não estiver ativa
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Verificar se há dados de login no localStorage (através de cookies ou parâmetros)
 $forceLogin = isset($_GET['diretamente']) && $_GET['diretamente'] === 'true';

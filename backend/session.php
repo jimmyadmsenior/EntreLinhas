@@ -1,22 +1,15 @@
 <?php
 // Este arquivo será incluído em todas as páginas para gerenciar sessões
+// Agora usa o session_helper.php para garantir consistência
 
-// Iniciar a sessão se ainda não estiver iniciada
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// Incluir o helper de sessão
+require_once dirname(__FILE__) . "/session_helper.php";
 
 // Incluir arquivo de sincronização entre localStorage e sessões PHP
 require_once dirname(__FILE__) . "/sync_login.php";
 
-// Funções de gerenciamento de sessão
-function is_logged_in() {
-    return isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
-}
-
-function is_admin() {
-    return is_logged_in() && isset($_SESSION["tipo"]) && $_SESSION["tipo"] === "admin";
-}
+// Nota: As funções is_logged_in, is_admin, require_login e require_admin
+// agora são fornecidas pelo session_helper.php
 
 function get_user_name() {
     return $_SESSION["nome"] ?? "";
