@@ -16,7 +16,11 @@ $root_path = isset($root_path) ? $root_path : "..";
         <div class="footer-section">
             <h3>Links Rápidos</h3>
             <ul class="footer-links">
+<<<<<<< Updated upstream
                 <li><a href="../index.php">Início</a></li>
+=======
+                <li><a href="index.php">Início</a></li>
+>>>>>>> Stashed changes
                 <li><a href="artigos.php">Artigos</a></li>
                 <li><a href="sobre.php">Sobre</a></li>
                 <li><a href="escola.php">A Escola</a></li>

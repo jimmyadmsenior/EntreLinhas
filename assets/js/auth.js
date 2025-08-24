@@ -3,6 +3,17 @@
  * Gerencia o estado de autenticação do usuário em todas as páginas
  */
 
+// Função para fazer logout
+function logout() {
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userType');
+    
+    // Redirecionar para a página inicial
+    window.location.href = 'index.html';
+}
+
 // Função para verificar se o usuário está logado
 function checkUserAuth() {
     const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
@@ -47,11 +58,19 @@ function updateNavigation() {
                 <i class="fas fa-user"></i> ${auth.userName} <i class="fas fa-chevron-down"></i>
             </div>
             <div class="dropdown-menu">
+<<<<<<< Updated upstream
                 <a href="perfil.php"><i class="fas fa-id-card"></i> Meu Perfil</a>
                 <a href="meus-artigos.php"><i class="fas fa-newspaper"></i> Meus Artigos</a>
                 <a href="enviar-artigo.php"><i class="fas fa-edit"></i> Enviar Artigo</a>
                 ${auth.isAdmin ? '<a href="admin_dashboard.php"><i class="fas fa-cogs"></i> Painel de Admin</a>' : ''}
                 <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a>
+=======
+                <a href="perfil.html">Meu Perfil</a>
+                <a href="meus-artigos.html">Meus Artigos</a>
+                <a href="enviar-artigo.html">Enviar Artigo</a>
+                ${auth.isAdmin ? '<a href="admin.html">Painel de Admin</a>' : ''}
+                <a href="javascript:void(0)" onclick="logout()">Sair</a>
+>>>>>>> Stashed changes
             </div>
         `;
         

@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $response['message'] = "Por favor, insira sua senha.";
     } else {
         // Consultar o banco de dados
-        $sql = "SELECT id, nome, email, senha, tipo, status FROM usuarios WHERE email = ?";
+        $sql = "SELECT id, nome, email, senha, tipo, ativo FROM usuarios WHERE email = ?";
         
         if ($stmt = mysqli_prepare($conn, $sql)) {
             // Vincular o parâmetro email
@@ -43,14 +43,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 // Verificar se o usuário existe
                 if (mysqli_stmt_num_rows($stmt) === 1) {
                     // Vincular as variáveis de resultado
-                    mysqli_stmt_bind_result($stmt, $id, $nome, $email_db, $hashed_password, $tipo, $status);
+                    mysqli_stmt_bind_result($stmt, $id, $nome, $email_db, $hashed_password, $tipo, $ativo);
                     
                     // Obter os resultados
                     if (mysqli_stmt_fetch($stmt)) {
                         // Verificar a senha
                         if (password_verify($senha, $hashed_password)) {
                             // Verificar o status da conta
-                            if ($status === 'ativo') {
+                            if ($ativo) {
                                 // Criar a sessão
                                 $_SESSION["loggedin"] = true;
                                 $_SESSION["id"] = $id;
@@ -74,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $response['success'] = true;
                                 $response['message'] = "Login bem-sucedido!";
                                 $response['user_type'] = $tipo;
+                                $response['user_name'] = $nome;
                                 
                                 // Definir o redirecionamento com base no tipo de usuário
                                 if ($tipo === 'admin') {
