@@ -1,0 +1,18 @@
+<!-- Este arquivo deve ser incluído em todas as páginas HTML -->
+
+<script>
+// Este script detecta se a página atual é HTML e redireciona para a versão PHP
+(function() {
+    // Verificar se estamos em uma página HTML
+    var path = window.location.pathname.toLowerCase();
+    if (path.endsWith('.html')) {
+        // Substituir .html por .php
+        var newPath = path.replace(/\.html$/, '.php');
+        // Preservar parâmetros de consulta e hash
+        var queryString = window.location.search || '';
+        var hash = window.location.hash || '';
+        // Redirecionar
+        window.location.replace(newPath + queryString + hash);
+    }
+})();
+</script>

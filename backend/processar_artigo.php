@@ -11,6 +11,7 @@ if (!isset($_SESSION['id'])) {
 // Incluir arquivos necessários
 require_once '../backend/config.php';
 require_once '../backend/artigos.php';
+require_once '../backend/email_notification.php';
 
 // Verificar o tipo de ação (enviar ou editar)
 $acao = isset($_POST['acao']) ? $_POST['acao'] : 'enviar';
@@ -34,6 +35,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $resultado = enviarArtigo($conn, $artigo, $imagens);
         
         if ($resultado['status']) {
+            // Obter nome do autor para o e-mail
+            $autor_nome = $_SESSION['nome'];
+            
+            // Enviar notificação por e-mail para os administradores
+            $artigo['id'] = $resultado['artigo_id'];
+            notificar_admins_novo_artigo($artigo, $autor_nome);
+            
             // Redirecionar para página de sucesso
             $_SESSION['mensagem'] = $resultado['mensagem'];
             $_SESSION['tipo_mensagem'] = 'success';

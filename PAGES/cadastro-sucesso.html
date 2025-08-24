@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/user-menu.css">
 </head>
 <body>
     <!-- Header -->
@@ -33,7 +34,7 @@
             </ul>
             
             <div class="nav-buttons">
-                <a href="login.php" class="btn btn-secondary">Entrar</a>
+                <a href="login.html" class="btn btn-secondary">Entrar</a>
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -53,7 +54,7 @@
             <p>Seu cadastro foi realizado com sucesso. Agora você já pode fazer login e começar a compartilhar seus artigos.</p>
             
             <div class="mt-4">
-                <a href="login.php" class="btn btn-primary">Fazer Login</a>
+                <a href="login.html" class="btn btn-primary">Fazer Login</a>
                 <a href="index.html" class="btn btn-secondary mt-2">Voltar para o Início</a>
             </div>
         </div>
@@ -94,5 +95,27 @@
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header-nav.js"></script>
+    
+    <script>
+    // Verificar se o usuário está logado e atualizar o conteúdo da página
+    document.addEventListener('DOMContentLoaded', function() {
+        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        const userName = localStorage.getItem('userName');
+        
+        // Se o usuário estiver logado, mostrar uma mensagem diferente
+        if (isLoggedIn && userName) {
+            document.querySelector('.form-container p').textContent = 
+                `Bem-vindo, ${userName}! Seu cadastro foi realizado com sucesso e você já está logado. Agora você pode compartilhar seus artigos.`;
+            
+            // Alterar os botões
+            const buttonContainer = document.querySelector('.form-container .mt-4');
+            buttonContainer.innerHTML = `
+                <a href="enviar-artigo.html" class="btn btn-primary">Enviar um Artigo</a>
+                <a href="index.html" class="btn btn-secondary mt-2">Voltar para o Início</a>
+            `;
+        }
+    });
+    </script>
 </body>
 </html>

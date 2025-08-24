@@ -2,6 +2,9 @@
 // Iniciar sessão
 session_start();
 
+// Incluir arquivo de sincronização entre localStorage e sessões PHP
+require_once "../backend/sync_login.php";
+
 // Verificar se o usuário está logado, senão redirecionar para a página de login
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
@@ -228,6 +231,10 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
     $root_path = "..";
     include 'includes/footer.php'; 
     ?>
+    
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/user-menu.js"></script>
+    <script src="../assets/js/header-nav.js"></script>
 </body>
 </html>
 
