@@ -101,7 +101,54 @@ document.addEventListener("DOMContentLoaded", () => {
                     successDiv.className = "alert alert-success";
                     loginForm.prepend(successDiv);
                 }
+<<<<<<< Updated upstream
                 successDiv.textContent = data.message || "Login bem-sucedido! Redirecionando...";
+=======
+                return response.json(); // Now expecting JSON response
+            })
+            .then(data => {
+                // Check if login was successful
+                if (data.success) {
+                    // Show success message briefly
+                    let successDiv = document.getElementById('login-success');
+                    if (!successDiv) {
+                        successDiv = document.createElement('div');
+                        successDiv.id = 'login-success';
+                        successDiv.className = 'alert alert-success';
+                        loginForm.prepend(successDiv);
+                    }
+                    successDiv.textContent = 'Login bem-sucedido! Redirecionando...';
+                    
+                    // Salvar os dados do usuário no localStorage
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('userType', data.user_type);
+                    localStorage.setItem('userName', data.user_name || email.split('@')[0]);
+                    
+                    // Redirect based on user type
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1000);
+                } else {
+                    // Show error message
+                    let errorDiv = document.getElementById('login-error');
+                    if (!errorDiv) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.id = 'login-error';
+                        errorDiv.className = 'alert alert-danger';
+                        loginForm.prepend(errorDiv);
+                    }
+                    
+                    errorDiv.textContent = data.message;
+                    
+                    // Reset button
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+>>>>>>> Stashed changes
                 
                 try {
                     // Salvar dados do usuário no localStorage como backup

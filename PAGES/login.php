@@ -4,7 +4,7 @@ session_start();
 
 // Se o usuário já estiver logado, redirecione para a página principal
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: index.html");
+    header("location: index.php");
     exit;
 }
 

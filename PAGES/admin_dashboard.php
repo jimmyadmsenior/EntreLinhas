@@ -40,11 +40,7 @@ if ($row = mysqli_fetch_assoc($result)) {
 
 // Artigos recentes
 $artigos_recentes = [];
-<<<<<<< Updated upstream
-$result = mysqli_query($conn, "SELECT a.id, a.titulo, LEFT(a.conteudo, 150) as resumo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
-=======
 $result = mysqli_query($conn, "SELECT a.id, a.titulo, a.conteudo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
->>>>>>> Stashed changes
 while ($row = mysqli_fetch_assoc($result)) {
     // Criar um resumo do conteúdo (primeiros 100 caracteres)
     $row['resumo'] = mb_substr(strip_tags($row['conteudo']), 0, 100) . '...';
