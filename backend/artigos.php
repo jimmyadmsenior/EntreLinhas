@@ -77,9 +77,6 @@ function enviarArtigo($conn, $artigo, $imagens = null) {
                 
                 $resultado['status'] = true;
                 $resultado['mensagem'] = "Artigo enviado com sucesso! Aguarde a aprovação.";
-                
-                // Enviar notificação por email para o administrador
-                enviarNotificacaoNovoArtigo($conn, $resultado['artigo_id']);
             } else {
                 // Reverter em caso de erro
                 mysqli_rollback($conn);

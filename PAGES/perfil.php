@@ -2,6 +2,9 @@
 // Iniciar sessão
 session_start();
 
+// Incluir arquivo de sincronização entre localStorage e sessões PHP
+require_once "../backend/auth-bridge.php";
+
 // Verificar se o usuário está logado, senão redirecionar para a página de login
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
@@ -258,15 +261,10 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
             border-color: #c3e6cb;
         }
     </style>
+    <script src="../assets/js/user-menu.js" defer></script>
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </nav>
-    </header>
 
     <!-- Main Content -->
     <main class="container">

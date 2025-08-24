@@ -40,18 +40,18 @@ function updateNavigation() {
         
         // Criar o dropdown do usuário
         const dropdown = document.createElement('div');
-        dropdown.className = 'dropdown';
+        dropdown.className = 'user-menu';
         
         dropdown.innerHTML = `
-            <button class="btn btn-secondary dropdown-toggle">
-                <i class="fas fa-user"></i> ${auth.userName}
-            </button>
+            <div class="user-name">
+                <i class="fas fa-user"></i> ${auth.userName} <i class="fas fa-chevron-down"></i>
+            </div>
             <div class="dropdown-menu">
-                <a href="perfil.php">Meu Perfil</a>
-                <a href="meus-artigos.php">Meus Artigos</a>
-                <a href="enviar-artigo.php">Enviar Artigo</a>
-                ${auth.isAdmin ? '<a href="admin.php">Painel de Admin</a>' : ''}
-                <a href="../backend/logout.php">Sair</a>
+                <a href="perfil.php"><i class="fas fa-id-card"></i> Meu Perfil</a>
+                <a href="meus-artigos.php"><i class="fas fa-newspaper"></i> Meus Artigos</a>
+                <a href="enviar-artigo.php"><i class="fas fa-edit"></i> Enviar Artigo</a>
+                ${auth.isAdmin ? '<a href="admin_dashboard.php"><i class="fas fa-cogs"></i> Painel de Admin</a>' : ''}
+                <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a>
             </div>
         `;
         
@@ -61,6 +61,8 @@ function updateNavigation() {
         } else {
             navButtons.prepend(dropdown);
         }
+        
+        // O setupUserMenuEvents será chamado do script user-menu.js
         
     } else {
         // Limpar conteúdo existente exceto theme toggle e mobile menu
@@ -77,7 +79,7 @@ function updateNavigation() {
         loginBtn.textContent = 'Entrar';
         
         const registerBtn = document.createElement('a');
-        registerBtn.href = 'cadastro.html';
+        registerBtn.href = 'cadastro.php';
         registerBtn.className = 'btn btn-primary';
         registerBtn.textContent = 'Cadastrar';
         
@@ -116,12 +118,22 @@ function clearUserData() {
     updateNavigation();
 }
 
+// A função setupUserMenuEvents foi movida para user-menu.js
+
 // Inicializar ao carregar a página
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("auth.js carregado - atualizando navegação");
     updateNavigation();
     
-    // Detectar logout.php e limpar dados do usuário
-    if (window.location.pathname.includes('logout.php')) {
+    // setupUserMenuEvents agora é chamado do user-menu.js
+    
+    // Função para fazer logout
+    window.logout = function() {
+        console.log('Executando logout');
+        // Usar a função de limpeza de dados para evitar duplicação de código
         clearUserData();
+        console.log('Dados do usuário removidos');
+        alert('Você foi desconectado com sucesso!');
+        window.location.href = 'index.php';
     }
 });

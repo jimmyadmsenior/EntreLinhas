@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/user-menu.css">
 </head>
 <body>
     <!-- Header -->
@@ -62,8 +63,8 @@
             </div>
             
             <div class="mt-4">
-                <a href="meus-artigos.php" class="btn btn-primary">Meus Artigos</a>
-                <a href="enviar-artigo.php" class="btn btn-secondary mt-2">Enviar Outro Artigo</a>
+                <a href="meus-artigos.html" class="btn btn-primary">Meus Artigos</a>
+                <a href="enviar-artigo.html" class="btn btn-secondary mt-2">Enviar Outro Artigo</a>
                 <a href="index.html" class="btn btn-outline mt-2">Voltar para o Início</a>
             </div>
         </div>
@@ -104,44 +105,6 @@
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
-    <script>
-        // Verificar se o usuário está logado
-        document.addEventListener('DOMContentLoaded', function() {
-            const userSection = document.getElementById('nav-user-section');
-            
-            // Tentar obter dados do usuário do localStorage
-            const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-            const userName = localStorage.getItem('userName');
-            
-            if (userLoggedIn && userName) {
-                // Usuário está logado
-                const dropdownHTML = `
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle">
-                            <i class="fas fa-user"></i> ${userName}
-                        </button>
-                        <div class="dropdown-menu">
-                            <a href="perfil.php">Meu Perfil</a>
-                            <a href="meus-artigos.php">Meus Artigos</a>
-                            <a href="enviar-artigo.php">Enviar Artigo</a>
-                            <a href="../backend/logout.php">Sair</a>
-                        </div>
-                    </div>
-                `;
-                
-                // Inserir o dropdown antes dos botões de tema e menu
-                userSection.innerHTML = dropdownHTML + userSection.innerHTML;
-            } else {
-                // Usuário não está logado
-                const loginHTML = `
-                    <a href="login.php" class="btn btn-secondary">Entrar</a>
-                    <a href="cadastro.html" class="btn btn-primary">Cadastrar</a>
-                `;
-                
-                // Inserir os botões de login antes dos botões de tema e menu
-                userSection.innerHTML = loginHTML + userSection.innerHTML;
-            }
-        });
-    </script>
+    <script src="../assets/js/header-nav.js"></script>
 </body>
 </html>

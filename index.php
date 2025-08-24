@@ -1,5 +1,5 @@
 <?php
 // Redirecionar para a página principal
-header("Location: PAGES/index.html");
+header("Location: PAGES/index.php");
 exit;
 ?>

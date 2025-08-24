@@ -6,6 +6,9 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Incluir arquivo de sincronização entre localStorage e sessões PHP
+require_once dirname(__FILE__) . "/sync_login.php";
+
 // Funções de gerenciamento de sessão
 function is_logged_in() {
     return isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;

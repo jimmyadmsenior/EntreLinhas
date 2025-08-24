@@ -1,0 +1,3 @@
+# Configuração mínima
+RewriteEngine On
+Options -Indexes

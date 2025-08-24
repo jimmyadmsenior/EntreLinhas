@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Garantido - EntreLinhas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .debug-box { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; margin-top: 20px; }
+        .hidden { display: none; }
+        .w-full { width: 100%; }
+        .mt-3 { margin-top: 15px; }
+        .text-center { text-align: center; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html">EntreLinhas</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="artigos.html">Artigos</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="escola.html">A Escola</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-secondary active">Entrar</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="form-container fade-in">
+            <h1 class="form-title">Entrar no EntreLinhas</h1>
+            
+            <div id="alert-message" class="alert hidden"></div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="senha" required>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span>Lembrar de mim</span>
+                    </label>
+                </div>
+                
+                <button type="submit" id="login-btn" class="btn btn-primary w-full">Entrar</button>
+            </form>
+            
+            <p class="text-center mt-3">
+                <a href="esqueci-senha.html">Esqueceu a senha?</a>
+            </p>
+            
+            <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">
+            
+            <p class="text-center">
+                Ainda não tem uma conta? <a href="cadastro.html">Cadastre-se</a>
+            </p>
+            
+            <div class="debug-box hidden" id="debug-panel">
+                <h3>Painel de Debug</h3>
+                <div id="debug-content"></div>
+                <button id="clear-login" class="btn btn-secondary mt-3">Limpar Login</button>
+            </div>
+            <button id="toggle-debug" class="btn btn-secondary mt-3">Mostrar Debug</button>
+        </div>
+    </main>
+
+    <script>
+    // Script de login autocontido
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Página de login carregada");
+        
+        // Elementos da página
+        const loginForm = document.getElementById('login-form');
+        const alertMessage = document.getElementById('alert-message');
+        const debugPanel = document.getElementById('debug-panel');
+        const debugContent = document.getElementById('debug-content');
+        const toggleDebugBtn = document.getElementById('toggle-debug');
+        const clearLoginBtn = document.getElementById('clear-login');
+        
+        // Botão de debug
+        toggleDebugBtn.addEventListener('click', function() {
+            debugPanel.classList.toggle('hidden');
+            this.textContent = debugPanel.classList.contains('hidden') ? 
+                'Mostrar Debug' : 'Esconder Debug';
+            updateDebugInfo();
+        });
+        
+        // Botão de limpar login
+        clearLoginBtn.addEventListener('click', function() {
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('userId');
+            showAlert('Dados de login removidos com sucesso!', 'success');
+            updateDebugInfo();
+        });
+        
+        // Função para mostrar alertas
+        function showAlert(message, type) {
+            alertMessage.textContent = message;
+            alertMessage.className = `alert alert-${type}`;
+            alertMessage.classList.remove('hidden');
+            setTimeout(() => {
+                alertMessage.classList.add('hidden');
+            }, 5000);
+        }
+        
+        // Função para atualizar informações de debug
+        function updateDebugInfo() {
+            let debugInfo = '<strong>LocalStorage:</strong><br>';
+            
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    debugInfo += `${key}: ${localStorage.getItem(key)}<br>`;
+                }
+            } catch (e) {
+                debugInfo += 'Erro ao acessar localStorage: ' + e.message;
+            }
+            
+            debugContent.innerHTML = debugInfo;
+        }
+        
+        // Verificar parâmetros de URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceLogout = urlParams.get('logout');
+        
+        if (forceLogout === 'true') {
+            // Forçar logout
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('userId');
+            showAlert('Você foi desconectado com sucesso!', 'success');
+        }
+        
+        // Verificar se já está logado
+        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        if (isLoggedIn && forceLogout !== 'true') {
+            showAlert('Você já está logado! Redirecionando...', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+        
+        // Usuários de demonstração
+        const demoUsers = [
+            { 
+                email: 'admin@exemplo.com', 
+                senha: 'admin123', 
+                nome: 'Administrador',
+                tipo: 'admin',
+                id: '1'
+            },
+            { 
+                email: 'usuario@exemplo.com', 
+                senha: 'usuario123', 
+                nome: 'Usuário Teste',
+                tipo: 'usuario',
+                id: '2'
+            }
+        ];
+        
+        // Processar submissão do formulário
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Formulário de login enviado");
+            
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            
+            console.log("Email fornecido:", email);
+            
+            // Alterar estado do botão
+            const loginBtn = document.getElementById('login-btn');
+            const originalText = loginBtn.textContent;
+            loginBtn.textContent = 'Entrando...';
+            loginBtn.disabled = true;
+            
+            // Verificar login após breve delay (simula processamento)
+            setTimeout(() => {
+                // Combinar usuários demo com registrados
+                const registeredUsers = JSON.parse(localStorage.getItem('users') || '[]');
+                const allUsers = [...demoUsers, ...registeredUsers];
+                
+                // Verificar credenciais
+                const user = allUsers.find(u => u.email === email && u.senha === password);
+                
+                if (user) {
+                    // Login bem-sucedido
+                    showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+                    
+                    // Salvar dados do usuário
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userName', user.nome);
+                    localStorage.setItem('userEmail', user.email);
+                    localStorage.setItem('userType', user.tipo);
+                    localStorage.setItem('userId', user.id);
+                    
+                    updateDebugInfo();
+                    
+                    // Redirecionar para página inicial
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    // Login falhou
+                    showAlert('Email ou senha incorretos. Por favor, tente novamente.', 'danger');
+                    loginBtn.textContent = originalText;
+                    loginBtn.disabled = false;
+                }
+            }, 500);
+        });
+        
+        // Inicializar informações de debug
+        updateDebugInfo();
+    });
+    </script>
+</body>
+</html>

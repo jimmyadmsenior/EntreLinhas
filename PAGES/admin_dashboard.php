@@ -40,7 +40,7 @@ if ($row = mysqli_fetch_assoc($result)) {
 
 // Artigos recentes
 $artigos_recentes = [];
-$result = mysqli_query($conn, "SELECT a.id, a.titulo, a.resumo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.usuario_id = u.id ORDER BY a.data_criacao DESC LIMIT 5");
+$result = mysqli_query($conn, "SELECT a.id, a.titulo, LEFT(a.conteudo, 150) as resumo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
 while ($row = mysqli_fetch_assoc($result)) {
     $artigos_recentes[] = $row;
 }

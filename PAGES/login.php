@@ -66,11 +66,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["email"] = $email;
                             $_SESSION["tipo"] = $tipo;
                             
+                            // Definir cookies para JavaScript localStorage
+                            setcookie("userLoggedIn", "true", time() + 86400, "/");
+                            setcookie("userName", $nome, time() + 86400, "/");
+                            setcookie("userEmail", $email, time() + 86400, "/");
+                            setcookie("userType", $tipo, time() + 86400, "/");
+                            setcookie("userId", $id, time() + 86400, "/");
+                            
                             // Redirecionar usuário com base no tipo de conta
                             if ($tipo === "admin") {
                                 header("location: admin_dashboard.php");
                             } else {
-                                header("location: index.html");
+                                header("location: ../index.php");
                             }
                         } else{
                             // Senha não é válida, exibir mensagem de erro genérica

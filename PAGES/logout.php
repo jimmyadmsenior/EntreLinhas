@@ -16,6 +16,25 @@ if (ini_get("session.use_cookies")) {
  
 // Destruir a sessão
 session_destroy();
+
+// Limpar cookies de autenticação
+setcookie("userLoggedIn", "", time() - 3600, "/");
+setcookie("userName", "", time() - 3600, "/");
+setcookie("userEmail", "", time() - 3600, "/");
+setcookie("userType", "", time() - 3600, "/");
+setcookie("userId", "", time() - 3600, "/");
+setcookie("php_auth", "", time() - 3600, "/");
+
+// Adicionar script para limpar localStorage também
+echo "<script>
+    if (window.localStorage) {
+        localStorage.removeItem('userLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userId');
+    }
+</script>";
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -23,7 +42,7 @@ session_destroy();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saindo... - EntreLinhas</title>
-    <meta http-equiv="refresh" content="2;url=index.html">
+    <meta http-equiv="refresh" content="2;url=../index.php">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body {

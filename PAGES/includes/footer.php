@@ -16,11 +16,11 @@ $root_path = isset($root_path) ? $root_path : "..";
         <div class="footer-section">
             <h3>Links Rápidos</h3>
             <ul class="footer-links">
-                <li><a href="index.html">Início</a></li>
-                <li><a href="artigos.html">Artigos</a></li>
-                <li><a href="sobre.html">Sobre</a></li>
-                <li><a href="escola.html">A Escola</a></li>
-                <li><a href="contato.html">Contato</a></li>
+                <li><a href="../index.php">Início</a></li>
+                <li><a href="artigos.php">Artigos</a></li>
+                <li><a href="sobre.php">Sobre</a></li>
+                <li><a href="escola.php">A Escola</a></li>
+                <li><a href="contato.php">Contato</a></li>
             </ul>
         </div>
         
@@ -40,3 +40,4 @@ $root_path = isset($root_path) ? $root_path : "..";
 
 <!-- JavaScript -->
 <script src="<?php echo $root_path; ?>/assets/js/main.js"></script>
+<script src="<?php echo $root_path; ?>/assets/js/header-nav.js"></script>

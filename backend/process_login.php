@@ -58,6 +58,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $_SESSION["email"] = $email_db;
                                 $_SESSION["tipo"] = $tipo;
                                 
+                                // Definir cookies para integração com JavaScript
+                                // Não usar URL encoding para evitar problemas de exibição
+                                setcookie("userLoggedIn", "true", time() + 86400, "/");
+                                setcookie("userName", $nome, time() + 86400, "/", "", false, false);
+                                setcookie("userEmail", $email_db, time() + 86400, "/");
+                                setcookie("userType", $tipo, time() + 86400, "/");
+                                setcookie("userId", $id, time() + 86400, "/");
+                                setcookie("php_auth", "true", time() + 86400, "/");
+                                
+                                // Registrar log de login bem-sucedido
+                                error_log("Login bem-sucedido: $nome ($email_db) - Tipo: $tipo");
+                                
                                 // Configurar a resposta
                                 $response['success'] = true;
                                 $response['message'] = "Login bem-sucedido!";

@@ -10,11 +10,11 @@
     margin-right: 1rem;
 }
 
-.user-menu:hover {
+.user-menu:hover, .user-menu.active {
     background-color: rgba(0,0,0,0.05);
 }
 
-.dark-mode .user-menu:hover {
+.dark-mode .user-menu:hover, .dark-mode .user-menu.active {
     background-color: rgba(255,255,255,0.1);
 }
 
@@ -28,6 +28,26 @@
 .user-name i {
     font-size: 0.75rem;
     transition: transform 0.2s ease;
+}
+
+/* Estilo para o avatar do usuário no menu */
+.avatar-container {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    max-width: 24px; /* Garantir que não exceda o tamanho */
+    max-height: 24px; /* Garantir que não exceda o tamanho */
 }
 
 .user-menu.active .user-name i {
