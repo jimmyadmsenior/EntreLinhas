@@ -1,5 +1,5 @@
 /**
- * Script para sincronizar cookies com localStorage
+ * Script para gerenciar autenticação com localStorage
  * Este script é importante para manter o estado de autenticação consistente
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -7,24 +7,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.toLowerCase().includes('login.php') || 
         window.location.pathname.toLowerCase().includes('cadastro.php') ||
         window.location.pathname.toLowerCase().includes('registro.php')) {
-        console.log('Página de autenticação detectada, desativando sincronização de cookies');
+        console.log('Página de autenticação detectada, desativando sincronização de autenticação');
         return; // Sai completamente da função
     }
     
-    // Função para obter valor de cookie por nome
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
-        return null;
-    }
-    
-    // Verificar se os cookies de login estão definidos
-    const userLoggedIn = getCookie('userLoggedIn');
-    const userName = getCookie('userName');
-    const userEmail = getCookie('userEmail');
-    const userType = getCookie('userType');
-    const userId = getCookie('userId');
+    // Verificar se os dados de login estão no localStorage
+    const userLoggedIn = localStorage.getItem('userLoggedIn');
+    const userName = localStorage.getItem('userName');
+    const userEmail = localStorage.getItem('userEmail');
+    const userType = localStorage.getItem('userType');
+    const userId = localStorage.getItem('userId');
     
     console.log('Verificando cookies de autenticação:');
     console.log('- userLoggedIn:', userLoggedIn);
@@ -35,15 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Cookies indicam que o usuário está logado. Sincronizando com localStorage...');
         
         // Atualizar localStorage
-        localStorage.setItem('userLoggedIn', 'true');
-        localStorage.setItem('userName', userName);
-        localStorage.setItem('userEmail', userEmail || '');
-        localStorage.setItem('userType', userType || '');
-        localStorage.setItem('userId', userId || '');
-        
-        console.log('localStorage atualizado com dados dos cookies.');
+        // Os dados já estão no localStorage a partir do header.php
+        console.log('Usando dados do localStorage para autenticação.');
     } 
-    // Se os cookies não estão definidos, mas localStorage indica login
+    // Se o localStorage não tem dados de login mas a sessão PHP indica que há um login,
+    // o localStorage pode ter sido limpo pelo usuário
     else {
         const lsLoggedIn = localStorage.getItem('userLoggedIn');
         const lsUserName = localStorage.getItem('userName');
@@ -52,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('- userLoggedIn:', lsLoggedIn);
         console.log('- userName:', lsUserName);
         
-        if (lsLoggedIn === 'true' && lsUserName && !userLoggedIn) {
+        if (lsLoggedIn !== 'true' && userLoggedIn === 'true') {
             console.log('localStorage indica login mas cookies não. Possível problema de sessão.');
             
             // Se estamos em uma página .html, redirecionar para login, 

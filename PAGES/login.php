@@ -269,7 +269,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     loginBtn.textContent = 'Entrando...';
                     
                     // Fazer requisição AJAX
-                    fetch('../backend/process_login.php', {
+                    fetch('../backend/login_debug.php', {
                         method: 'POST',
                         body: formData
                     })

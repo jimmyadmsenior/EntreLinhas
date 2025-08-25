@@ -68,7 +68,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["comentario"]) && isset(
             'conteudo' => $conteudo
         ];
         
-        $resultado = adicionarComentario($conn, $comentario);
+        // Desabilitado: $resultado = adicionarComentario($conn, $comentario);
+        $resultado['status'] = false;
         
         if($resultado['status']){
             // Comentário adicionado com sucesso
@@ -85,8 +86,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["comentario"]) && isset(
 // Formatar a data
 $data_formatada = date('d/m/Y', strtotime($artigo['data_criacao']));
 
-// Fechar conexão
-mysqli_close($conn);
+// Não fechar a conexão aqui, ela será usada no header.php
+// A conexão será fechada no final do arquivo
 ?>
 
 <!DOCTYPE html>
@@ -96,6 +97,135 @@ mysqli_close($conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($artigo['titulo']); ?> - EntreLinhas</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/dark-mode-fix.js" defer></script>
+    <script src="../assets/js/no-comments-fix.js" defer></script>
+    <style>
+        /* Estilos críticos para garantir visibilidade em modo escuro */
+        .dark-mode .article-header,
+        .dark-mode .article-content,
+        .dark-mode .comments-section {
+            background-color: #1e1e1e !important;
+            color: #ffffff !important;
+        }
+        
+        /* Garantir que todo o conteúdo seja visível no modo escuro */
+        .dark-mode .article-content * {
+            color: #ffffff !important;
+        }
+        
+        .dark-mode .article-content a {
+            color: #add8e6 !important;
+        }
+        
+        /* Estilos para os comentários */
+        .dark-mode .comment-header,
+        .dark-mode .comment-content,
+        .dark-mode .comments-title {
+            color: #ffffff !important;
+        }
+        
+        /* Status do artigo */
+        .dark-mode .article-title {
+            color: #ffffff !important;
+        }
+        
+        /* Estilos específicos para a seção de nenhum comentário */
+        .dark-mode .no-comments {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #444 !important;
+        }
+        
+        .dark-mode .no-comments p {
+            color: #ffffff !important;
+        }
+        
+        /* Campo de texto para comentário */
+        .dark-mode .comment-form textarea {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border-color: #444 !important;
+        }
+        
+        /* Botão de enviar comentário */
+        .dark-mode .btn-primary {
+            background-color: #444 !important;
+            color: #ffffff !important;
+        }
+        
+        .dark-mode .btn-primary:hover {
+            background-color: #666 !important;
+        }
+    </style>
+    
+    <!-- CSS Inline crítico para garantir visibilidade imediata no modo escuro -->
+    <script>
+        // Verificar se o modo escuro está ativo imediatamente
+        if (localStorage.getItem('theme') === 'dark' || 
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+            localStorage.getItem('theme') !== 'light')) {
+            
+            // Criar e injetar estilo inline crítico
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .article-header, .article-content, .comments-section {
+                    background-color: #1e1e1e !important;
+                    color: #ffffff !important;
+                }
+                .article-content * {
+                    color: #ffffff !important;
+                }
+                .article-content a {
+                    color: #add8e6 !important;
+                }
+                .article-title, .comments-title, .comment-author, .comment-content {
+                    color: #ffffff !important;
+                }
+                /* Estilo específico para área de "Nenhum comentário ainda" */
+                .no-comments {
+                    background-color: #2d2d2d !important;
+                    color: #ffffff !important;
+                }
+                .no-comments p {
+                    color: #ffffff !important;
+                }
+                /* Campo de texto e botão */
+                .comment-form textarea {
+                    background-color: #2d2d2d !important;
+                    color: #ffffff !important;
+                    border-color: #444 !important;
+                }
+                .btn-primary {
+                    background-color: #444 !important;
+                    color: #ffffff !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Função para aplicar estilos assim que os elementos estiverem disponíveis
+            function ensureNoCommentsVisibility() {
+                // Tentar selecionar o elemento .no-comments
+                const noComments = document.querySelector('.no-comments');
+                if (noComments) {
+                    // Aplicar estilos diretamente
+                    noComments.style.backgroundColor = '#2d2d2d';
+                    noComments.style.color = '#ffffff';
+                    
+                    // Para todos os elementos dentro de .no-comments
+                    const childElements = noComments.querySelectorAll('*');
+                    childElements.forEach(function(el) {
+                        el.style.color = '#ffffff';
+                    });
+                }
+            }
+            
+            // Executar imediatamente
+            ensureNoCommentsVisibility();
+            
+            // E também após um pequeno atraso para garantir que o DOM esteja carregado
+            setTimeout(ensureNoCommentsVisibility, 100);
+        }
+    </script>
     <style>
         .container {
             max-width: 800px;
@@ -103,17 +233,20 @@ mysqli_close($conn);
         }
         
         .article-header {
-            background: white;
+            background: var(--card-bg-light);
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-light);
             padding: 20px;
             margin-bottom: 20px;
+            transition: background-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed);
         }
         
         .article-title {
             font-size: 32px;
             margin-top: 0;
             margin-bottom: 15px;
+            color: var(--primary);
+            transition: color var(--transition-speed);
         }
         
         .article-meta {
@@ -123,7 +256,8 @@ mysqli_close($conn);
             font-size: 14px;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-light);
+            transition: color var(--transition-speed), border-color var(--transition-speed);
         }
         
         .article-image {
@@ -135,23 +269,32 @@ mysqli_close($conn);
         }
         
         .article-content {
-            background: white;
+            background: var(--card-bg-light);
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-light);
             padding: 20px;
             line-height: 1.6;
             margin-bottom: 20px;
+            transition: background-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        
+        body.dark-mode .article-content {
+            background: var(--card-bg-dark);
+            color: var(--text-light);
+            box-shadow: var(--shadow-dark);
         }
         
         .article-content p {
             margin-bottom: 15px;
+            transition: color var(--transition-speed);
         }
         
         .comments-section {
-            background: white;
+            background: var(--card-bg-light);
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-light);
             padding: 20px;
+            transition: background-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed);
         }
         
         .comments-title {
@@ -159,7 +302,8 @@ mysqli_close($conn);
             margin-top: 0;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-light);
+            transition: color var(--transition-speed), border-color var(--transition-speed);
         }
         
         .comment-form {
@@ -169,39 +313,45 @@ mysqli_close($conn);
         .comment-form textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-light);
             border-radius: 4px;
             resize: vertical;
             min-height: 100px;
             margin-bottom: 10px;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
         }
         
         .btn-primary {
-            background-color: #000;
-            color: white;
+            background-color: var(--primary);
+            color: var(--text-light);
             padding: 10px 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color var(--transition-speed);
         }
         
         .btn-primary:hover {
-            background-color: #333;
+            background-color: var(--primary-light);
         }
         
         .login-message {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
             text-align: center;
+            transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
         }
         
         .login-message a {
-            color: #000;
+            color: var(--primary);
             font-weight: bold;
             text-decoration: none;
+            transition: color var(--transition-speed);
         }
         
         .login-message a:hover {
@@ -215,7 +365,8 @@ mysqli_close($conn);
         .comment-item {
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-light);
+            transition: border-color var(--transition-speed);
         }
         
         .comment-item:last-child {
@@ -230,15 +381,19 @@ mysqli_close($conn);
         
         .comment-author {
             font-weight: bold;
+            color: var(--primary);
+            transition: color var(--transition-speed);
         }
         
         .comment-date {
             color: #6c757d;
             font-size: 14px;
+            transition: color var(--transition-speed);
         }
         
         .comment-content {
             line-height: 1.5;
+            transition: color var(--transition-speed);
         }
         
         .alert {
@@ -255,10 +410,11 @@ mysqli_close($conn);
         
         .no-comments {
             padding: 15px;
-            background-color: #f9f9f9;
+            background-color: var(--bg-light);
             border-radius: 4px;
             text-align: center;
             margin-top: 20px;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
         
         .article-status {
@@ -312,7 +468,7 @@ mysqli_close($conn);
                 
                 <div class="article-meta">
                     <div>
-                        <span>Por: <?php echo htmlspecialchars($artigo['nome_usuario']); ?></span> |
+                        <span>Por: <?php echo htmlspecialchars($artigo['nome_autor'] ?? 'Autor desconhecido'); ?></span> |
                         <span>Categoria: <?php echo htmlspecialchars($artigo['categoria']); ?></span>
                     </div>
                     <div>
@@ -354,8 +510,8 @@ mysqli_close($conn);
                         <?php foreach($comentarios as $comentario): ?>
                             <div class="comment-item">
                                 <div class="comment-header">
-                                    <span class="comment-author"><?php echo htmlspecialchars($comentario['nome_usuario']); ?></span>
-                                    <span class="comment-date"><?php echo date('d/m/Y H:i', strtotime($comentario['data_comentario'])); ?></span>
+                                    <span class="comment-author"><?php echo htmlspecialchars($comentario['nome_usuario'] ?? 'Usuário'); ?></span>
+                                    <span class="comment-date"><?php echo date('d/m/Y H:i', strtotime($comentario['data_criacao'] ?? $comentario['data_comentario'] ?? date('Y-m-d H:i:s'))); ?></span>
                                 </div>
                                 <div class="comment-content">
                                     <?php echo htmlspecialchars($comentario['conteudo']); ?>
@@ -363,9 +519,20 @@ mysqli_close($conn);
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <div class="no-comments">
-                            <p>Nenhum comentário ainda. Seja o primeiro a comentar!</p>
+                        <div class="no-comments" style="color: var(--text-dark); background-color: var(--bg-light);" data-dark-mode-color="#ffffff" data-dark-mode-bg="#2d2d2d">
+                            <p style="color: inherit;">Nenhum comentário ainda. Seja o primeiro a comentar!</p>
                         </div>
+                        <script>
+                            // Script inline para garantir visibilidade no modo escuro
+                            if (document.body.classList.contains('dark-mode') || localStorage.getItem('theme') === 'dark') {
+                                const noCommentsDiv = document.querySelector('.no-comments');
+                                if (noCommentsDiv) {
+                                    noCommentsDiv.style.backgroundColor = '#2d2d2d';
+                                    noCommentsDiv.style.color = '#ffffff';
+                                    noCommentsDiv.querySelector('p').style.color = '#ffffff';
+                                }
+                            }
+                        </script>
                     <?php endif; ?>
                 </div>
             </div>
@@ -375,3 +542,8 @@ mysqli_close($conn);
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+
+<?php
+// Agora podemos fechar a conexão com segurança
+mysqli_close($conn);
+?>

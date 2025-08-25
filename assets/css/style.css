@@ -480,6 +480,109 @@ footer {
     color: var(--primary);
 }
 
+/* Estilos para artigos em modo escuro */
+.dark-mode .article-header,
+.dark-mode .article-content,
+.dark-mode .comments-section {
+    background-color: var(--card-bg-dark);
+    color: var(--text-light);
+    box-shadow: var(--shadow-dark);
+}
+
+.dark-mode .article-meta,
+.dark-mode .comment-date {
+    color: #b0b0b0;
+}
+
+.dark-mode .article-title,
+.dark-mode .comments-title,
+.dark-mode .comment-author {
+    color: var(--text-light);
+}
+
+.dark-mode .comment-item {
+    border-color: #444;
+}
+
+.dark-mode .login-message {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-dark);
+    color: var(--text-light);
+}
+
+.dark-mode .login-message a {
+    color: #add8e6;
+}
+
+.dark-mode .login-message a:hover {
+    color: #ffffff;
+}
+
+.dark-mode .no-comments {
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+}
+
+/* Melhorias adicionais para o modo escuro */
+.dark-mode .article-content {
+    background-color: var(--card-bg-dark);
+    color: var(--text-light);
+}
+
+.dark-mode .article-content * {
+    color: var(--text-light);
+}
+
+.dark-mode .article-content img {
+    filter: brightness(0.9);
+    border: 1px solid var(--border-dark);
+}
+
+.dark-mode .article-content table {
+    border-color: var(--border-dark);
+    background-color: var(--card-bg-dark);
+}
+
+.dark-mode .article-content th,
+.dark-mode .article-content td {
+    border-color: var(--border-dark);
+    color: var(--text-light);
+}
+
+.dark-mode .article-content blockquote {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left-color: var(--primary);
+}
+
+.dark-mode .article-content pre,
+.dark-mode .article-content code {
+    background-color: #2d2d2d;
+    color: #f8f8f8;
+}
+
+.dark-mode .article-content p,
+.dark-mode .article-content li,
+.dark-mode .article-content span {
+    color: var(--text-light) !important;
+}
+
+/* Estilos específicos para a seção de comentários no modo escuro */
+.dark-mode .no-comments {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    border: 1px solid #444 !important;
+}
+
+.dark-mode .no-comments * {
+    color: #ffffff !important;
+}
+
+.dark-mode .comment-form textarea {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    border-color: #444 !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .navbar {
