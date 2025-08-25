@@ -25,19 +25,31 @@ if ($usuario_logado && isset($conn)) {
 $pagina_atual = basename($_SERVER['PHP_SELF']);
 
 // Garantir que o nome do usuário esteja disponível para JavaScript
-if ($usuario_logado) {
-    // Definir cookies para JavaScript
-    setcookie("userLoggedIn", "true", time() + 86400, "/");
-    setcookie("userName", $_SESSION["nome"], time() + 86400, "/");
-    setcookie("userEmail", $_SESSION["email"], time() + 86400, "/");
-    setcookie("userType", $_SESSION["tipo"], time() + 86400, "/");
-    setcookie("userId", $_SESSION["id"], time() + 86400, "/");
-}
+// Note: Os cookies devem ser definidos nas páginas principais antes de qualquer saída
+// Aqui apenas armazenamos os valores para uso no JavaScript
+$userLoggedIn = $usuario_logado ? "true" : "false";
+$userName = $usuario_logado ? $_SESSION["nome"] : "";
+$userEmail = $usuario_logado ? $_SESSION["email"] : "";
+$userType = $usuario_logado ? $_SESSION["tipo"] : "";
+$userId = $usuario_logado ? $_SESSION["id"] : "";
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <script>
+    // Armazenar dados do usuário no localStorage ao invés de cookies
+    document.addEventListener('DOMContentLoaded', function() {
+        const userLoggedIn = "<?php echo $userLoggedIn; ?>";
+        if (userLoggedIn === "true") {
+            localStorage.setItem("userLoggedIn", "true");
+            localStorage.setItem("userName", "<?php echo addslashes($userName); ?>");
+            localStorage.setItem("userEmail", "<?php echo addslashes($userEmail); ?>");
+            localStorage.setItem("userType", "<?php echo addslashes($userType); ?>");
+            localStorage.setItem("userId", "<?php echo addslashes($userId); ?>");
+        }
+    });
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'EntreLinhas'; ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">

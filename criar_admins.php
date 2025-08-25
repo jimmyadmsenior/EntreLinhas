@@ -40,8 +40,8 @@ function create_admin($conn, $nome, $email, $senha) {
         $hashed_password = password_hash($senha, PASSWORD_DEFAULT);
         
         // Inserir novo usuário
-        $insert_sql = "INSERT INTO usuarios (nome, email, senha, tipo, status, data_registro) 
-                       VALUES (?, ?, ?, 'admin', 'ativo', NOW())";
+        $insert_sql = "INSERT INTO usuarios (nome, email, senha, tipo, data_cadastro) 
+                       VALUES (?, ?, ?, 'admin', NOW())";
         $stmt = mysqli_prepare($conn, $insert_sql);
         mysqli_stmt_bind_param($stmt, "sss", $nome, $email, $hashed_password);
         $result = mysqli_stmt_execute($stmt);
@@ -66,15 +66,15 @@ $admin1 = [
 ];
 
 $admin2 = [
-    'nome' => 'Admin 2', // Atualizar quando tiver o nome
-    'email' => 'admin2@exemplo.com', // Atualizar quando tiver o email
-    'senha' => 'AdminEntreLinhas2#' // Senha segura e única
+    'nome' => 'Bianca Blanco',
+    'email' => 'bianca.blanco@aluno.senai.br',
+    'senha' => 'BiancaAdmin@2025#' // Senha segura e única
 ];
 
 $admin3 = [
-    'nome' => 'Admin 3', // Atualizar quando tiver o nome
-    'email' => 'admin3@exemplo.com', // Atualizar quando tiver o email
-    'senha' => 'AdminEntreLinhas3#' // Senha segura e única
+    'nome' => 'Miguel Zacharias',
+    'email' => 'miguel.zacharias@aluno.senai.br',
+    'senha' => 'MiguelAdmin@2025#' // Senha segura e única
 ];
 
 // Array de resultados

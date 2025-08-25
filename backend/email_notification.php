@@ -26,7 +26,7 @@ function notificar_admins_novo_artigo($artigo, $autor) {
     $mensagem .= "<p><strong>Autor:</strong> {$autor}</p>";
     $mensagem .= "<p><strong>Data de envio:</strong> " . date("d/m/Y H:i:s") . "</p>";
     $mensagem .= "<p><strong>Resumo:</strong> " . substr(strip_tags($artigo['conteudo']), 0, 200) . "...</p>";
-    $mensagem .= "<p>Para revisar e aprovar este artigo, acesse o <a href='http://seusite.com/PAGES/admin_dashboard.php'>Painel de Administração</a>.</p>";
+    $mensagem .= "<p>Para revisar e aprovar este artigo, acesse o <a href='http://localhost:8000/PAGES/admin_dashboard.php'>Painel de Administração</a>.</p>";
     $mensagem .= "</body></html>";
     
     // Cabeçalhos para envio de e-mail HTML

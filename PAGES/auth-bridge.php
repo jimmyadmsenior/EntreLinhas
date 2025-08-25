@@ -10,11 +10,11 @@ session_start();
 
 // Função para criar a sessão do usuário
 function create_session($conn) {
-    // Tentar obter o ID do usuário do cookie ou do parâmetro GET
-    $user_id = isset($_COOKIE['userId']) ? $_COOKIE['userId'] : (isset($_GET['userId']) ? $_GET['userId'] : null);
+    // Tentar obter o ID do usuário do parâmetro GET
+    $user_id = isset($_GET['userId']) ? $_GET['userId'] : null;
     
     // Se não temos ID, usar o email para buscar
-    $user_email = isset($_COOKIE['userEmail']) ? $_COOKIE['userEmail'] : (isset($_GET['userEmail']) ? $_GET['userEmail'] : null);
+    $user_email = isset($_GET['userEmail']) ? $_GET['userEmail'] : null;
     
     // Se temos ID ou email, buscar dados do usuário no banco de dados
     if ($user_id || $user_email) {
