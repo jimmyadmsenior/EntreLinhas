@@ -25,7 +25,7 @@ require_once "../backend/config.php";
     <link rel="stylesheet" href="../assets/css/user-menu.css">
 </head>
 <body>
-<<<<<<< Updated upstream
+
     <!-- Header -->
     <header>
         <nav class="navbar">
@@ -96,9 +96,7 @@ require_once "../backend/config.php";
             </div>
         </nav>
     </header>
-=======
-    <?php include 'includes/header.php'; ?>
->>>>>>> Stashed changes
+
     
     <main>
         <section class="school-section">
@@ -176,15 +174,13 @@ require_once "../backend/config.php";
     <?php include 'includes/footer.php'; ?>
     
     <!-- JavaScript -->
-<<<<<<< Updated upstream
+
     <script src="../assets/js/auth-cookies.js"></script>
     <script src="../assets/js/verificar-sincronizar-login.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/user-menu.js"></script>
     <script src="../assets/js/dropdown-menu.js"></script>
     <script src="../assets/js/header-nav.js"></script>
-=======
-    <script src="../assets/js/main.js"></script>
->>>>>>> Stashed changes
+
 </body>
 </html>

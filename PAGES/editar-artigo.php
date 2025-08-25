@@ -124,7 +124,31 @@ mysqli_close($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Artigo - EntreLinhas</title>
-    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/user-menu.css">
+    <link rel="stylesheet" href="../assets/css/alerts.css">
+    <!-- Adicionando CKEditor (sem necessidade de API key) -->
+    <script src="https://cdn.ckeditor.com/4.16.2/standard-all/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            CKEDITOR.replace('conteudo', {
+                height: 400,
+                removePlugins: 'elementspath',
+                resize_enabled: true,
+                extraPlugins: 'colorbutton,font,justify,uploadimage',
+                toolbar: [
+                    { name: 'document', items: [ 'Source' ] },
+                    { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
+                    { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
+                    { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat', 'TextColor', 'BGColor' ] },
+                    { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', 'Outdent', 'Indent', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink' ] },
+                    { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+                    { name: 'tools', items: [ 'Maximize' ] }
+                ]
+            });
+        });
+    </script>
     <style>
         .container {
             max-width: 800px;
@@ -328,7 +352,7 @@ mysqli_close($conn);
                 </div>
                 <div class="form-group">
                     <label>Conteúdo *</label>
-                    <textarea name="conteudo" class="<?php echo (!empty($conteudo_err)) ? 'is-invalid' : ''; ?>"><?php echo $conteudo; ?></textarea>
+                    <textarea name="conteudo" id="conteudo" class="<?php echo (!empty($conteudo_err)) ? 'is-invalid' : ''; ?>"><?php echo $conteudo; ?></textarea>
                     <span class="help-block"><?php echo $conteudo_err; ?></span>
                 </div>
                 <div class="form-group">

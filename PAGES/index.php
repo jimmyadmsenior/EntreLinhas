@@ -2,11 +2,7 @@
 // Iniciar a sessão para poder acessar as variáveis de sessão
 session_start();
 
-<<<<<<< Updated upstream
-// Incluir apenas o arquivo de configuração, sem outras dependências
-=======
 // Incluir arquivo de configuração para conexão com o banco de dados
->>>>>>> Stashed changes
 require_once "../backend/config.php";
 ?>
 <!DOCTYPE html>
@@ -30,7 +26,7 @@ require_once "../backend/config.php";
     <link rel="stylesheet" href="../assets/css/alerts.css">
 </head>
 <body>
-<<<<<<< Updated upstream
+
     <!-- Header -->
     <header>
         <nav class="navbar">
@@ -129,41 +125,7 @@ require_once "../backend/config.php";
                         WHERE a.status = 'aprovado' 
                         ORDER BY a.data_criacao DESC 
                         LIMIT 3";
-=======
-    <?php include 'includes/header.php'; ?>
 
-    <!-- Conteúdo Principal -->
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-content">
-                <h1>EntreLinhas</h1>
-                <p class="subtitle">Jornal Digital SESI</p>
-                <p class="description">Notícias, artigos e textos da nossa comunidade escolar</p>
-                <div class="cta-buttons">
-                    <a href="artigos.php" class="btn btn-primary">Ver Artigos</a>
-                    <a href="conhecimentos.html" class="btn btn-secondary">Sobre o Projeto</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Artigos em Destaque -->
-        <section class="featured-articles">
-            <div class="section-header">
-                <h2>Artigos em Destaque</h2>
-                <a href="artigos.php" class="view-all">Ver todos</a>
-            </div>
-            <div class="articles-grid">
-                <?php
-                // Consultar os 6 artigos mais recentes aprovados
-                $sql = "SELECT a.id, a.titulo, a.resumo, a.data_criacao as data_publicacao, 
-                        'Geral' as categoria, '' as imagem_capa, u.nome as autor 
-                        FROM artigos a 
-                        JOIN usuarios u ON a.usuario_id = u.id 
-                        WHERE a.status = 'aprovado' 
-                        ORDER BY a.data_criacao DESC 
-                        LIMIT 6";
->>>>>>> Stashed changes
                 $result = mysqli_query($conn, $sql);
                 
                 if (mysqli_num_rows($result) > 0) {
@@ -177,7 +139,7 @@ require_once "../backend/config.php";
                                 : "../assets/images/jornal.png";
                                 
                         echo '
-<<<<<<< Updated upstream
+
                         <article class="article-card fade-in">
                             <img src="' . htmlspecialchars($imagem) . '" alt="' . htmlspecialchars($artigo['titulo']) . '" class="article-image">
                             <div class="article-content">
@@ -188,26 +150,12 @@ require_once "../backend/config.php";
                                 <h3>' . htmlspecialchars($artigo['titulo']) . '</h3>
                                 <p>' . htmlspecialchars(strip_tags(substr($artigo['resumo'], 0, 100))) . '...</p>
                                 <a href="artigo.php?id=' . $artigo['id'] . '" class="read-more">Leia mais</a>
-=======
-                        <article class="article-card">
-                            <div class="article-img">
-                                <img src="' . htmlspecialchars($imagem) . '" alt="' . htmlspecialchars($artigo['titulo']) . '">
-                                <span class="category">' . htmlspecialchars($artigo['categoria']) . '</span>
-                            </div>
-                            <div class="article-content">
-                                <h3><a href="artigo.php?id=' . $artigo['id'] . '">' . htmlspecialchars($artigo['titulo']) . '</a></h3>
-                                <p class="article-meta">
-                                    <span class="author">Por ' . htmlspecialchars($artigo['autor']) . '</span>
-                                    <span class="date">' . $data . '</span>
-                                </p>
-                                <p class="excerpt">' . htmlspecialchars($artigo['resumo']) . '</p>
-                                <a href="artigo.php?id=' . $artigo['id'] . '" class="read-more">Ler mais</a>
->>>>>>> Stashed changes
+
                             </div>
                         </article>';
                     }
                 } else {
-<<<<<<< Updated upstream
+
                     // Se não houver artigos, exibir artigos de exemplo como no HTML original
                     echo '
                     <!-- Artigo 1 -->
@@ -251,15 +199,13 @@ require_once "../backend/config.php";
                             <a href="#" class="read-more">Leia mais</a>
                         </div>
                     </article>';
-=======
-                    echo '<div class="no-articles"><p>Nenhum artigo publicado ainda.</p></div>';
->>>>>>> Stashed changes
+
                 }
                 ?>
             </div>
         </section>
         
-<<<<<<< Updated upstream
+
         <section class="categories mb-5">
             <h2 class="mb-3">Categorias</h2>
             <div class="flex flex-wrap gap-2">
@@ -283,25 +229,7 @@ require_once "../backend/config.php";
                     <a href="cadastro.php" class="btn btn-primary">Cadastre-se</a>
                 <?php endif; ?>
             </div>
-=======
-        <!-- Sobre a Escola -->
-        <section class="about-section">
-            <div class="about-content">
-                <h2>SESI Escola</h2>
-                <p>A Escola SESI proporciona educação de qualidade com foco no desenvolvimento integral dos alunos, preparando-os para os desafios do século XXI. Nossa metodologia inovadora combina aprendizado teórico com prática, estimulando a criatividade e o pensamento crítico.</p>
-                <a href="escola.php" class="btn btn-secondary">Conheça nossa escola</a>
-            </div>
-            <div class="about-image">
-                <img src="../assets/images/escola-quadra.png" alt="Escola SESI">
-            </div>
-        </section>
-        
-        <!-- Call to Action -->
-        <section class="cta-section">
-            <h2>Compartilhe suas ideias</h2>
-            <p>Tem algo a dizer? Uma história para contar? Um conhecimento para compartilhar?</p>
-            <a href="enviar-artigo.php" class="btn btn-primary">Enviar um Artigo</a>
->>>>>>> Stashed changes
+
         </section>
     </main>
 
@@ -309,7 +237,7 @@ require_once "../backend/config.php";
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
-<<<<<<< Updated upstream
+
     <script src="../assets/js/debug.js"></script>
     <script src="../assets/js/user-menu.js"></script>
     <script src="../assets/js/header-nav.js"></script>
@@ -323,7 +251,6 @@ require_once "../backend/config.php";
             console.log('Página inicial carregada');
         });
     </script>
-=======
->>>>>>> Stashed changes
+
 </body>
 </html>

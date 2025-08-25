@@ -24,7 +24,7 @@ function resolveGitConflicts($filePath, $keepUpdated = true) {
     }
     
     // Resolver conflitos
-    $pattern = '/<<<<<<< .*?\n(.*?)=======\n(.*?)>>>>>>> .*?\n/s';
+    $pattern = '/<<<<<<< .*?\n(.*?)\n(.*?)>>>>>>> .*?\n/s';
     
     // Substituir o padrão pelo conteúdo desejado
     $newContent = preg_replace_callback(

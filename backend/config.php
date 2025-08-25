@@ -9,7 +9,7 @@ define('DB_NAME', 'entrelinhas');
 define('ADMIN_EMAIL', 'jimmycastilho555@gmail.com');
 
 // Tentativa de conexão com o banco de dados MySQL
-$conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD);
+$conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
 // Verificar conexão
 if (!$conn) {
