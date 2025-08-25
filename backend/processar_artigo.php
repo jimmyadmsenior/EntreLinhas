@@ -40,7 +40,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             // Enviar notificação por e-mail para os administradores
             $artigo['id'] = $resultado['artigo_id'];
-            notificar_admins_novo_artigo($artigo, $autor_nome);
+            $notificacao_enviada = notificar_admins_novo_artigo($artigo, $autor_nome);
+            
+            // Registrar no log se a notificação foi enviada
+            if ($notificacao_enviada) {
+                error_log("E-mail de notificação enviado para administradores sobre o artigo ID: " . $artigo['id']);
+            } else {
+                error_log("Falha ao enviar e-mail de notificação para administradores sobre o artigo ID: " . $artigo['id']);
+            }
             
             // Redirecionar para página de sucesso
             $_SESSION['mensagem'] = $resultado['mensagem'];

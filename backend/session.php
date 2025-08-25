@@ -23,19 +23,6 @@ function get_user_id() {
     return $_SESSION["id"] ?? 0;
 }
 
-// Redirecionar se não estiver logado (para páginas que exigem login)
-function require_login() {
-    if (!is_logged_in()) {
-        header("Location: login.php");
-        exit;
-    }
-}
-
-// Redirecionar se não for administrador (para páginas de administração)
-function require_admin() {
-    if (!is_admin()) {
-        header("Location: index.php?erro=acesso_negado");
-        exit;
-    }
-}
+// Nota: As funções require_login e require_admin estão no session_helper.php
+// Não definimos aqui para evitar duplicação e possíveis conflitos
 ?>

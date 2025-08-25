@@ -44,7 +44,7 @@ $total_paginas = ceil($total_rows / $por_pagina);
 
 $sql = "SELECT a.id, a.titulo, LEFT(a.conteudo, 150) as resumo, a.data_criacao as data_publicacao, 
         a.categoria, a.imagem as imagem_capa, u.nome as autor, 
-        (SELECT COUNT(*) FROM comentarios c WHERE c.id_artigo = a.id) as comentarios 
+        (SELECT COUNT(*) FROM comentarios c WHERE c.artigo_id = a.id) as comentarios 
         FROM artigos a 
         JOIN usuarios u ON a.id_usuario = u.id 
 
