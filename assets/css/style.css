@@ -480,6 +480,26 @@ footer {
     color: var(--primary);
 }
 
+/* Estilos para o modal no modo escuro */
+.dark-mode .modal-content {
+    background-color: var(--card-bg-dark) !important;
+    color: var(--text-light) !important;
+    box-shadow: var(--shadow-dark) !important;
+}
+
+.dark-mode .modal h3 {
+    color: var(--text-light);
+}
+
+.dark-mode .modal p {
+    color: var(--text-light);
+}
+
+/* Estilos para o título do modal (sempre preto) */
+.modal-content h3 {
+    color: #000000 !important; /* Forçar cor preta para o título */
+}
+
 /* Estilos para artigos em modo escuro */
 .dark-mode .article-header,
 .dark-mode .article-content,

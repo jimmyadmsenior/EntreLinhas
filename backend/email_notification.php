@@ -42,10 +42,17 @@ function notificar_admins_novo_artigo($artigo, $autor) {
     foreach ($admin_emails as $email) {
         error_log("[{$data_atual}] Tentando enviar e-mail de notificação para {$email} sobre artigo: {$artigo['titulo']}");
         
+        // Adicionar informações de depuração
+        $debug_info = "Sending mail to: {$email}\n";
+        $debug_info .= "Subject: {$assunto}\n";
+        $debug_info .= "Headers: {$headers}\n";
+        error_log("[DEBUG EMAIL] {$debug_info}");
+        
         if (!mail($email, $assunto, $mensagem, $headers)) {
             // Se falhar, marcamos como falha mas continuamos tentando enviar para os outros
             $sucesso = false;
-            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail de notificação para {$email}");
+            $error = error_get_last();
+            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail de notificação para {$email}. Erro: " . ($error ? json_encode($error) : "Desconhecido"));
         } else {
             error_log("[{$data_atual}] SUCESSO: E-mail de notificação enviado para {$email}");
         }

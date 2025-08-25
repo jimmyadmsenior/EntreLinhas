@@ -12,15 +12,15 @@ if (!isset($_SESSION['id'])) {
 require_once 'config.php';
 require_once 'artigos.php';
 
-// Verificar se os dados necessários foram enviados
-if (!isset($_POST['artigo_id'])) {
+// Verificar se os dados necessários foram enviados (aceitar tanto POST quanto GET)
+if (!isset($_POST['artigo_id']) && !isset($_GET['id'])) {
     $_SESSION['mensagem'] = "Dados incompletos para processar a exclusão.";
     $_SESSION['tipo_mensagem'] = 'danger';
     header("Location: ../PAGES/index.php");
     exit;
 }
 
-$artigo_id = intval($_POST['artigo_id']);
+$artigo_id = isset($_POST['artigo_id']) ? intval($_POST['artigo_id']) : intval($_GET['id']);
 
 // Verificar se o artigo existe e se o usuário tem permissão para excluí-lo
 $artigo = obterArtigo($conn, $artigo_id);

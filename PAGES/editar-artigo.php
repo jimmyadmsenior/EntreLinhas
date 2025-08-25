@@ -148,6 +148,13 @@ mysqli_close($conn);
                 ]
             });
         });
+        
+        // Função para confirmar a exclusão do artigo
+        function confirmarExclusao(artigo_id, titulo) {
+            artigoIdParaExcluir = artigo_id;
+            document.getElementById('artigo-titulo').textContent = titulo;
+            document.getElementById('modal-exclusao').style.display = 'block';
+        }
     </script>
     <style>
         .container {
@@ -289,6 +296,27 @@ mysqli_close($conn);
     </style>
 </head>
 <body>
+            .btn-secondary:hover {
+            background-color: #444;
+        }
+        
+        .btn-danger {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
     <?php include 'includes/header.php'; ?>
     
     <main>
@@ -358,6 +386,7 @@ mysqli_close($conn);
                 <div class="form-group">
                     <input type="submit" class="btn-primary" value="Salvar Alterações">
                     <a href="artigo.php?id=<?php echo $artigo_id; ?>" class="btn-secondary">Cancelar</a>
+                    <button type="button" class="btn-danger" onclick="confirmarExclusao(<?php echo $artigo_id; ?>, '<?php echo addslashes(htmlspecialchars($titulo)); ?>')" style="margin-left: 10px;">Excluir Artigo</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -365,5 +394,40 @@ mysqli_close($conn);
     </main>
     
     <?php include 'includes/footer.php'; ?>
+    
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="modal-exclusao" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.5);">
+        <div class="modal-content" style="background-color:var(--card-bg-light, #fff); margin:15% auto; padding:20px; border-radius:8px; width:90%; max-width:500px; box-shadow:0 4px 8px rgba(0,0,0,0.2); color:var(--text-dark, #333);">
+            <h3 style="color: #000000;">Confirmar Exclusão</h3>
+            <p>Você tem certeza que deseja excluir o artigo "<span id="artigo-titulo"></span>"?</p>
+            <p>Esta ação não pode ser desfeita.</p>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button onclick="fecharModal()" class="btn-secondary">Cancelar</button>
+                <button id="btn-confirmar-exclusao" onclick="excluirArtigo()" class="btn-danger">Excluir</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let artigoIdParaExcluir = null;
+        
+        function fecharModal() {
+            document.getElementById('modal-exclusao').style.display = 'none';
+        }
+        
+        function excluirArtigo() {
+            if (artigoIdParaExcluir) {
+                window.location.href = '../backend/processar_exclusao.php?id=' + artigoIdParaExcluir;
+            }
+        }
+        
+        // Fechar o modal se o usuário clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal-exclusao');
+            if (event.target == modal) {
+                fecharModal();
+            }
+        }
+    </script>
 </body>
 </html>
