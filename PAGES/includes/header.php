@@ -12,11 +12,7 @@ $foto_perfil = null;
 if ($usuario_logado && isset($conn)) {
     // Carregar helper se ainda não estiver carregado
     if (!function_exists('obter_foto_perfil')) {
-<<<<<<< Updated upstream
         require_once dirname(__FILE__) . "/../../backend/usuario_helper.php";
-=======
-        require_once "../backend/usuario_helper.php";
->>>>>>> Stashed changes
     }
     
     // Obter foto de perfil
@@ -28,7 +24,6 @@ if ($usuario_logado && isset($conn)) {
 // Determinar qual página está ativa para destacar no menu
 $pagina_atual = basename($_SERVER['PHP_SELF']);
 
-<<<<<<< Updated upstream
 // Garantir que o nome do usuário esteja disponível para JavaScript
 if ($usuario_logado) {
     // Definir cookies para JavaScript
@@ -56,8 +51,14 @@ if ($usuario_logado) {
     <?php endif; ?>
     
     <!-- Scripts para autenticação e menu do usuário -->
+    <?php 
+    $pagina_atual = basename($_SERVER['PHP_SELF']);
+    $paginas_auth = ['login.php', 'cadastro.php', 'registro.php'];
+    if (!in_array($pagina_atual, $paginas_auth)): 
+    ?>
     <script src="<?php echo $root_path ?? '..'; ?>/assets/js/auth-cookies.js" defer></script>
     <script src="<?php echo $root_path ?? '..'; ?>/assets/js/verificar-sincronizar-login.js" defer></script>
+    <?php endif; ?>
     <script src="<?php echo $root_path ?? '..'; ?>/assets/js/user-menu.js" defer></script>
     <script src="<?php echo $root_path ?? '..'; ?>/assets/js/dropdown-menu.js" defer></script>
     
@@ -72,47 +73,6 @@ if ($usuario_logado) {
             <div class="logo">
                 <a href="../index.php">EntreLinhas</a>
             </div>
-=======
-<!-- Header -->
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="index.php">EntreLinhas</a>
-        </div>
-        
-        <ul class="nav-links">
-            <li><a href="index.php" <?php if($pagina_atual == 'index.html' || $pagina_atual == 'index.php') echo 'class="active"'; ?>>Início</a></li>
-            <li><a href="artigos.php" <?php if($pagina_atual == 'artigos.html' || $pagina_atual == 'artigos.php') echo 'class="active"'; ?>>Artigos</a></li>
-            <li><a href="sobre.php" <?php if($pagina_atual == 'sobre.html' || $pagina_atual == 'sobre.php') echo 'class="active"'; ?>>Sobre</a></li>
-            <li><a href="escola.php" <?php if($pagina_atual == 'escola.html' || $pagina_atual == 'escola.php') echo 'class="active"'; ?>>A Escola</a></li>
-            <li><a href="contato.php" <?php if($pagina_atual == 'contato.html' || $pagina_atual == 'contato.php') echo 'class="active"'; ?>>Contato</a></li>
-        </ul>
-        
-        <div class="nav-buttons">
-            <?php if ($usuario_logado): ?>
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" style="display: flex; align-items: center; gap: 8px;">
-                        <?php if ($foto_perfil): ?>
-                            <div style="width: 24px; height: 24px; border-radius: 50%; overflow: hidden;">
-                                <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                        <?php else: ?>
-                            <i class="fas fa-user"></i>
-                        <?php endif; ?>
-                        <?php echo htmlspecialchars($_SESSION["nome"]); ?>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="perfil.php" <?php if($pagina_atual == 'perfil.php') echo 'class="active"'; ?>>Meu Perfil</a>
-                        <a href="meus-artigos.php" <?php if($pagina_atual == 'meus-artigos.php') echo 'class="active"'; ?>>Meus Artigos</a>
-                        <a href="enviar-artigo.php" <?php if($pagina_atual == 'enviar-artigo.php') echo 'class="active"'; ?>>Enviar Artigo</a>
-                        <a href="../backend/logout.php">Sair</a>
-                    </div>
-                </div>
-            <?php else: ?>
-                <a href="login.php" class="btn btn-secondary">Entrar</a>
-                <a href="cadastro.php" class="btn btn-primary">Cadastrar</a>
-            <?php endif; ?>
->>>>>>> Stashed changes
             
             <ul class="nav-links">
                 <li><a href="../index.php" <?php if($pagina_atual == 'index.html' || $pagina_atual == 'index.php') echo 'class="active"'; ?>>Início</a></li>
@@ -143,13 +103,13 @@ if ($usuario_logado) {
                             <?php if (isset($_SESSION["tipo"]) && $_SESSION["tipo"] === 'admin'): ?>
                                 <a href="admin_dashboard.php" class="dropdown-link"><i class="fas fa-cogs"></i> Painel de Admin</a>
                             <?php endif; ?>
-                            <a href="logout.php" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                            <a href="../backend/logout.php" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                         </div>
                     </div>
                 <?php else: ?>
                     <!-- Links de login e cadastro -->
                     <a href="login.php" class="btn btn-secondary">Entrar</a>
-                    <a href="registro.php" class="btn btn-primary">Cadastrar</a>
+                    <a href="cadastro.php" class="btn btn-primary">Cadastrar</a>
                 <?php endif; ?>
                 
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">

@@ -228,7 +228,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/auth.js"></script>
+    <!-- Script personalizado para a página de login -->
+    <script src="../assets/js/login-page.js"></script>
     <link rel="stylesheet" href="../assets/css/alerts.css">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -279,8 +280,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             showAlert(data.message || 'Login realizado com sucesso!', 'success');
                             
                             // Salvar dados do usuário no localStorage
-                            if (data.user) {
-                                saveUserData(data.user);
+                            // Criar objeto com os dados do usuário para o localStorage
+                            const userData = {
+                                nome: data.user_name || '',
+                                email: data.user_email || '',
+                                tipo: data.user_type || '',
+                                id: data.user_id || ''
+                            };
+                            
+                            // Chamar a função do script login-page.js
+                            if (window.saveUserData) {
+                                window.saveUserData(userData);
                             }
                             
                             // Redirecionar após um breve delay

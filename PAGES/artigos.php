@@ -19,11 +19,7 @@ if (!empty($categoria)) {
     $where_clause .= " AND a.titulo LIKE '%" . mysqli_real_escape_string($conn, $categoria) . "%'";
 }
 if (!empty($busca)) {
-<<<<<<< Updated upstream
-    $where_clause .= " AND (a.titulo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%' OR a.conteudo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%')";
-=======
-    $where_clause .= " AND (a.titulo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%' OR a.resumo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%')";
->>>>>>> Stashed changes
+    $where_clause .= " AND (a.titulo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%' OR a.conteudo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%' OR a.resumo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%')";
 }
 
 // Determinar a ordenação
@@ -45,19 +41,13 @@ $total_rows = mysqli_fetch_assoc($count_result)['total'];
 $total_paginas = ceil($total_rows / $por_pagina);
 
 // Consultar os artigos com os filtros aplicados
-<<<<<<< Updated upstream
+
 $sql = "SELECT a.id, a.titulo, LEFT(a.conteudo, 150) as resumo, a.data_criacao as data_publicacao, 
         a.categoria, a.imagem as imagem_capa, u.nome as autor, 
         (SELECT COUNT(*) FROM comentarios c WHERE c.id_artigo = a.id) as comentarios 
         FROM artigos a 
         JOIN usuarios u ON a.id_usuario = u.id 
-=======
-$sql = "SELECT a.id, a.titulo, a.resumo, a.data_criacao as data_publicacao, 
-        'Geral' as categoria, '' as imagem_capa, u.nome as autor, 
-        (SELECT COUNT(*) FROM comentarios c WHERE c.artigo_id = a.id) as comentarios 
-        FROM artigos a 
-        JOIN usuarios u ON a.usuario_id = u.id 
->>>>>>> Stashed changes
+
         $where_clause 
         $order_clause 
         LIMIT $inicio, $por_pagina";
@@ -195,7 +185,7 @@ $categorias_result = mysqli_query($conn, $categorias_sql);
     </style>
 </head>
 <body>
-<<<<<<< Updated upstream
+
     <!-- Header -->
     <header>
         <nav class="navbar">
@@ -266,9 +256,7 @@ $categorias_result = mysqli_query($conn, $categorias_sql);
             </div>
         </nav>
     </header>
-=======
-    <?php include 'includes/header.php'; ?>
->>>>>>> Stashed changes
+
 
     <main>
         <section class="articles-section">
@@ -408,15 +396,13 @@ $categorias_result = mysqli_query($conn, $categorias_sql);
     <?php include 'includes/footer.php'; ?>
 
     <!-- JavaScript -->
-<<<<<<< Updated upstream
+
     <script src="../assets/js/auth-cookies.js"></script>
     <script src="../assets/js/verificar-sincronizar-login.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/user-menu.js"></script>
     <script src="../assets/js/dropdown-menu.js"></script>
     <script src="../assets/js/header-nav.js"></script>
-=======
-    <script src="../assets/js/main.js"></script>
->>>>>>> Stashed changes
+
 </body>
 </html>
