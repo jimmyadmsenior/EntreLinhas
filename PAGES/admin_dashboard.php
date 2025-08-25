@@ -3,8 +3,11 @@
 require_once "../backend/session_helper.php";
 require_once "../backend/config.php";
 
-// Redirecionar se não for administrador
-require_admin();
+// Verificar se é administrador
+if (!is_admin()) {
+    header("Location: ../index.php");
+    exit;
+}
 
 // Consultar estatísticas
 $stats = [
@@ -38,6 +41,15 @@ if ($row = mysqli_fetch_assoc($result)) {
     $stats["comentarios_pendentes"] = $row["total"];
 }
 
+// Tentar obter a foto de perfil do usuário
+$foto_perfil = null;
+if (function_exists('obter_foto_perfil') || (!function_exists('obter_foto_perfil') && file_exists(dirname(__FILE__) . "/../backend/usuario_helper.php"))) {
+    if (!function_exists('obter_foto_perfil')) {
+        require_once dirname(__FILE__) . "/../backend/usuario_helper.php";
+    }
+    $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+}
+
 // Artigos recentes
 $artigos_recentes = [];
 $result = mysqli_query($conn, "SELECT a.id, a.titulo, a.conteudo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
@@ -69,6 +81,7 @@ mysqli_close($conn);
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/user-menu.css">
     <style>
         .dashboard {
             padding: 2rem 0;
@@ -144,38 +157,56 @@ mysqli_close($conn);
             font-weight: 600;
         }
     </style>
+    <script src="../assets/js/user-menu.js" defer></script>
+    <script src="../assets/js/theme.js" defer></script>
+    <script src="../assets/js/admin-dashboard.js" defer></script>
+    <script src="../assets/js/admin-dropdown.js" defer></script>
 </head>
 <body>
     <!-- Header -->
     <header>
         <nav class="navbar">
             <div class="logo">
-                <a href="index.html">EntreLinhas</a>
+                <a href="index.php">EntreLinhas</a>
             </div>
             
             <ul class="nav-links">
-                <li><a href="index.html">Início</a></li>
-                <li><a href="artigos.html">Artigos</a></li>
-                <li><a href="sobre.html">Sobre</a></li>
-                <li><a href="escola.html">A Escola</a></li>
-                <li><a href="contato.html">Contato</a></li>
+                <li><a href="index.php">Início</a></li>
+                <li><a href="artigos.php">Artigos</a></li>
+                <li><a href="sobre.php">Sobre</a></li>
+                <li><a href="escola.php">A Escola</a></li>
+                <li><a href="contato.php">Contato</a></li>
             </ul>
             
             <div class="nav-buttons">
+                <!-- Menu dropdown do usuário -->
                 <div class="user-menu" id="user-menu">
-                    <span class="user-name"><?php echo htmlspecialchars($_SESSION["nome"]); ?> <i class="fas fa-chevron-down"></i></span>
-                    <div class="dropdown-menu">
-                        <a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Painel</a>
-                        <a href="meus-artigos.php"><i class="fas fa-newspaper"></i> Meus Artigos</a>
-                        <a href="perfil.php"><i class="fas fa-user"></i> Perfil</a>
-                        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                    <div class="user-name">
+                        <span class="avatar-container">
+                            <?php if ($foto_perfil): ?>
+                                <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil" class="user-avatar">
+                            <?php else: ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </span>
+                        <?php echo htmlspecialchars($_SESSION["nome"]); ?> <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-menu" id="user-dropdown-menu">
+                        <a href="admin_dashboard.php" class="dropdown-link"><i class="fas fa-tachometer-alt"></i> Painel</a>
+                        <a href="perfil.php" class="dropdown-link"><i class="fas fa-id-card"></i> Meu Perfil</a>
+                        <a href="meus-artigos.php" class="dropdown-link"><i class="fas fa-newspaper"></i> Meus Artigos</a>
+                        <a href="enviar-artigo.php" class="dropdown-link"><i class="fas fa-edit"></i> Enviar Artigo</a>
+                        <a href="../backend/logout.php" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                     </div>
                 </div>
+                
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
+                <button id="mobile-menu" class="mobile-menu-btn" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </nav>
@@ -301,11 +332,11 @@ mysqli_close($conn);
             <div class="footer-section">
                 <h3>Links Rápidos</h3>
                 <ul class="footer-links">
-                    <li><a href="index.html">Início</a></li>
-                    <li><a href="artigos.html">Artigos</a></li>
-                    <li><a href="sobre.html">Sobre</a></li>
-                    <li><a href="escola.html">A Escola</a></li>
-                    <li><a href="contato.html">Contato</a></li>
+                    <li><a href="index.php">Início</a></li>
+                    <li><a href="artigos.php">Artigos</a></li>
+                    <li><a href="sobre.php">Sobre</a></li>
+                    <li><a href="escola.php">A Escola</a></li>
+                    <li><a href="contato.php">Contato</a></li>
                 </ul>
             </div>
             
@@ -325,46 +356,5 @@ mysqli_close($conn);
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Tab switching functionality
-            const tabs = document.querySelectorAll('.admin-tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs
-                    tabs.forEach(t => t.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    tab.classList.add('active');
-                    
-                    // Hide all tab contents
-                    tabContents.forEach(content => {
-                        content.style.display = 'none';
-                    });
-                    
-                    // Show selected tab content
-                    const tabId = tab.getAttribute('data-tab');
-                    document.getElementById(tabId).style.display = 'block';
-                });
-            });
-            
-            // User menu dropdown
-            const userMenu = document.getElementById('user-menu');
-            if (userMenu) {
-                userMenu.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                });
-                
-                // Close menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('#user-menu')) {
-                        userMenu.classList.remove('active');
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>

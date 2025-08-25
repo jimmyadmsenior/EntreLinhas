@@ -5,6 +5,10 @@ session_start();
 // Incluir arquivo de configuração para conexão com o banco de dados
 require_once "../backend/config.php";
 ?>
+<?php
+// Incluir arquivo com funções do cabeçalho
+require_once 'includes/cabecalho_helper.php';
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,79 +28,15 @@ require_once "../backend/config.php";
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">
     <link rel="stylesheet" href="../assets/css/alerts.css">
+    <script src="../assets/js/user-menu.js" defer></script>
+    <script src="../assets/js/theme.js" defer></script>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <a href="index.php">EntreLinhas</a>
-            </div>
-            
-            <ul class="nav-links">
-                <li><a href="index.php" class="active">Início</a></li>
-                <li><a href="artigos.php">Artigos</a></li>
-                <li><a href="sobre.php">Sobre</a></li>
-                <li><a href="escola.php">A Escola</a></li>
-                <li><a href="contato.php">Contato</a></li>
-            </ul>
-            
-            <div class="nav-buttons">
-                <?php if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
-                    <!-- Menu dropdown do usuário -->
-                    <div class="user-menu">
-                        <div class="user-name">
-                            <span class="avatar-container">
-                                <?php 
-                                // Tentar obter a foto de perfil
-                                $foto_perfil = null;
-                                if (isset($conn)) {
-                                    // Carregar helper se ainda não estiver carregado
-                                    if (!function_exists('obter_foto_perfil')) {
-                                        require_once dirname(__FILE__) . "/../backend/usuario_helper.php";
-                                    }
-                                    
-                                    // Obter foto de perfil
-                                    if (function_exists('obter_foto_perfil')) {
-                                        $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
-                                    }
-                                }
-                                
-                                if ($foto_perfil): 
-                                ?>
-                                    <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil" class="user-avatar">
-                                <?php else: ?>
-                                    <i class="fas fa-user"></i>
-                                <?php endif; ?>
-                            </span>
-                            <?php echo htmlspecialchars($_SESSION["nome"]); ?> <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown-menu" id="user-dropdown-menu">
-                            <a href="perfil.php" class="dropdown-link"><i class="fas fa-id-card"></i> Meu Perfil</a>
-                            <a href="meus-artigos.php" class="dropdown-link"><i class="fas fa-newspaper"></i> Meus Artigos</a>
-                            <a href="enviar-artigo.php" class="dropdown-link"><i class="fas fa-edit"></i> Enviar Artigo</a>
-                            <?php if (isset($_SESSION["tipo"]) && $_SESSION["tipo"] === 'admin'): ?>
-                                <a href="admin_dashboard.php" class="dropdown-link"><i class="fas fa-cogs"></i> Painel de Admin</a>
-                            <?php endif; ?>
-                            <a href="logout.php" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <!-- Links de login e cadastro -->
-                    <a href="login.php" class="btn btn-secondary">Entrar</a>
-                    <a href="registro.php" class="btn btn-primary">Cadastrar</a>
-                <?php endif; ?>
-                
-                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </nav>
-    </header>
+    <?php 
+    // Gerar o cabeçalho com o menu
+    echo gerar_cabecalho($conn, 'index.php');
+    ?>
 
     <!-- Hero Section -->
     <section class="hero">

@@ -14,6 +14,7 @@ function notificar_admins_novo_artigo($artigo, $autor) {
     // Lista de e-mails dos administradores
     $admin_emails = [
         'jimmycastilho555@gmail.com',
+        // Adicione aqui os emails dos seus amigos administradores
         'bianca.blanco@aluno.senai.br',
         'miguel.zacharias@aluno.senai.br'
     ];
@@ -36,11 +37,17 @@ function notificar_admins_novo_artigo($artigo, $autor) {
     
     // Enviar e-mail para cada administrador
     $sucesso = true;
+    $data_atual = date("Y-m-d H:i:s");
+    
     foreach ($admin_emails as $email) {
+        error_log("[{$data_atual}] Tentando enviar e-mail de notificação para {$email} sobre artigo: {$artigo['titulo']}");
+        
         if (!mail($email, $assunto, $mensagem, $headers)) {
             // Se falhar, marcamos como falha mas continuamos tentando enviar para os outros
             $sucesso = false;
-            error_log("Falha ao enviar e-mail de notificação para {$email}");
+            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail de notificação para {$email}");
+        } else {
+            error_log("[{$data_atual}] SUCESSO: E-mail de notificação enviado para {$email}");
         }
     }
     
@@ -85,6 +92,18 @@ function notificar_autor_status_artigo($email_autor, $nome_autor, $artigo, $apro
     $headers .= "Content-type: text/html; charset=UTF-8\r\n";
     $headers .= "From: EntreLinhas <noreply@entrelinhas.com>\r\n";
     
-    return mail($email_autor, $assunto, $mensagem, $headers);
+    // Registrar tentativa de envio no log
+    $data_atual = date("Y-m-d H:i:s");
+    error_log("[{$data_atual}] Tentando enviar e-mail para o autor {$nome_autor} <{$email_autor}> sobre o status do artigo: {$artigo['titulo']}");
+    
+    $resultado = mail($email_autor, $assunto, $mensagem, $headers);
+    
+    if ($resultado) {
+        error_log("[{$data_atual}] SUCESSO: E-mail enviado para o autor {$nome_autor} <{$email_autor}>");
+    } else {
+        error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail para o autor {$nome_autor} <{$email_autor}>");
+    }
+    
+    return $resultado;
 }
 ?>
