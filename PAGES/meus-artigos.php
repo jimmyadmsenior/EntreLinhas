@@ -200,7 +200,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
                             </div>
                             
                             <div class="article-actions">
-                                <a href="visualizar-artigo.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline">
+                                <a href="artigo.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline">
                                     <i class="fas fa-eye"></i> Visualizar
                                 </a>
                                 

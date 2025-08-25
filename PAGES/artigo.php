@@ -27,14 +27,28 @@ $artigo = obterArtigo($conn, $artigo_id);
 // Verificar se o artigo existe e está aprovado (ou se o usuário é o autor ou admin)
 $usuario_pode_ver = false;
 
-if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    // Verificar se é o autor do artigo ou um administrador
-    if(isset($artigo['usuario_id']) && ($artigo['usuario_id'] == $_SESSION["id"] || isAdmin($conn, $_SESSION["id"]))){
+// Garantir que o artigo foi encontrado
+if($artigo) {
+    // Se o usuário estiver logado, verificar permissões
+    if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+        // Verificar se é o autor do artigo
+        if($artigo['id_usuario'] == $_SESSION["id"]) {
+            $usuario_pode_ver = true;
+        } 
+        // Ou se é um administrador
+        else if(isAdmin($conn, $_SESSION["id"])) {
+            $usuario_pode_ver = true;
+        }
+    }
+    
+    // Se o artigo estiver aprovado, qualquer pessoa pode ver
+    if($artigo['status'] === 'aprovado') {
         $usuario_pode_ver = true;
     }
 }
 
-if(!$artigo || ($artigo['status'] !== 'aprovado' && !$usuario_pode_ver)){
+// Se não pode ver o artigo, redirecionar
+if(!$artigo || !$usuario_pode_ver) {
     header("location: ../index.php");
     exit;
 }
@@ -81,7 +95,7 @@ mysqli_close($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($artigo['titulo']); ?> - EntreLinhas</title>
-    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .container {
             max-width: 800px;

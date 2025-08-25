@@ -55,7 +55,7 @@ function adicionarComentario($conn, $comentario) {
     }
     
     // Inserir o comentário
-    $sql = "INSERT INTO comentarios (usuario_id, artigo_id, conteudo, data_comentario) VALUES (?, ?, ?, NOW())";
+    $sql = "INSERT INTO comentarios (usuario_id, artigo_id, conteudo) VALUES (?, ?, ?)";
     
     if ($stmt = mysqli_prepare($conn, $sql)) {
         mysqli_stmt_bind_param($stmt, "iis", $comentario['usuario_id'], $comentario['artigo_id'], $comentario['conteudo']);
@@ -181,11 +181,11 @@ function notificarNovoComentario($conn, $comentario_id, $autor_comentario) {
 function listarComentarios($conn, $artigo_id) {
     $comentarios = [];
     
-    $sql = "SELECT c.id, c.conteudo, c.data_comentario, u.id AS usuario_id, u.nome AS nome_usuario 
+    $sql = "SELECT c.id, c.conteudo, c.data_criacao AS data_comentario, u.id AS usuario_id, u.nome AS nome_usuario 
             FROM comentarios c 
             JOIN usuarios u ON c.usuario_id = u.id 
             WHERE c.artigo_id = ? 
-            ORDER BY c.data_comentario DESC";
+            ORDER BY c.data_criacao DESC";
     
     if ($stmt = mysqli_prepare($conn, $sql)) {
         mysqli_stmt_bind_param($stmt, "i", $artigo_id);
@@ -209,7 +209,7 @@ function listarComentarios($conn, $artigo_id) {
  * @return array|bool Dados do comentário ou false se não encontrado
  */
 function obterComentario($conn, $comentario_id) {
-    $sql = "SELECT c.id, c.usuario_id, c.artigo_id, c.conteudo, c.data_comentario, u.nome AS nome_usuario 
+    $sql = "SELECT c.id, c.usuario_id, c.artigo_id, c.conteudo, c.data_criacao AS data_comentario, u.nome AS nome_usuario 
             FROM comentarios c 
             JOIN usuarios u ON c.usuario_id = u.id 
             WHERE c.id = ?";
