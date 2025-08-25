@@ -40,19 +40,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             // Enviar notificação por e-mail para os administradores
             $artigo['id'] = $resultado['artigo_id'];
-            $notificacao_enviada = notificar_admins_novo_artigo($artigo, $autor_nome);
             
-            // Registrar no log se a notificação foi enviada
-            if ($notificacao_enviada) {
-                error_log("E-mail de notificação enviado para administradores sobre o artigo ID: " . $artigo['id']);
-            } else {
-                error_log("Falha ao enviar e-mail de notificação para administradores sobre o artigo ID: " . $artigo['id']);
+            try {
+                // Criar diretório de logs se não existir
+                if (!is_dir('../logs')) {
+                    mkdir('../logs', 0777, true);
+                }
+                
+                // Registrar a tentativa de envio
+                error_log("[" . date('Y-m-d H:i:s') . "] Tentando enviar notificação sobre artigo ID: " . $artigo['id'], 3, "../logs/email_notify.log");
+                
+                $notificacao_enviada = notificar_admins_novo_artigo($artigo, $autor_nome);
+                
+                // Registrar no log se a notificação foi enviada
+                if ($notificacao_enviada) {
+                    error_log("[" . date('Y-m-d H:i:s') . "] E-mail de notificação enviado para administradores sobre o artigo ID: " . $artigo['id'], 3, "../logs/email_notify.log");
+                } else {
+                    error_log("[" . date('Y-m-d H:i:s') . "] Falha ao enviar e-mail de notificação para administradores sobre o artigo ID: " . $artigo['id'], 3, "../logs/email_notify.log");
+                }
+            } catch (Exception $e) {
+                error_log("[" . date('Y-m-d H:i:s') . "] Exceção ao enviar notificação: " . $e->getMessage(), 3, "../logs/email_notify.log");
+                $notificacao_enviada = false;
             }
             
             // Redirecionar para página de sucesso
             $_SESSION['mensagem'] = $resultado['mensagem'];
             $_SESSION['tipo_mensagem'] = 'success';
-            header("Location: meus-artigos.php");
+            $_SESSION['artigo_enviado'] = true; // Marcar que um artigo foi enviado com sucesso
+            
+            // Registrar informações de debug sobre o envio de notificação
+            error_log("[DEBUG] Notificação de artigo: " . ($notificacao_enviada ? "ENVIADA" : "FALHOU"));
+            error_log("[DEBUG] ID do artigo: " . $artigo['id']);
+            error_log("[DEBUG] Autor: " . $autor_nome);
+            
+            // Redirecionar para a página de sucesso
+            header("Location: ../PAGES/envio-sucesso.php");
             exit;
         } else {
             // Exibir mensagem de erro
