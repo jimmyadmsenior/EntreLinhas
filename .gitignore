@@ -1,0 +1,37 @@
+# Arquivos de ambiente
+.env
+*.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Dependências
+/vendor/
+/node_modules/
+composer.lock
+package-lock.json
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+/logs/
+*.log
+npm-debug.log*
+
+# Arquivos de upload
+/uploads/*
+!/uploads/.gitkeep
+
+# Arquivos de configuração sensíveis
+config.php.bak
+config.local.php
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.swp
+*.swo

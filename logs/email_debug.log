@@ -1,0 +1,9 @@
+[26-Aug-2025 00:32:31 UTC] ===== INÍCIO DE TESTE DE EMAIL: 2025-08-26 00:32:31 =====
+[26-Aug-2025 00:32:31 UTC] [EMAIL TEST] Tentando enviar e-mail para: jimmycastilho555@gmail.com
+[26-Aug-2025 00:32:31 UTC] [EMAIL TEST] Assunto: Teste de Email EntreLinhas - 2025-08-26 00:32:31
+[26-Aug-2025 00:32:31 UTC] [EMAIL TEST] Headers: From: EntreLinhas <noreply@entrelinhas.com>
+
+[26-Aug-2025 00:32:33 UTC] [EMAIL TEST] Função mail() retornou FALSE
+[26-Aug-2025 00:32:33 UTC] [EMAIL TEST] Último erro: mail(): Failed to connect to mailserver at &quot;localhost&quot; port 25, verify your &quot;SMTP&quot; and &quot;smtp_port&quot; setting in php.ini or use ini_set()
+[26-Aug-2025 00:32:35 UTC] [EMAIL TEST] Teste HTML: Função mail() retornou FALSE
+[26-Aug-2025 00:32:35 UTC] ===== FIM DE TESTE DE EMAIL: 2025-08-26 00:32:35 =====

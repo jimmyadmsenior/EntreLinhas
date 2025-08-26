@@ -12,6 +12,7 @@ if (!isset($_SESSION['id'])) {
 require_once '../backend/config.php';
 require_once '../backend/artigos.php';
 require_once '../backend/email_notification.php';
+require_once '../backend/email_integration.php';
 
 // Verificar o tipo de ação (enviar ou editar)
 $acao = isset($_POST['acao']) ? $_POST['acao'] : 'enviar';
@@ -50,6 +51,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Registrar a tentativa de envio
                 error_log("[" . date('Y-m-d H:i:s') . "] Tentando enviar notificação sobre artigo ID: " . $artigo['id'], 3, "../logs/email_notify.log");
                 
+                // Usar a nova integração de e-mail
+                $artigo['status'] = 'pendente';
+                // Enviar notificação diretamente
                 $notificacao_enviada = notificar_admins_novo_artigo($artigo, $autor_nome);
                 
                 // Registrar no log se a notificação foi enviada

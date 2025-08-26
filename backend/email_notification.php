@@ -3,6 +3,9 @@
  * Funções para enviar notificações por e-mail
  */
 
+// Incluir o arquivo com as funções do SendGrid
+require_once __DIR__ . '/sendgrid_email.php';
+
 /**
  * Envia e-mail para os administradores sobre um novo artigo
  * 
@@ -39,22 +42,34 @@ function notificar_admins_novo_artigo($artigo, $autor) {
     $sucesso = true;
     $data_atual = date("Y-m-d H:i:s");
     
-    foreach ($admin_emails as $email) {
-        error_log("[{$data_atual}] Tentando enviar e-mail de notificação para {$email} sobre artigo: {$artigo['titulo']}");
+    // Verificar se temos as funções do SendGrid disponíveis
+    if (function_exists('notificar_admins_artigo')) {
+        // Usar SendGrid para enviar a notificação
+        error_log("[{$data_atual}] Usando SendGrid para enviar e-mails de notificação aos admins");
         
-        // Adicionar informações de depuração
-        $debug_info = "Sending mail to: {$email}\n";
-        $debug_info .= "Subject: {$assunto}\n";
-        $debug_info .= "Headers: {$headers}\n";
-        error_log("[DEBUG EMAIL] {$debug_info}");
+        $resultado = notificar_admins_artigo($artigo, $autor);
         
-        if (!mail($email, $assunto, $mensagem, $headers)) {
-            // Se falhar, marcamos como falha mas continuamos tentando enviar para os outros
-            $sucesso = false;
-            $error = error_get_last();
-            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail de notificação para {$email}. Erro: " . ($error ? json_encode($error) : "Desconhecido"));
+        if ($resultado) {
+            error_log("[{$data_atual}] SUCESSO: E-mails enviados para os administradores via SendGrid");
         } else {
-            error_log("[{$data_atual}] SUCESSO: E-mail de notificação enviado para {$email}");
+            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mails via SendGrid");
+            $sucesso = false;
+        }
+    } else {
+        // Método antigo com mail() como fallback
+        error_log("[{$data_atual}] SendGrid não disponível, usando mail() para enviar");
+        
+        foreach ($admin_emails as $email) {
+            error_log("[{$data_atual}] Tentando enviar e-mail de notificação para {$email} sobre artigo: {$artigo['titulo']}");
+            
+            if (!mail($email, $assunto, $mensagem, $headers)) {
+                // Se falhar, marcamos como falha mas continuamos tentando enviar para os outros
+                $sucesso = false;
+                $error = error_get_last();
+                error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail de notificação para {$email}. Erro: " . ($error ? json_encode($error) : "Desconhecido"));
+            } else {
+                error_log("[{$data_atual}] SUCESSO: E-mail de notificação enviado para {$email}");
+            }
         }
     }
     
@@ -103,12 +118,31 @@ function notificar_autor_status_artigo($email_autor, $nome_autor, $artigo, $apro
     $data_atual = date("Y-m-d H:i:s");
     error_log("[{$data_atual}] Tentando enviar e-mail para o autor {$nome_autor} <{$email_autor}> sobre o status do artigo: {$artigo['titulo']}");
     
-    $resultado = mail($email_autor, $assunto, $mensagem, $headers);
-    
-    if ($resultado) {
-        error_log("[{$data_atual}] SUCESSO: E-mail enviado para o autor {$nome_autor} <{$email_autor}>");
+    // Verificar se temos as funções do SendGrid disponíveis
+    if (function_exists('notificar_autor_status')) {
+        // Usar SendGrid para enviar a notificação
+        $artigo_data = [
+            'id' => $artigo['id'],
+            'titulo' => $artigo['titulo']
+        ];
+        $status = $aprovado ? 'aprovado' : 'rejeitado';
+        
+        $resultado = notificar_autor_status($artigo_data, $email_autor, $nome_autor, $status);
+        
+        if ($resultado) {
+            error_log("[{$data_atual}] SUCESSO: E-mail enviado para o autor {$nome_autor} <{$email_autor}> via SendGrid");
+        } else {
+            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail via SendGrid para {$nome_autor} <{$email_autor}>");
+        }
     } else {
-        error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail para o autor {$nome_autor} <{$email_autor}>");
+        // Método antigo com mail() como fallback
+        $resultado = mail($email_autor, $assunto, $mensagem, $headers);
+        
+        if ($resultado) {
+            error_log("[{$data_atual}] SUCESSO: E-mail enviado para o autor {$nome_autor} <{$email_autor}> via mail()");
+        } else {
+            error_log("[{$data_atual}] ERRO: Falha ao enviar e-mail via mail() para {$nome_autor} <{$email_autor}>");
+        }
     }
     
     return $resultado;
