@@ -2,6 +2,7 @@
 // Incluir arquivo de gerenciamento de sessões
 require_once "../backend/session_helper.php";
 require_once "../backend/config.php";
+require_once "../backend/db_connection_fix.php"; // Fix para problemas de conexão
 
 // Verificar se é administrador
 if (!is_admin()) {
