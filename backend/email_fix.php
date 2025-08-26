@@ -29,6 +29,11 @@ function log_email_attempt($subject, $to, $body, $success = true) {
     file_put_contents($log_file, $log_message, FILE_APPEND);
 }
 
+// Incluir solução para problemas de conexão com o banco de dados
+if (file_exists(__DIR__ . '/db_connection_fix.php')) {
+    require_once __DIR__ . '/db_connection_fix.php';
+}
+
 // Sobrescrever função de notificação para ambiente de desenvolvimento
 function notificar_admins_novo_artigo($artigo, $autor) {
     if (is_development_env()) {

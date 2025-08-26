@@ -4,6 +4,7 @@ session_start();
 
 // Incluir arquivo de configuração para conexão com o banco de dados
 require_once "../backend/config.php";
+require_once "../backend/db_connection_fix.php"; // Fix para problemas de conexão
 
 // Processar filtros
 $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : '';

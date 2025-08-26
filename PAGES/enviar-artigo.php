@@ -10,6 +10,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 
 // Incluir arquivo de configuração e helper de usuário
 require_once "../backend/config.php";
+require_once "../backend/db_connection_fix.php"; // Incluir o fix de conexão
 require_once "../backend/usuario_helper.php";
 
 // Obter a foto de perfil do usuário

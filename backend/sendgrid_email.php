@@ -6,10 +6,16 @@
  * sem dependências externas, usando apenas cURL que já vem com o PHP.
  */
 
+// Carregar variáveis de ambiente se o carregador existir
+if (file_exists(__DIR__ . '/env_loader.php')) {
+    require_once __DIR__ . '/env_loader.php';
+    carregarVariaveisAmbiente();
+}
+
 // Configuração da API SendGrid
-define('SENDGRID_API_KEY', 'CHAVE_SENDGRID_REMOVIDA'); // API Key do SendGrid
-define('EMAIL_FROM', 'noreply@entrelinhas.com'); // E-mail de envio
-define('EMAIL_FROM_NAME', 'EntreLinhas'); // Nome de exibição
+define('SENDGRID_API_KEY', getenv('SENDGRID_API_KEY') ?: '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'); // API Key do SendGrid
+define('EMAIL_FROM', getenv('EMAIL_REMETENTE') ?: 'noreply@entrelinhas.com'); // E-mail de envio
+define('EMAIL_FROM_NAME', getenv('EMAIL_NOME') ?: 'EntreLinhas'); // Nome de exibição
 
 /**
  * Envia e-mail usando a API SendGrid
@@ -31,7 +37,7 @@ function sendEmail($to, $subject, $html_content, $plain_content = '') {
     }
     
     // Verifica se a API Key foi configurada
-    if (!defined('SENDGRID_API_KEY') || SENDGRID_API_KEY == 'SUA_API_KEY_AQUI') {
+    if (!defined('SENDGRID_API_KEY') || empty(SENDGRID_API_KEY)) {
         $erro = 'SendGrid API Key não configurada!';
         error_log($erro);
         file_put_contents($log_file, date('Y-m-d H:i:s') . " - ERRO: {$erro}\n", FILE_APPEND);
