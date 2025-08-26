@@ -5,8 +5,12 @@
  * Funções de apoio para envio de e-mails usando a API do SendGrid
  */
 
-// Chave de API do SendGrid (não alterar)
-define('SENDGRID_API_KEY', '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');
+// Carregar variáveis de ambiente
+require_once __DIR__ . '/env_loader.php';
+carregarVariaveisAmbiente();
+
+// Chave de API do SendGrid
+define('SENDGRID_API_KEY', getenv('SENDGRID_API_KEY') ?: '');
 
 /**
  * Envia e-mail usando a API SendGrid
@@ -18,7 +22,10 @@ define('SENDGRID_API_KEY', 'SG.U-8z00lQQLOGgS2jBYZvOA.UzuCd163lX5DSDfuPszu59v2nF
  * @param string $remetente_email E-mail do remetente (opcional)
  * @return bool Verdadeiro se o e-mail foi enviado, falso caso contrário
  */
-function sendEmail($destinatario, $assunto, $conteudo, $remetente_nome = 'EntreLinhas', $remetente_email = 'jimmycastilho555@gmail.com') {
+function sendEmail($destinatario, $assunto, $conteudo, $remetente_nome = null, $remetente_email = null) {
+    // Obter nome e email do remetente das variáveis de ambiente ou usar valores padrão
+    $remetente_nome = $remetente_nome ?: (getenv('EMAIL_NOME') ?: 'EntreLinhas');
+    $remetente_email = $remetente_email ?: (getenv('EMAIL_REMETENTE') ?: 'jimmycastilho555@gmail.com');
     $url = 'https://api.sendgrid.com/v3/mail/send';
     $headers = [
         'Authorization: Bearer ' . SENDGRID_API_KEY,
