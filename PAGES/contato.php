@@ -192,8 +192,7 @@ $page_title = "Contato - EntreLinhas";
                     </div>
                     <div>
                         <h3>Telefone</h3>
-                        <p>(11) 4029-1234</p>
-                        <p>(11) 98765-4321</p>
+                        <p>(11) 4029-8635</p>
                     </div>
                 </div>
                 
@@ -203,8 +202,8 @@ $page_title = "Contato - EntreLinhas";
                     </div>
                     <div>
                         <h3>Endereço</h3>
-                        <p>Av. Marechal Rondon, 3000</p>
-                        <p>Jardim Bandeirantes, Salto - SP</p>
+                        <p>Rua Israel, 100</p>
+                        <p>Jardim Panorama, Salto - SP</p>
                         <p>CEP: 13324-000</p>
                     </div>
                 </div>
@@ -224,7 +223,7 @@ $page_title = "Contato - EntreLinhas";
         
         <div class="map-container my-5">
             <h2>Como Chegar</h2>
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3670.9259775887546!2d-47.29529778503663!3d-23.05589204904281!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cf4dff1b31a70b%3A0x86b61f14ca3c84a5!2sAv.%20Mal.%20Rondon%2C%203000%20-%20Jardim%20Bandeirantes%2C%20Salto%20-%20SP%2C%2013324-065!5e0!3m2!1spt-BR!2sbr!4v1679876543210!5m2!1spt-BR!2sbr" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3673.4455067545604!2d-47.29987792352808!3d-22.985418479086388!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8b5acd735fc87%3A0xdfa7c96e51bfdf8!2sR.%20Israel%2C%20100%20-%20Jardim%20Panorama%2C%20Salto%20-%20SP%2C%2013324-300!5e0!3m2!1spt-BR!2sbr!4v1684524361021!5m2!1spt-BR!2sbr" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </main>
 

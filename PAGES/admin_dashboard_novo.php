@@ -397,9 +397,9 @@ $nome_admin = isset($_SESSION["nome"]) ? htmlspecialchars($_SESSION["nome"]) : "
                 <div class="footer-section">
                     <h3>Contato</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-envelope"></i> contato@entrelinhas.com</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Av. Marechal Rondon, 3000 - Salto/SP</li>
-                        <li><i class="fas fa-phone"></i> (11) 4029-1234</li>
+                        <li><i class="fas fa-envelope"></i> jimmycastilho555@gmail.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Rua Israel, 100 - Jardim Panorama, Salto - SP</li>
+                        <li><i class="fas fa-phone"></i> (11) 4029-8635</li>
                     </ul>
                 </div>
             </div>
