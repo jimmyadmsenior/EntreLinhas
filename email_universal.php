@@ -607,7 +607,7 @@ if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
                 <h3>Configurações do SendGrid</h3>
                 <div class="form-group">
                     <label for="sendgrid_api_key">API Key:</label>
-                    <input type="text" id="sendgrid_api_key" name="sendgrid_api_key" placeholder="SG.xxxxx" value="<?php echo $email->configuracoes['sendgrid']['api_key'] ?? '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'; ?>">
+                    <input type="text" id="sendgrid_api_key" name="sendgrid_api_key" placeholder="SG.xxxxx" value="<?php echo $email->configuracoes['sendgrid']['api_key'] ?? 'CHAVE_SENDGRID_REMOVIDA'; ?>">
                 </div>
             </div>
             

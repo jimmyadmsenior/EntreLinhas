@@ -20,7 +20,7 @@ if (!isset($_POST['enviar'])) {
         <p>E-mail destinatário: <input type="email" name="to_email" value="jimmycastilho555@gmail.com" required></p>
         <p>Assunto: <input type="text" name="subject" value="Teste Simples SendGrid" required></p>
         <p>Mensagem: <textarea name="message" required>Teste simples de e-mail via SendGrid</textarea></p>
-        <p>API Key: <input type="text" name="api_key" value="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" required></p>
+        <p>API Key: <input type="text" name="api_key" value="CHAVE_SENDGRID_REMOVIDA" required></p>
         <p><input type="submit" name="enviar" value="Enviar E-mail"></p>
     </form>';
 } else {

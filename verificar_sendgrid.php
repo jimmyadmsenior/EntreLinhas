@@ -36,7 +36,7 @@ function check_connection($host, $port=443, $timeout=5) {
 $sendgrid_api_connection = check_connection('api.sendgrid.com');
 
 // Verificar API Key
-$api_key = "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";
+$api_key = "CHAVE_SENDGRID_REMOVIDA";
 $api_key_valid_format = (strpos($api_key, 'SG.') === 0 && strlen($api_key) > 20);
 
 // Verificar arquivo de configuração

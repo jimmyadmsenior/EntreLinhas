@@ -7,7 +7,7 @@
  */
 
 // Configuração da API SendGrid
-define('SENDGRID_API_KEY', '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'); // API Key do SendGrid
+define('SENDGRID_API_KEY', 'CHAVE_SENDGRID_REMOVIDA'); // API Key do SendGrid
 define('EMAIL_FROM', 'noreply@entrelinhas.com'); // E-mail de envio
 define('EMAIL_FROM_NAME', 'EntreLinhas'); // Nome de exibição
 

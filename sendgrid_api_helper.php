@@ -18,7 +18,7 @@
  * @param string $api_key Chave API do SendGrid (opcional)
  * @return array Resultado da operação
  */
-function sendgrid_send_email($to_email, $subject, $html_message, $plain_message = '', $from_email = 'jimmycastilho555@gmail.com', $from_name = 'EntreLinhas', $api_key = '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') {
+function sendgrid_send_email($to_email, $subject, $html_message, $plain_message = '', $from_email = 'jimmycastilho555@gmail.com', $from_name = 'EntreLinhas', $api_key = 'CHAVE_SENDGRID_REMOVIDA') {
     // Verificar parâmetros
     if (empty($to_email) || empty($subject) || empty($html_message)) {
         return [

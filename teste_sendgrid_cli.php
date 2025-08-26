@@ -7,7 +7,7 @@ $to_email = "jimmycastilho555@gmail.com";
 $from_email = "jimmycastilho555@gmail.com";
 $subject = "Teste CLI SendGrid";
 $message = "Este é um teste de envio via linha de comando.";
-$api_key = "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";
+$api_key = "CHAVE_SENDGRID_REMOVIDA";
 
 // Ativar relatório de erros
 ini_set('display_errors', 1);

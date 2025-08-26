@@ -173,7 +173,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div style="margin-top: 10px;">
                 <label for="api_key">SendGrid API Key:</label><br>
                 <input type="text" id="api_key" name="api_key" required style="width: 100%;"
-                       value="<?php echo isset($_POST['api_key']) ? htmlspecialchars($_POST['api_key']) : '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'; ?>">
+                       value="<?php echo isset($_POST['api_key']) ? htmlspecialchars($_POST['api_key']) : 'CHAVE_SENDGRID_REMOVIDA'; ?>">
             </div>
             <div style="margin-top: 20px;">
                 <input type="submit" name="enviar" value="Enviar E-mail de Teste">

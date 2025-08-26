@@ -77,7 +77,7 @@ function executarTeste($nome, $funcao) {
         
         <?php
         // API Key do SendGrid para teste
-        $api_key = "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";
+        $api_key = "CHAVE_SENDGRID_REMOVIDA";
         
         // 1. Teste de disponibilidade de cURL
         executarTeste("Verificação de cURL", function() {
