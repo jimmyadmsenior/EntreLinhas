@@ -1,0 +1,82 @@
+<?php
+// Criar um helper de usuário para recuperar a foto de perfil
+// Este arquivo será incluído em todas as páginas que precisam exibir a foto de perfil do usuário
+
+/**
+ * Cria ou recupera uma conexão válida com o banco de dados
+ * 
+ * @return mysqli Uma conexão válida com o banco de dados
+ */
+function get_valid_connection() {
+    // Verificar se temos as constantes definidas
+    if (!defined('DB_SERVER') || !defined('DB_USERNAME') || !defined('DB_PASSWORD') || !defined('DB_NAME')) {
+        // Definir as constantes se não existirem
+        define('DB_SERVER', 'localhost');
+        define('DB_USERNAME', 'root');
+        define('DB_PASSWORD', '');
+        define('DB_NAME', 'entrelinhas');
+    }
+    
+    // Criar uma nova conexão
+    $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    
+    // Verificar conexão
+    if (!$conn) {
+        // Registrar erro
+        error_log('Falha ao conectar ao MySQL: ' . mysqli_connect_error());
+        return null;
+    }
+    
+    // Configurar charset para UTF-8
+    mysqli_set_charset($conn, "utf8mb4");
+    
+    return $conn;
+}
+
+/**
+ * Obtém a foto de perfil do usuário
+ * 
+ * @param mysqli $conn A conexão com o banco de dados (pode ser ignorada)
+ * @param int $usuario_id O ID do usuário
+ * @return string|null A imagem em base64 ou null se não existir
+ */
+function obter_foto_perfil($conn, $usuario_id) {
+    $foto_perfil = null;
+    
+    // Verificar se precisamos de uma nova conexão
+    $nova_conexao = false;
+    if (!$conn || !($conn instanceof mysqli) || @$conn->connect_errno) {
+        // Se a conexão não estiver ativa, criar uma nova
+        $conn = get_valid_connection();
+        $nova_conexao = true;
+        if (!$conn) {
+            return null; // Não foi possível conectar ao banco
+        }
+    }
+    
+    $sql_foto = "SELECT imagem_base64 FROM fotos_perfil WHERE id_usuario = ?";
+    
+    try {
+        if ($stmt_foto = mysqli_prepare($conn, $sql_foto)) {
+            mysqli_stmt_bind_param($stmt_foto, "i", $usuario_id);
+            mysqli_stmt_execute($stmt_foto);
+            mysqli_stmt_bind_result($stmt_foto, $imagem_base64);
+            
+            if (mysqli_stmt_fetch($stmt_foto)) {
+                $foto_perfil = $imagem_base64;
+            }
+            
+            mysqli_stmt_close($stmt_foto);
+        }
+    } catch (Exception $e) {
+        error_log('Erro ao obter foto de perfil: ' . $e->getMessage());
+    }
+    
+    // Se criamos uma nova conexão, fechar
+    if ($nova_conexao && $conn) {
+        mysqli_close($conn);
+    }
+    
+    return $foto_perfil;
+}
+?>

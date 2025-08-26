@@ -1,0 +1,19 @@
+<?php
+// Redirecionar para a versão PHP
+header("Location: escola.php");
+exit;
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=escola.php">
+    <title>Redirecionando...</title>
+    <script>
+        window.location.href = "escola.php" + window.location.search;
+    </script>
+</head>
+<body>
+    <p>Redirecionando para <a href="escola.php">escola.php</a>...</p>
+</body>
+</html>

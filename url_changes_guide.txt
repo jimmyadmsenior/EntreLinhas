@@ -1,0 +1,57 @@
+# Modificações para URLs no Site EntreLinhas
+
+Quando fizer o deploy no InfinityFree ou em qualquer outra hospedagem, você precisará atualizar as URLs em várias partes do código. Aqui está uma lista dos principais arquivos onde você deve procurar e alterar as URLs:
+
+## 1. Funções de notificação no arquivo sendgrid_email.php
+
+Altere as URLs de localhost para seu domínio:
+
+```php
+// Antes:
+$mensagem .= "<p>Para revisar e aprovar este artigo, acesse o <a href='http://localhost:8000/PAGES/admin_dashboard.php'>Painel de Administração</a>.</p>";
+
+// Depois:
+$mensagem .= "<p>Para revisar e aprovar este artigo, acesse o <a href='https://entrelinhas.infinityfreeapp.com/PAGES/admin_dashboard.php'>Painel de Administração</a>.</p>";
+```
+
+```php
+// Antes:
+$mensagem .= "<p>Você pode visualizar seu artigo publicado <a href='http://localhost:8000/PAGES/artigo.php?id={$artigo['id']}'>clicando aqui</a>.</p>";
+
+// Depois:
+$mensagem .= "<p>Você pode visualizar seu artigo publicado <a href='https://entrelinhas.infinityfreeapp.com/PAGES/artigo.php?id={$artigo['id']}'>clicando aqui</a>.</p>";
+```
+
+## 2. Links em arquivos de template/HTML
+
+Procure por links absolutos em arquivos como:
+- PAGES/*.php
+- PAGES/includes/*.php
+
+Exemplos de padrões a procurar:
+- `href="http://localhost"`
+- `action="http://localhost"`
+- `src="http://localhost"`
+
+## 3. Redirecionamentos em arquivos PHP
+
+Procure por funções header() que redirecionam para URLs absolutas:
+
+```php
+// Antes:
+header("Location: http://localhost:8000/PAGES/login.php");
+
+// Depois:
+header("Location: https://entrelinhas.infinityfreeapp.com/PAGES/login.php");
+```
+
+## Dica: Use a função BASE_URL
+
+Se você definiu BASE_URL no config.php, pode usar essa constante para construir URLs:
+
+```php
+// Exemplo:
+$url = BASE_URL . '/PAGES/artigo.php?id=' . $id;
+```
+
+Isso torna mais fácil mudar de ambiente no futuro.

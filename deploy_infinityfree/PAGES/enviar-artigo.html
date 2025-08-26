@@ -1,0 +1,19 @@
+<?php
+// Redirecionar para a versão PHP
+header("Location: enviar-artigo.php");
+exit;
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=enviar-artigo.php">
+    <title>Redirecionando...</title>
+    <script>
+        window.location.href = "enviar-artigo.php" + window.location.search;
+    </script>
+</head>
+<body>
+    <p>Redirecionando para <a href="enviar-artigo.php">enviar-artigo.php</a>...</p>
+</body>
+</html>
