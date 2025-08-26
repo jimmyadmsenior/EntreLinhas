@@ -1,0 +1,21 @@
+## Checklist de pré-deploy para o EntreLinhas
+
+1. Configuração do banco de dados:
+   - Atualizar backend/config.php com as credenciais do banco de dados da hospedagem
+   - Verificar se o arquivo .env (se existir) está configurado corretamente
+
+2. Ajustes de caminhos:
+   - Verificar se todos os caminhos estão relativos e não absolutos
+   - Confirmar que as referências a arquivos e diretórios funcionarão no novo ambiente
+
+3. Configurações de email:
+   - Garantir que as credenciais do SendGrid estão configuradas para o ambiente de produção
+   - Verificar se o email de contato está configurado corretamente
+
+4. Segurança:
+   - Remover arquivos de teste como teste_php.php, teste_db.php, phpinfo.php
+   - Verificar se informações sensíveis não estão expostas no código
+
+5. Otimização:
+   - Minificar CSS e JavaScript (opcional)
+   - Otimizar imagens (opcional)

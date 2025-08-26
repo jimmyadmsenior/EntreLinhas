@@ -1,0 +1,83 @@
+# Guia de Deploy Gratuito no InfinityFree
+
+## 1. Criar uma conta no InfinityFree
+
+1. Acesse [https://infinityfree.net](https://infinityfree.net)
+2. Clique em "Sign up" e crie uma conta gratuita
+3. Verifique seu email e confirme sua conta
+
+## 2. Criar um novo site
+
+1. Faça login no painel do InfinityFree
+2. Clique em "New Website"
+3. Escolha um subdomínio (exemplo: entrelinhas.infinityfreeapp.com)
+4. Aguarde a criação do site (normalmente leva alguns minutos)
+
+## 3. Configurar o banco de dados
+
+1. No painel de controle, clique em "MySQL Databases"
+2. Clique em "Create New Database"
+3. Escolha um nome para o banco de dados, nome de usuário e senha
+   - Anote essas informações! Você precisará delas para atualizar seu arquivo config.php
+4. Clique em "Create"
+5. Acesse o phpMyAdmin clicando no ícone na mesma linha do seu banco de dados
+6. Importe seu arquivo SQL:
+   - Clique na aba "Importar"
+   - Selecione o arquivo SQL exportado do seu ambiente local
+   - Clique em "Executar"
+
+## 4. Preparar os arquivos do site
+
+1. Atualize o arquivo backend/config.php com as informações do banco de dados:
+   ```php
+   // Arquivo de configuração do banco de dados
+   define('DB_SERVER', 'sql306.infinityfree.com'); // Use o servidor MySQL fornecido pelo InfinityFree
+   define('DB_USERNAME', 'seu_usuario_do_mysql'); // O usuário que você criou
+   define('DB_PASSWORD', 'sua_senha_do_mysql'); // A senha que você criou
+   define('DB_NAME', 'seu_nome_de_banco'); // O nome do banco que você criou
+   ```
+
+2. Atualize as URLs em seus arquivos para apontar para o novo domínio:
+   - Procure por "http://localhost" ou "localhost:8000" e substitua pelo seu subdomínio
+   - Exemplo: substituir "http://localhost/PAGES/" por "https://entrelinhas.infinityfreeapp.com/PAGES/"
+
+## 5. Upload dos arquivos
+
+### Usando o Gerenciador de Arquivos:
+
+1. No painel do InfinityFree, clique em "Online File Manager"
+2. Navegue até a pasta "htdocs"
+3. Faça upload dos seus arquivos (você pode fazer upload de um arquivo ZIP e descompactá-lo lá)
+
+### Usando FTP:
+
+1. No painel do InfinityFree, clique em "FTP Accounts" para ver seus detalhes de FTP
+2. Use um cliente FTP como FileZilla com esses dados:
+   - Servidor: ftpupload.net (geralmente)
+   - Nome de usuário: seu nome de usuário fornecido
+   - Senha: sua senha de FTP
+   - Porta: 21
+3. Conecte-se e faça upload de todos os arquivos para a pasta "htdocs"
+
+## 6. Verificação e testes
+
+1. Acesse seu site pelo subdomínio (ex: https://entrelinhas.infinityfreeapp.com)
+2. Verifique se todas as páginas estão carregando corretamente
+3. Teste o login, cadastro e outras funcionalidades
+4. Verifique se as imagens estão sendo exibidas corretamente
+
+## Solução de problemas comuns
+
+1. **Erro de conexão com o banco de dados**:
+   - Verifique se as informações do banco de dados em config.php estão corretas
+   - Certifique-se de que o banco de dados foi importado corretamente
+
+2. **Arquivos não encontrados (404)**:
+   - Verifique se todos os arquivos foram enviados para a pasta correta
+   - Certifique-se de que os nomes dos arquivos correspondem exatamente aos links
+
+3. **Permissões de arquivos**:
+   - A pasta "uploads" precisa ter permissão de escrita (755 ou 775)
+
+4. **Erro de caminho absoluto**:
+   - Certifique-se de usar caminhos relativos em vez de absolutos em seu código

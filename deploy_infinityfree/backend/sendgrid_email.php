@@ -1,16 +1,21 @@
- <?php
+<?php
 /**
- * SendGrid Email Service para EntreLinhas
+ * SendGrid Email Service para EntreLinhas - Versão de Produção
  * 
- * Esta é uma implementação simples para envio de e-mails via SendGrid API
- * sem dependências externas, usando apenas cURL que já vem com o PHP.
+ * Esta é uma implementação para o ambiente de produção.
+ * As URLs foram atualizadas para usar o domínio real em vez de localhost.
  */
 
 // Carregar variáveis de ambiente se o carregador existir
-if (file_exists(__DIR__ . '/env_loader.php')) {
+if (file_exists(__DIR__ . '/env_infinityfree.php')) {
+    require_once __DIR__ . '/env_infinityfree.php';
+} elseif (file_exists(__DIR__ . '/env_loader.php')) {
     require_once __DIR__ . '/env_loader.php';
     carregarVariaveisAmbiente();
 }
+
+// URL base do site
+define('SITE_URL', 'https://entrelinhas.infinityfreeapp.com'); // Atualize para o seu domínio real
 
 // Configuração da API SendGrid
 define('SENDGRID_API_KEY', getenv('SENDGRID_API_KEY') ?: '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'); // API Key do SendGrid
@@ -167,7 +172,7 @@ function notificar_admins_artigo($artigo, $autor) {
     $mensagem .= "<p><strong>Autor:</strong> {$autor}</p>";
     $mensagem .= "<p><strong>Data de envio:</strong> " . date("d/m/Y H:i:s") . "</p>";
     $mensagem .= "<p><strong>Resumo:</strong> " . substr(strip_tags($artigo['conteudo']), 0, 200) . "...</p>";
-    $mensagem .= "<p>Para revisar e aprovar este artigo, acesse o <a href='http://localhost:8000/PAGES/admin_dashboard.php'>Painel de Administração</a>.</p>";
+    $mensagem .= "<p>Para revisar e aprovar este artigo, acesse o <a href='" . SITE_URL . "/PAGES/admin_dashboard.php'>Painel de Administração</a>.</p>";
     $mensagem .= "</body></html>";
     
     // Enviar e-mail para cada administrador
@@ -206,10 +211,10 @@ function notificar_autor_status($artigo, $email_autor, $nome_autor, $status_novo
     
     if ($status_novo == 'aprovado') {
         $mensagem .= "<p>Temos o prazer de informar que seu artigo foi <strong style='color: green;'>aprovado</strong> e já está disponível no EntreLinhas.</p>";
-        $mensagem .= "<p>Você pode visualizar seu artigo publicado <a href='http://localhost:8000/PAGES/artigo.php?id={$artigo['id']}'>clicando aqui</a>.</p>";
+        $mensagem .= "<p>Você pode visualizar seu artigo publicado <a href='" . SITE_URL . "/PAGES/artigo.php?id={$artigo['id']}'>clicando aqui</a>.</p>";
     } elseif ($status_novo == 'rejeitado') {
         $mensagem .= "<p>Infelizmente, seu artigo foi <strong style='color: red;'>rejeitado</strong> pela equipe editorial.</p>";
-        $mensagem .= "<p>Você pode revisar e reenviar seu artigo com as melhorias necessárias através da sua <a href='http://localhost:8000/PAGES/meus-artigos.php'>área de usuário</a>.</p>";
+        $mensagem .= "<p>Você pode revisar e reenviar seu artigo com as melhorias necessárias através da sua <a href='" . SITE_URL . "/PAGES/meus-artigos.php'>área de usuário</a>.</p>";
     } else {
         $mensagem .= "<p>Seu artigo está atualmente <strong>{$status_texto[$status_novo]}</strong> pela nossa equipe editorial.</p>";
     }

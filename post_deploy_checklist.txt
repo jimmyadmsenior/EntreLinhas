@@ -1,0 +1,39 @@
+# Lista de verificação pós-deploy do EntreLinhas
+
+Depois de fazer o upload do site para a hospedagem, siga estas etapas para garantir que tudo esteja funcionando corretamente:
+
+## 1. Verificações básicas:
+- [ ] Acessar a página inicial (homepage) do site
+- [ ] Verificar se as imagens estão carregando corretamente
+- [ ] Testar o menu de navegação e os links internos
+- [ ] Verificar se o CSS está sendo aplicado corretamente
+
+## 2. Funcionalidades do banco de dados:
+- [ ] Tentar criar uma nova conta de usuário
+- [ ] Fazer login com uma conta existente
+- [ ] Publicar um novo artigo
+- [ ] Verificar se os artigos existentes estão sendo exibidos corretamente
+- [ ] Testar comentários em artigos
+
+## 3. Funções administrativas:
+- [ ] Fazer login como administrador
+- [ ] Acessar o painel administrativo
+- [ ] Gerenciar artigos (editar/excluir)
+- [ ] Gerenciar usuários
+
+## 4. Sistema de e-mail:
+- [ ] Testar o formulário de contato
+- [ ] Verificar se e-mails de cadastro estão sendo enviados
+- [ ] Testar a recuperação de senha
+
+## 5. Performance:
+- [ ] Verificar o tempo de carregamento das páginas
+- [ ] Testar a responsividade em dispositivos móveis
+
+## 6. Logs e erros:
+- [ ] Verificar se não há erros PHP aparecendo para os usuários
+- [ ] Checar os logs de erro do servidor (se disponíveis na hospedagem)
+
+## 7. SEO básico:
+- [ ] Confirmar que as meta tags estão presentes
+- [ ] Verificar se os títulos das páginas estão corretos

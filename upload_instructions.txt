@@ -1,0 +1,34 @@
+# Como fazer o upload do site EntreLinhas para a hospedagem
+
+## Método 1: Usando FTP/SFTP
+1. Baixe e instale um cliente FTP como FileZilla ou WinSCP
+2. Configure a conexão com os dados fornecidos pela sua hospedagem:
+   - Endereço do servidor (normalmente ftp.seudominio.com)
+   - Nome de usuário
+   - Senha
+   - Porta (geralmente 21 para FTP ou 22 para SFTP)
+3. Conecte-se ao servidor
+4. Navegue até a pasta pública do seu site (geralmente chamada public_html, www, httpdocs ou htdocs)
+5. Faça o upload de todos os arquivos do projeto EntreLinhas para esta pasta
+
+## Método 2: Usando painel de controle da hospedagem
+1. Acesse o painel de controle da sua hospedagem (cPanel, Plesk, etc.)
+2. Encontre a opção de "Gerenciador de Arquivos" ou similar
+3. Navegue até a pasta pública do seu site
+4. Use a opção de upload para enviar um arquivo ZIP com todo o conteúdo do site
+5. Descompacte o arquivo no servidor
+
+## Arquivos e pastas para fazer upload
+- Pasta 'assets'
+- Pasta 'backend'
+- Pasta 'PAGES'
+- Pasta 'uploads' (certifique-se que esta pasta tem permissões de escrita - chmod 755 ou 775)
+- Arquivo '.htaccess'
+- Arquivo 'index.php'
+
+## Arquivos para NÃO fazer upload
+- Arquivos de configuração locais (se você criou versões separadas para desenvolvimento)
+- Arquivos de teste ('teste_*.php')
+- phpinfo.php
+- Arquivos temporários
+- Arquivos .git (se estiver usando controle de versão)

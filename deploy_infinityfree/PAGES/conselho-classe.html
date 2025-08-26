@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Conselho de Classe - 3º Ano SESI Salto</title>
+    <link rel="icon" type="image/png" href="../assets/images/jornal.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/user-menu.css">
+    <style>
+        .toggle-dark-switch {
+            position: fixed;
+            top: 22px;
+            right: 32px;
+            z-index: 1001;
+            background: none;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .switch-bg {
+            width: 70px;
+            height: 32px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(90deg, #ffb300 60%, #ffd600 100%);
+            box-shadow: 0 2px 8px rgba(160,0,0,0.10);
+            transition: background 0.4s;
+        }
+        .switch-knob {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+            left: 4px;
+            top: 2px;
+            transition: left 0.4s cubic-bezier(.4,2.08,.55,.44), background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            overflow: hidden;
+        }
+        .switch-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3em;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .switch-icon.sun {
+            color: #ffffff;
+            opacity: 1;
+        }
+        .switch-icon.moon {
+            color: #002ca5;
+            opacity: 0;
+        }
+        .dark-mode .switch-icon.sun {
+            opacity: 0;
+        }
+        .dark-mode .switch-icon.moon {
+            opacity: 1;
+        }
+        .dark-mode .switch-knob {
+            left: 38px;
+            background: #f3f3f3;
+        }
+        .dark-mode .switch-bg {
+            background: linear-gradient(90deg, #1e3a8a 60%, #2563eb 100%);
+        }
+        .toggle-dark-switch:hover,
+        .toggle-dark-switch:focus,
+        .toggle-dark-switch:active,
+        .dark-mode .toggle-dark-switch:hover,
+        .dark-mode .toggle-dark-switch:focus,
+        .dark-mode .toggle-dark-switch:active {
+            background: none;
+            outline: none;
+            box-shadow: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">SESI Salto</div>
+        <nav>
+            <a href="conselho-classe.html" class="active">Apresentando</a>
+            <a href="conhecimentos.html">Conhecimentos</a>
+            <a href="escola.html">A Escola</a>
+        </nav>
+        <div class="hamburger" id="sidebar-hamburger" aria-label="Abrir menu" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </aside>
+    <!-- Botão dark/light switch moderno -->
+    <button class="toggle-dark-switch" id="toggle-dark-btn" title="Alternar modo escuro" aria-label="Alternar modo escuro">
+        <span class="switch-bg">
+            <span class="switch-icon sun">&#9728;</span>
+            <span class="switch-icon moon">&#9790;</span>
+            <span class="switch-knob"></span>
+        </span>
+    </button>
+    <div class="main-content">
+        <h1 id="titulo">Conselho de Classe - 3º Ano SESI Salto</h1>
+        <p id="intro">Olá professores! Hoje viemos apresentar nossa participação para escola! Como a escola nos ajuda.<br>Nosso objetivo é ouvir, apoiar e representar todos os colegas da turma.</p>
+        <div class="representantes">
+            <div class="card" tabindex="0"
+                onmouseenter="mostrarCardMsg(this, 'Miguel')"
+                onmouseleave="ocultarCardMsg(this)"
+                onclick="mostrarCardMsg(this, 'Miguel')">
+                <img src="../MEDIA/Miguel_photoanother.png" alt="Foto de Miguel" class="card-foto" />
+                <h2>Miguel</h2>
+                <p>Representante de classe<br>3º Ano - SESI Salto</p>
+                <div class="card-msg" style="display:none;">Representante de classe, conversativo e participativo.</div>
+            </div>
+            <div class="card" tabindex="0"
+                onmouseenter="mostrarCardMsg(this, 'Bianca')"
+                onmouseleave="ocultarCardMsg(this)"
+                onclick="mostrarCardMsg(this, 'Bianca')">
+                <img src="../MEDIA/bianca.jpg" alt="Foto de Bianca" class="card-foto" />
+                <h2>Bianca</h2>
+                <p>Vice-Representante de classe<br>3º Ano - SESI Salto</p>
+                <div class="card-msg" style="display:none;">Vice representante de classe, sempre pronta para ajudar.</div>
+            </div>
+        </div>
+        <div class="welcome">
+            <button onclick="mostrarMensagem()">Clique para uma mensagem especial</button>
+            <p id="mensagem"></p>
+        </div>
+    </div>
+    <script>
+        // Sidebar hamburger menu (mobile)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarHamburger = document.getElementById('sidebar-hamburger');
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+        }
+        if (sidebarHamburger) {
+            sidebarHamburger.addEventListener('click', toggleSidebar);
+            sidebarHamburger.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    toggleSidebar();
+                }
+            });
+        }
+
+        // Fecha sidebar ao clicar fora (mobile)
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // Mensagem especial
+        function mostrarMensagem() {
+            const mensagem = "Contem sempre com a gente! Juntos, vamos fazer deste ano o melhor possível!";
+            const msgElem = document.getElementById('mensagem');
+            msgElem.textContent = mensagem;
+        }
+
+        // Mensagem dos representantes ao passar/clicar (sem efeito typing)
+        function mostrarCardMsg(card, nome) {
+            const msgDiv = card.querySelector('.card-msg');
+            msgDiv.style.display = "block";
+            card.classList.add('show-msg');
+        }
+        function ocultarCardMsg(card) {
+            const msgDiv = card.querySelector('.card-msg');
+            msgDiv.style.display = "none";
+            card.classList.remove('show-msg');
+        }
+
+        // Switch dark/light com persistência no localStorage
+        const toggleBtn = document.getElementById('toggle-dark-btn');
+        function setDarkMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('dark-mode', '1');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('dark-mode', '0');
+            }
+        }
+        function updateSwitchBtn() {
+            // Só anima via CSS, nada a fazer aqui
+        }
+        // Inicializa modo escuro se já estava ativado
+        if (localStorage.getItem('dark-mode') === '1') {
+            document.body.classList.add('dark-mode');
+        }
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const isDark = document.body.classList.toggle('dark-mode');
+                localStorage.setItem('dark-mode', isDark ? '1' : '0');
+                updateSwitchBtn();
+            });
+            updateSwitchBtn();
+        }
+    </script>
+    
+    <!-- Scripts principais -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header-nav.js"></script>
+</body>
+</html>

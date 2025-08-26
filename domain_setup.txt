@@ -1,0 +1,33 @@
+# Configuração de Domínio para o EntreLinhas
+
+## Se você já possui um domínio:
+
+1. Acesse o painel onde seu domínio está registrado (Registro.br, GoDaddy, etc.)
+2. Localize a seção de gerenciamento de DNS
+3. Configure os servidores DNS para apontar para os servidores da sua hospedagem:
+   - Normalmente, a hospedagem fornecerá 2-3 endereços de servidores DNS (ns1.hospedagem.com, ns2.hospedagem.com)
+   - Adicione estes servidores no painel do seu registrador de domínios
+4. Aguarde a propagação do DNS (pode levar de 24 a 48 horas)
+
+## Se você precisa comprar um domínio:
+
+1. Você pode comprar um domínio diretamente com a sua hospedagem ou em registradores como:
+   - Registro.br (para domínios .br)
+   - GoDaddy, Namecheap, HostGator, etc. (para outros domínios)
+2. Durante o processo de compra, você pode apontar diretamente para os servidores DNS da sua hospedagem
+
+## Configurações no painel da hospedagem:
+
+1. Acesse o painel de controle da sua hospedagem
+2. Localize a seção de "Domínios" ou "Gerenciar sites"
+3. Adicione seu domínio e aponte para a pasta onde você fez o upload dos arquivos
+4. Se necessário, configure certificados SSL (muitas hospedagens oferecem Let's Encrypt gratuitamente)
+
+## Subdomínios (opcional):
+
+Se você quiser criar subdomínios como:
+- admin.seudominio.com
+- blog.seudominio.com
+
+1. No painel da hospedagem, procure por "Subdomínios" ou similar
+2. Crie o subdomínio e aponte para a pasta correta no servidor

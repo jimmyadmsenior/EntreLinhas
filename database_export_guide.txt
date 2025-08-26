@@ -1,0 +1,24 @@
+# Exportando o banco de dados EntreLinhas
+
+## Usando phpMyAdmin:
+1. Acesse o phpMyAdmin do seu ambiente de desenvolvimento (normalmente em http://localhost/phpmyadmin)
+2. Selecione o banco de dados do EntreLinhas
+3. Clique na aba "Exportar"
+4. Escolha "Personalizado" para ver todas as opções
+5. Certifique-se que "Estrutura" e "Dados" estão marcados
+6. Selecione formato SQL
+7. Clique em "Executar" para baixar o arquivo SQL
+
+## Usando linha de comando:
+```bash
+# Substitua os valores entre <> pelos seus dados
+mysqldump -u <usuario> -p <senha> <nome_do_banco> > entrelinhas_backup.sql
+```
+
+## Importando na hospedagem:
+1. Acesse o phpMyAdmin da sua hospedagem
+2. Crie um novo banco de dados (se a hospedagem não tiver criado um para você)
+3. Selecione o banco de dados recém-criado
+4. Clique na aba "Importar"
+5. Escolha o arquivo SQL que você exportou
+6. Clique em "Executar"

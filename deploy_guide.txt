@@ -1,0 +1,52 @@
+# Guia de Deploy do EntreLinhas
+
+## 1. Preparação dos arquivos
+
+1. Crie uma pasta chamada `entrelinhas_deploy`
+2. Copie todos os arquivos e pastas do projeto para esta pasta, exceto:
+   - Pasta `.git`
+   - Arquivos de backup (`*.bak`)
+   - Arquivos de teste (`teste_*.php`, `phpinfo.php`)
+   - Arquivos de documentação e instruções (como este)
+
+3. Substitua os arquivos de configuração:
+   - Atualize `backend/config.php` com as credenciais da hospedagem
+   - Configure variáveis de ambiente para o SendGrid (ou atualize o arquivo .env)
+
+## 2. Banco de dados
+
+1. Exporte seu banco de dados local:
+   - Acesse phpMyAdmin (http://localhost/phpmyadmin)
+   - Selecione o banco de dados "entrelinhas"
+   - Clique em "Exportar" e baixe o arquivo SQL
+
+2. Crie o banco de dados na hospedagem:
+   - Acesse o phpMyAdmin da hospedagem
+   - Crie um novo banco de dados
+   - Importe o arquivo SQL que você exportou
+
+## 3. Upload para a hospedagem
+
+1. Conecte-se via FTP:
+   - Use FileZilla ou outro cliente FTP
+   - Conecte-se usando os dados fornecidos pela hospedagem
+
+2. Faça o upload de todos os arquivos para a pasta pública (geralmente `public_html` ou `www`)
+
+3. Ajuste permissões:
+   - Pasta `uploads` deve ter permissão 755 ou 775
+   - Arquivos PHP geralmente precisam de permissão 644
+
+## 4. Configuração do domínio
+
+1. Aponte o domínio para a hospedagem conforme instruções do provedor
+
+## 5. Testes
+
+1. Acesse o site pelo domínio
+2. Teste todas as principais funcionalidades:
+   - Registro de usuário
+   - Login
+   - Publicação de artigos
+   - Envio de mensagens de contato
+   - Painel administrativo

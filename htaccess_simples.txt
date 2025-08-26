@@ -1,0 +1,3 @@
+# Configuração básica para PHP
+Options -Indexes
+RewriteEngine Off
