@@ -2,7 +2,15 @@
 // Iniciar sessão
 session_start();
 
-// Verificar se o usuário está logado, senão redirecionar para a página de login
+// Verificar se o usuário está logado, senão redireci        <form action="../backend/processar_artigo.php" method="post" enctype="multipart/form-data">
+            <!-- Campo oculto para definir a ação -->
+            <input type="hidden" name="acao" value="enviar">
+            
+            <div class="form-group mb-3">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="titulo" class="form-control <?php echo (!empty($titulo_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $titulo; ?>">
+                <span class="invalid-feedback"><?php echo $titulo_err; ?></span>
+            </div>ara a página de login
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
     exit;
@@ -20,97 +28,37 @@ $titulo = $conteudo = $categoria = "";
 $titulo_err = $conteudo_err = $categoria_err = $imagem_err = "";
 $upload_status = "";
 
-// Processar dados do formulário quando o formulário é enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Validar título
-    if (empty(trim($_POST["titulo"]))) {
-        $titulo_err = "Por favor, insira um título para o artigo.";
-    } elseif (strlen(trim($_POST["titulo"])) > 255) {
-        $titulo_err = "O título não pode ter mais de 255 caracteres.";
-    } else {
-        $titulo = trim($_POST["titulo"]);
-    }
-    
-    // Validar conteúdo
-    if (empty(trim($_POST["conteudo"]))) {
-        $conteudo_err = "Por favor, insira o conteúdo do artigo.";
-    } else {
-        $conteudo = trim($_POST["conteudo"]);
-    }
-    
-    // Validar categoria
-    if (empty(trim($_POST["categoria"]))) {
-        $categoria_err = "Por favor, selecione uma categoria.";
-    } else {
-        $categoria = trim($_POST["categoria"]);
-    }
-    
-    // Processar upload de imagem se existir
-    $imagem_path = "";
-    if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
-        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-        $filename = $_FILES['imagem']['name'];
-        $filetype = pathinfo($filename, PATHINFO_EXTENSION);
+// Verificar se há mensagens na sessão
+if (isset($_SESSION['mensagem']) && isset($_SESSION['tipo_mensagem'])) {
+    if ($_SESSION['tipo_mensagem'] == 'danger') {
+        if ($_SESSION['tipo_mensagem'] == 'danger' && isset($_SESSION['titulo'])) {
+            $titulo = $_SESSION['titulo'];
+        }
+        if ($_SESSION['tipo_mensagem'] == 'danger' && isset($_SESSION['conteudo'])) {
+            $conteudo = $_SESSION['conteudo'];
+        }
+        if ($_SESSION['tipo_mensagem'] == 'danger' && isset($_SESSION['categoria'])) {
+            $categoria = $_SESSION['categoria'];
+        }
         
-        // Verificar extensão do arquivo
-        if (!in_array(strtolower($filetype), $allowed)) {
-            $imagem_err = "Tipo de arquivo não permitido. Apenas JPG, JPEG, PNG e GIF são aceitos.";
-        } else {
-            // Gerar nome único para o arquivo
-            $new_filename = uniqid() . '.' . $filetype;
-            $upload_dir = "../uploads/artigos/";
-            
-            // Criar diretório se não existir
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0755, true);
-            }
-            
-            $upload_path = $upload_dir . $new_filename;
-            
-            // Mover arquivo para o diretório de uploads
-            if (move_uploaded_file($_FILES['imagem']['tmp_name'], $upload_path)) {
-                $imagem_path = $upload_path;
-                $upload_status = "Imagem enviada com sucesso!";
-            } else {
-                $imagem_err = "Erro ao fazer upload da imagem.";
-            }
+        // Definir mensagens de erro
+        if (strpos($_SESSION['mensagem'], 'título') !== false) {
+            $titulo_err = $_SESSION['mensagem'];
+        } else if (strpos($_SESSION['mensagem'], 'conteúdo') !== false) {
+            $conteudo_err = $_SESSION['mensagem'];
+        } else if (strpos($_SESSION['mensagem'], 'categoria') !== false) {
+            $categoria_err = $_SESSION['mensagem'];
+        } else if (strpos($_SESSION['mensagem'], 'imagem') !== false || strpos($_SESSION['mensagem'], 'arquivo') !== false) {
+            $imagem_err = $_SESSION['mensagem'];
         }
     }
     
-    // Verificar erros antes de inserir no banco de dados
-    if (empty($titulo_err) && empty($conteudo_err) && empty($categoria_err) && empty($imagem_err)) {
-        
-        // Preparar declaração de inserção
-        $sql = "INSERT INTO artigos (titulo, conteudo, id_usuario, categoria, imagem, status) VALUES (?, ?, ?, ?, ?, 'pendente')";
-        
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            // Vincular variáveis à instrução preparada como parâmetros
-            mysqli_stmt_bind_param($stmt, "sssss", $param_titulo, $param_conteudo, $param_usuario_id, $param_categoria, $param_imagem);
-            
-            // Definir parâmetros
-            $param_titulo = $titulo;
-            $param_conteudo = $conteudo;
-            $param_usuario_id = $_SESSION["id"];
-            $param_categoria = $categoria;
-            $param_imagem = $imagem_path;
-            
-            // Tentar executar a declaração preparada
-            if (mysqli_stmt_execute($stmt)) {
-                // Redirecionar para a página de sucesso
-                header("location: envio-sucesso.html");
-                exit();
-            } else {
-                echo "Algo deu errado. Por favor, tente novamente mais tarde.";
-            }
-            
-            // Fechar declaração
-            mysqli_stmt_close($stmt);
-        }
-    }
-    
-    // Fechar conexão
-    mysqli_close($conn);
+    // Limpar mensagens da sessão
+    unset($_SESSION['mensagem']);
+    unset($_SESSION['tipo_mensagem']);
+    if (isset($_SESSION['titulo'])) unset($_SESSION['titulo']);
+    if (isset($_SESSION['conteudo'])) unset($_SESSION['conteudo']);
+    if (isset($_SESSION['categoria'])) unset($_SESSION['categoria']);
 }
 ?>
 
@@ -157,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="alert alert-success"><?php echo $upload_status; ?></div>
         <?php endif; ?>
         
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
+        <form action="../backend/processar_artigo.php" method="post" enctype="multipart/form-data">
             <div class="form-group mb-3">
                 <label for="titulo">Título</label>
                 <input type="text" id="titulo" name="titulo" class="form-control <?php echo (!empty($titulo_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $titulo; ?>">
@@ -201,5 +149,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include "includes/footer.php"; ?>
     
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/user-menu.js"></script>
+    <script src="../assets/js/header-nav.js"></script>
 </body>
 </html>
+<?php 
+// Fechar a conexão com o banco de dados no final da página
+if (isset($conn) && $conn) {
+    mysqli_close($conn);
+}
+?>

@@ -8,6 +8,8 @@
 
 // Incluir os arquivos necessários
 require_once __DIR__ . '/sendgrid_api_helper.php';
+require_once __DIR__ . '/enviar_email_nativo.php';
+require_once __DIR__ . '/enviar_email_arquivo.php';
 require_once __DIR__ . '/backend/config.php';
 
 // Verificar parâmetros da linha de comando
@@ -130,31 +132,48 @@ $message .= '
 </body>
 </html>';
 
-// Enviar o e-mail
-echo "Enviando e-mail para {$artigo['email']}...\n";
+// Enviar o e-mail primeiro via SendGrid
+echo "Tentando enviar e-mail via SendGrid para {$artigo['email']}...\n";
 $result = sendgrid_send_email($artigo['email'], $subject, $message);
+
+// Se falhar com SendGrid, tentar com a função nativa mail()
+if (!$result['success']) {
+    echo "Tentativa via SendGrid falhou: {$result['message']}\n";
+    echo "Tentando método alternativo com mail() nativo...\n";
+    
+    $result = enviar_email_nativo($artigo['email'], $subject, $message);
+    
+    // Se ainda falhar, tentar salvar como arquivo
+    if (!$result['success']) {
+        echo "Tentativa com mail() nativo falhou: {$result['message']}\n";
+        echo "Salvando e-mail como arquivo local...\n";
+        
+        $result = enviar_email_arquivo($artigo['email'], $subject, $message);
+    }
+}
 
 // Verificar resultado
 if ($result['success']) {
-    echo "✅ E-mail enviado com sucesso!\n";
+    $metodo = isset($result['method']) ? $result['method'] : ($result['http_code'] == 200 ? 'mail_nativo' : 'sendgrid');
+    echo "✅ E-mail enviado com sucesso via {$metodo}!\n";
     
     // Registrar o envio no log
     $log_query = "INSERT INTO email_log (artigo_id, destinatario, assunto, status_envio, metodo_envio, data_envio) 
-                 VALUES (?, ?, ?, 'enviado', 'sendgrid', NOW())";
+                 VALUES (?, ?, ?, 'enviado', ?, NOW())";
                  
     $stmt = $conn->prepare($log_query);
     if ($stmt) {
-        $stmt->bind_param("iss", $artigo_id, $artigo['email'], $subject);
+        $stmt->bind_param("isss", $artigo_id, $artigo['email'], $subject, $metodo);
         $stmt->execute();
         $stmt->close();
         echo "Log registrado no banco de dados.\n";
     }
 } else {
-    echo "❌ Falha ao enviar e-mail: {$result['message']}\n";
+    echo "❌ Falha ao enviar e-mail por todos os métodos: {$result['message']}\n";
     
     // Registrar a falha no log
     $log_query = "INSERT INTO email_log (artigo_id, destinatario, assunto, status_envio, metodo_envio, data_envio) 
-                 VALUES (?, ?, ?, 'falha', 'sendgrid', NOW())";
+                 VALUES (?, ?, ?, 'falha', 'todos_metodos', NOW())";
                  
     $stmt = $conn->prepare($log_query);
     if ($stmt) {
