@@ -12,6 +12,7 @@ if (!isset($_SESSION['email']) || $_SESSION['email'] !== ADMIN_EMAIL) {
 require_once 'config.php';
 require_once 'artigos.php';
 require_once 'email_notification.php';
+require_once 'email_integration.php';
 
 // Verificar se os dados necessários foram enviados
 if (!isset($_POST['artigo_id']) || !isset($_POST['status'])) {
@@ -52,13 +53,23 @@ if (atualizarStatusArtigo($conn, $artigo_id, $status)) {
             if ($artigo_dados = mysqli_fetch_assoc($resultado)) {
                 // Notificar o autor sobre a aprovação/rejeição
                 $comentario = isset($_POST['comentario']) ? $_POST['comentario'] : '';
-                notificar_autor_status_artigo(
-                    $artigo_dados['autor_email'],
-                    $artigo_dados['autor_nome'],
-                    $artigo_dados,
-                    ($status === 'aprovado'),
-                    $comentario
-                );
+                
+                // Verificar se temos a nova integração de e-mail disponível
+                if (function_exists('hook_after_status_alterado')) {
+                    // Usar a nova integração de e-mail via SendGrid
+                    error_log("[" . date('Y-m-d H:i:s') . "] Usando integração de e-mail para notificar mudança de status para: " . $status);
+                    hook_after_status_alterado($artigo_id, $status, $comentario);
+                } else {
+                    // Usar o método antigo
+                    error_log("[" . date('Y-m-d H:i:s') . "] Usando método antigo para notificar mudança de status para: " . $status);
+                    notificar_autor_status_artigo(
+                        $artigo_dados['autor_email'],
+                        $artigo_dados['autor_nome'],
+                        $artigo_dados,
+                        ($status === 'aprovado'),
+                        $comentario
+                    );
+                }
             }
         }
         

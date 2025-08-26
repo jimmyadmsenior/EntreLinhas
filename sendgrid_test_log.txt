@@ -1,0 +1,18 @@
+2025-08-26 01:10:06 - Iniciando teste direto
+2025-08-26 01:10:16 - Iniciando teste direto
+2025-08-26 01:10:18 - Falha ao enviar e-mail para jimmycastilho555@gmail.com, código: 403, resposta: {"errors":[{"message":"The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements","field":"from","help":null}]}
+2025-08-26 01:10:18 - Iniciando teste direto
+2025-08-26 01:10:19 - Falha ao enviar e-mail para jimmycastilho555@gmail.com, código: 403, resposta: {"errors":[{"message":"The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements","field":"from","help":null}]}
+2025-08-26 01:10:38 - Iniciando teste direto
+2025-08-26 01:10:39 - Falha ao enviar e-mail para jimmycastilho555@gmail.com, código: 403, resposta: {"errors":[{"message":"The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements","field":"from","help":null}]}
+2025-08-26 01:11:19 - Iniciando teste direto
+2025-08-26 01:11:30 - Iniciando teste direto
+2025-08-26 01:11:31 - Falha ao enviar e-mail para jimmycastilho555@gmail.com, código: 403, resposta: {"errors":[{"message":"The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements","field":"from","help":null}]}
+2025-08-26 01:18:16 - Iniciando teste direto
+2025-08-26 01:18:18 - Falha ao enviar e-mail para jimmycastilho555@gmail.com, código: 403, resposta: {"errors":[{"message":"The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements","field":"from","help":null}]}
+2025-08-26 01:18:21 - Iniciando teste direto
+2025-08-26 01:18:22 - Falha ao enviar e-mail para jimmycastilho555@gmail.com, código: 403, resposta: {"errors":[{"message":"The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements","field":"from","help":null}]}
+2025-08-26 01:29:13 - Iniciando teste direto
+2025-08-26 01:29:15 - E-mail enviado com sucesso para jimmycastilho555@gmail.com
+2025-08-26 01:29:17 - Iniciando teste direto
+2025-08-26 01:29:18 - E-mail enviado com sucesso para jimmycastilho555@gmail.com
