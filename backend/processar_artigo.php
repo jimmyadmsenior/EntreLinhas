@@ -20,13 +20,65 @@ $mensagem = '';
 $tipo_mensagem = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Preparar dados do artigo
-    $artigo = [
-        'titulo' => $_POST['titulo'],
-        'conteudo' => $_POST['conteudo'],
-        'categoria' => $_POST['categoria'],
-        'id_usuario' => $_SESSION['id']
-    ];
+    // Validar os campos
+    $titulo = !empty($_POST['titulo']) ? trim($_POST['titulo']) : '';
+    $conteudo = !empty($_POST['conteudo']) ? trim($_POST['conteudo']) : '';
+    $categoria = !empty($_POST['categoria']) ? trim($_POST['categoria']) : '';
+    
+    // Validar dados
+    if (empty($titulo)) {
+        $mensagem = "Por favor, insira um título para o artigo.";
+        $tipo_mensagem = 'danger';
+    } elseif (empty($conteudo)) {
+        $mensagem = "Por favor, insira o conteúdo do artigo.";
+        $tipo_mensagem = 'danger';
+    } elseif (empty($categoria)) {
+        $mensagem = "Por favor, selecione uma categoria.";
+        $tipo_mensagem = 'danger';
+    } else {
+        // Processar upload de imagem se existir
+        $imagem_path = "";
+        if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
+            $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+            $filename = $_FILES['imagem']['name'];
+            $filetype = pathinfo($filename, PATHINFO_EXTENSION);
+            
+            // Verificar extensão do arquivo
+            if (!in_array(strtolower($filetype), $allowed)) {
+                $mensagem = "Tipo de arquivo não permitido. Apenas JPG, JPEG, PNG e GIF são aceitos.";
+                $tipo_mensagem = 'danger';
+            } else {
+                // Gerar nome único para o arquivo
+                $new_filename = uniqid() . '.' . $filetype;
+                $upload_dir = "../uploads/artigos/";
+                
+                // Criar diretório se não existir
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+                
+                $upload_path = $upload_dir . $new_filename;
+                
+                // Mover arquivo para o diretório de uploads
+                if (move_uploaded_file($_FILES['imagem']['tmp_name'], $upload_path)) {
+                    $imagem_path = $upload_path;
+                } else {
+                    $mensagem = "Erro ao fazer upload da imagem.";
+                    $tipo_mensagem = 'danger';
+                }
+            }
+        }
+        
+        // Se não houver erro, preparar dados do artigo
+        if (empty($mensagem)) {
+            // Preparar dados do artigo
+            $artigo = [
+                'titulo' => $titulo,
+                'conteudo' => $conteudo,
+                'categoria' => $categoria,
+                'id_usuario' => $_SESSION['id'],
+                'imagem' => $imagem_path
+            ];
     
     // Verificar imagens enviadas
     $imagens = isset($_FILES['imagens']) ? $_FILES['imagens'] : null;

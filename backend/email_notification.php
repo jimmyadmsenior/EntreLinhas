@@ -6,6 +6,9 @@
 // Incluir o arquivo com as funções do SendGrid
 require_once __DIR__ . '/sendgrid_email.php';
 
+// Incluir solução para problemas de email em ambiente de desenvolvimento
+require_once __DIR__ . '/email_fix.php';
+
 /**
  * Envia e-mail para os administradores sobre um novo artigo
  * 
@@ -13,7 +16,7 @@ require_once __DIR__ . '/sendgrid_email.php';
  * @param string $autor Nome do autor
  * @return bool Se o e-mail foi enviado com sucesso
  */
-function notificar_admins_novo_artigo($artigo, $autor) {
+function notificar_admins_artigo_original($artigo, $autor) {
     // Lista de e-mails dos administradores
     $admin_emails = [
         'jimmycastilho555@gmail.com',

@@ -11,6 +11,16 @@
  */
 function obter_foto_perfil($conn, $usuario_id) {
     $foto_perfil = null;
+    
+    // Verificar se a conexão está ativa
+    if (!$conn || !($conn instanceof mysqli) || $conn->connect_errno) {
+        // Se a conexão não estiver ativa, criar uma nova
+        $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        if (!$conn) {
+            return null; // Não foi possível conectar ao banco
+        }
+    }
+    
     $sql_foto = "SELECT imagem_base64 FROM fotos_perfil WHERE id_usuario = ?";
     
     if ($stmt_foto = mysqli_prepare($conn, $sql_foto)) {
