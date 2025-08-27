@@ -1,9 +1,9 @@
 <?php
-// Arquivo de configuração do banco de dados
-define('DB_SERVER', 'localhost'); // Usando o MySQL já instalado no sistema na porta padrão 3306
-define('DB_USERNAME', 'root');  // Altere para o seu usuário do MySQL
-define('DB_PASSWORD', '');      // Altere para a sua senha do MySQL
-define('DB_NAME', 'entrelinhas');
+// Arquivo de configuração do banco de dados para InfinityFree
+define('DB_SERVER', 'localhost'); // Importante: Use 'localhost' quando estiver no servidor InfinityFree
+define('DB_USERNAME', 'if0_39798697');  // Usuário do banco de dados InfinityFree
+define('DB_PASSWORD', 'xKIcJzBS13BB50t');  // Senha do banco de dados InfinityFree
+define('DB_NAME', 'if0_39798697_entrelinhas');  // Nome do banco de dados InfinityFree
 
 // Email do administrador que receberá as notificações
 define('ADMIN_EMAIL', 'jimmycastilho555@gmail.com');
