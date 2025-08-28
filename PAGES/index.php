@@ -53,96 +53,66 @@ require_once 'includes/cabecalho_helper.php';
 
     <!-- Main Content -->
     <main class="main-content container">
-        <section class="featured-articles mb-5">
-            <h2 class="mb-3">Artigos em Destaque</h2>
+        <!-- Seção de Tirinhas -->
+        <section class="tirinhas mb-5">
+            <h2 class="mb-3">Tirinhas</h2>
             <div class="articles">
-                <?php
-                // Consultar os 6 artigos mais recentes aprovados
-                $sql = "SELECT a.id, a.titulo, LEFT(a.conteudo, 150) as resumo, a.data_criacao as data_publicacao, 
-                        IFNULL(a.categoria, 'Geral') as categoria, IFNULL(a.imagem, '') as imagem_capa, u.nome as autor 
-                        FROM artigos a 
-                        JOIN usuarios u ON a.id_usuario = u.id 
-                        WHERE a.status = 'aprovado' 
-                        ORDER BY a.data_criacao DESC 
-                        LIMIT 3";
-
-                $result = mysqli_query($conn, $sql);
+                <!-- Tirinha 1 -->
+                <article class="article-card fade-in">
+                    <div class="image-container">
+                        <img src="../assets/images/tirinhas/TirinhaAfrodite.png" alt="Tirinha Afrodite" class="article-image" title="Clique para ampliar">
+                    </div>
+                    <div class="article-content">
+                        <h3>Afrodite</h3>
+                    </div>
+                </article>
                 
-                if (mysqli_num_rows($result) > 0) {
-                    while ($artigo = mysqli_fetch_assoc($result)) {
-                        // Formatar a data
-                        $data = date("d/m/Y", strtotime($artigo['data_publicacao']));
-                        
-                        // Imagem padrão se não houver imagem
-                        $imagem = !empty($artigo['imagem_capa']) 
-                                ? $artigo['imagem_capa'] 
-                                : "../assets/images/jornal.png";
-                                
-                        echo '
-
-                        <article class="article-card fade-in">
-                            <img src="' . htmlspecialchars($imagem) . '" alt="' . htmlspecialchars($artigo['titulo']) . '" class="article-image">
-                            <div class="article-content">
-                                <div class="article-meta">
-                                    <span>' . htmlspecialchars($artigo['categoria']) . '</span>
-                                    <span>' . $data . '</span>
-                                </div>
-                                <h3>' . htmlspecialchars($artigo['titulo']) . '</h3>
-                                <p>' . htmlspecialchars(strip_tags(substr($artigo['resumo'], 0, 100))) . '...</p>
-                                <a href="artigo.php?id=' . $artigo['id'] . '" class="read-more">Leia mais</a>
-
-                            </div>
-                        </article>';
-                    }
-                } else {
-
-                    // Se não houver artigos, exibir artigos de exemplo como no HTML original
-                    echo '
-                    <!-- Artigo 1 -->
-                    <article class="article-card fade-in">
-                        <img src="../assets/images/Sesi-Biblioteca.png" alt="Biblioteca da escola" class="article-image">
-                        <div class="article-content">
-                            <div class="article-meta">
-                                <span>Educação</span>
-                                <span>15/08/2025</span>
-                            </div>
-                            <h3>A importância da leitura no desenvolvimento escolar</h3>
-                            <p>Descubra como o hábito da leitura pode transformar o aprendizado e abrir novas portas para o conhecimento.</p>
-                            <a href="#" class="read-more">Leia mais</a>
-                        </div>
-                    </article>
-                    
-                    <!-- Artigo 2 -->
-                    <article class="article-card fade-in">
-                        <img src="../assets/images/escola-quadra.png" alt="Quadra poliesportiva" class="article-image">
-                        <div class="article-content">
-                            <div class="article-meta">
-                                <span>Esporte</span>
-                                <span>10/08/2025</span>
-                            </div>
-                            <h3>Esportes na escola: muito além da competição</h3>
-                            <p>Como as atividades esportivas contribuem para o desenvolvimento físico, social e emocional dos estudantes.</p>
-                            <a href="#" class="read-more">Leia mais</a>
-                        </div>
-                    </article>
-                    
-                    <!-- Artigo 3 -->
-                    <article class="article-card fade-in">
-                        <img src="../assets/images/Sesi-Vista.png" alt="Vista panorâmica da escola" class="article-image">
-                        <div class="article-content">
-                            <div class="article-meta">
-                                <span>Comunidade</span>
-                                <span>05/08/2025</span>
-                            </div>
-                            <h3>Nossa escola: um espaço de transformação social</h3>
-                            <p>Como projetos educacionais estão impactando positivamente a comunidade ao redor da escola.</p>
-                            <a href="#" class="read-more">Leia mais</a>
-                        </div>
-                    </article>';
-
-                }
-                ?>
+                <!-- Tirinha 2 -->
+                <article class="article-card fade-in">
+                    <div class="image-container">
+                        <img src="../assets/images/tirinhas/TirinhaHeroiPorRoteiro 6ºB.png" alt="Tirinha Herói por Roteiro" class="article-image" title="Clique para ampliar">
+                    </div>
+                    <div class="article-content">
+                        <h3>Herói por Roteiro - 6ºB</h3>
+                    </div>
+                </article>
+                
+                <!-- Tirinha 3 -->
+                <article class="article-card fade-in">
+                    <div class="image-container">
+                        <img src="../assets/images/tirinhas/TirinhaImagemGabriel6ºA.png" alt="Tirinha Gabriel" class="article-image" title="Clique para ampliar">
+                    </div>
+                    <div class="article-content">
+                        <h3>Gabriel - 6ºA</h3>
+                    </div>
+                </article>
             </div>
+        </section>
+        
+        <!-- Artigo Principal sobre a Feira de Profissões -->
+        <section class="featured-article mb-5">
+            <h2 class="mb-3">Artigo em Destaque</h2>
+            <article class="article-full fade-in">
+                <div class="article-header">
+                    <h3>SESI SALTO PROMOVE FEIRA DE PROFISSÕES 2025</h3>
+                    <div class="article-meta">
+                        <span>Educação</span>
+                        <span>28/08/2025</span>
+                    </div>
+                </div>
+                <div class="article-image-container">
+                    <img src="../assets/images/artigos/f623caca-1049-4588-babc-48f8e30bb31f_page-0001.jpg" alt="Feira de Profissões SESI" class="article-image-full" title="Clique para ampliar">
+                </div>
+                <div class="article-body">
+                    <p><em>Idealizada pela professora Nilceia Ragazzi, o evento promete oferecer aos educandos e educandas "um olhar para o amanhã".</em></p>
+                    <p><strong>Por Ana Carolina Gatti, professora de Língua Portuguesa do SESI.</strong></p>
+                    <p>Nos dias 4 e 5 de setembro, o Centro Educacional SESI da cidade de Salto realizará a 7ª Feira de Profissões da unidade. O evento, que ocorrerá das 8h às 12h, é organizado anualmente com o objetivo de apoiar os estudantes na escolha de seu futuro profissional, um momento decisivo no projeto de vida.</p>
+                    <p>Nilceia Ragazzi, docente da área de Geografia, em colaboração com os demais professores, é responsável por esse projeto que se tornou uma tradição no calendário institucional. Aguardada pela comunidade escolar, a feira promove orientação vocacional e de carreira, além de proporcionar a interação dos estudantes com instituições de ensino da região e profissionais das áreas de interesse. Neste ano, o evento ocorrerá em dois dias e contará com a participação de faculdades públicas e privadas, que apresentarão projetos, cursos e possibilidades de carreira.</p>
+                    <p>Além dessas iniciativas, os alunos e alunas do SESI Salto poderão participar de atividades práticas, dinâmicas interativas e palestras inspiradoras. Em 2025, a feira contará com a participação de egressas da unidade, profissionais da Faculdade SENAI e palestras de encerramento: na quinta-feira, Elaine Fidêncio (RH e Gestão de Pessoas) apresentará "Você no protagonismo: construa o seu caminho"; e, na sexta-feira, Francisco Petros discorrerá sobre "Os desafios da política brasileira frente ao mercado financeiro mundial".</p>
+                    <p>A Feira é um momento de notável importância para os jovens, por oferecer a oportunidade de conhecerem diferentes áreas de atuação, sanar dúvidas com especialistas e fomentar a autopercepção. Visando a promoção da reflexão sobre interesses e talentos individuais, o convite está aberto aos estudantes, e a participação de todos é fundamental para tornar o evento significativo na trajetória profissional e acadêmica de cada um deles.</p>
+                    <p>As inscrições estão abertas até o dia 29/08, no link abaixo: <a href="https://forms.gle/QabJ6Q3SFUNy5LQ4A" target="_blank">https://forms.gle/QabJ6Q3SFUNy5LQ4A</a></p>
+                </div>
+            </article>
         </section>
         
 
@@ -177,6 +147,7 @@ require_once 'includes/cabecalho_helper.php';
 
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/image-viewer.js"></script>
 
     <script src="../assets/js/debug.js"></script>
     <script src="../assets/js/user-menu.js"></script>
