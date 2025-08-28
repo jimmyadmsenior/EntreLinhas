@@ -1,9 +1,9 @@
 <?php
-// Arquivo de configuração do banco de dados para InfinityFree
-define('DB_SERVER', 'localhost'); // Importante: Use 'localhost' quando estiver no servidor InfinityFree
-define('DB_USERNAME', 'if0_39798697');  // Usuário do banco de dados InfinityFree
-define('DB_PASSWORD', 'xKIcJzBS13BB50t');  // Senha do banco de dados InfinityFree
-define('DB_NAME', 'if0_39798697_entrelinhas');  // Nome do banco de dados InfinityFree
+// Arquivo de configuração do banco de dados - Ambiente Local
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_NAME', 'entrelinhas');
 
 // Email do administrador que receberá as notificações
 define('ADMIN_EMAIL', 'jimmycastilho555@gmail.com');
