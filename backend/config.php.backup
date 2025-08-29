@@ -1,0 +1,153 @@
+<?php
+// Arquivo de configuração do banco de dados adaptável (local e InfinityFree)
+
+// Detecta automaticamente se estamos em ambiente local ou no servidor
+$is_local = !isset($_SERVER['SERVER_NAME']) || 
+            $_SERVER['SERVER_NAME'] == 'localhost' || 
+            $_SERVER['SERVER_NAME'] == '127.0.0.1' ||
+            strpos($_SERVER['SERVER_NAME'], '192.168.') === 0;
+
+// Carrega o arquivo de configuração apropriado
+if ($is_local) {
+    // Verifica se existe um arquivo de configuração local
+    if (file_exists(__DIR__ . '/config.local.php')) {
+        require_once __DIR__ . '/config.local.php';
+    } else {
+        // Configurações padrão para local se o arquivo não existir
+        $config = [
+            'db' => [
+                'host' => 'localhost',
+                'username' => 'root',
+                'password' => '',
+                'dbname' => 'entrelinhas',
+                'charset' => 'utf8mb4'
+            ],
+            'admin_email' => 'jimmycastilho555@gmail.com'
+        ];
+    }
+} else {
+    // Verifica se existe um arquivo de configuração para o servidor
+    if (file_exists(__DIR__ . '/config.infinityfree.php')) {
+        require_once __DIR__ . '/config.infinityfree.php';
+    } else {
+        // Configurações padrão para InfinityFree se o arquivo não existir
+        $config = [
+            'db' => [
+                'host' => 'sql302.infinityfree.com',
+                'username' => 'if0_39798697',
+                'password' => 'jimmysenai123',
+                'dbname' => 'if0_39798697_entrelinhas',
+                'charset' => 'utf8mb4'
+            ],
+            'admin_email' => 'jimmycastilho555@gmail.com'
+        ];
+    }
+}
+
+// Define constantes para compatibilidade com código existente
+define('DB_SERVER', $config['db']['host']);
+define('DB_USERNAME', $config['db']['username']);
+define('DB_PASSWORD', $config['db']['password']);
+define('DB_NAME', $config['db']['dbname']);
+define('ADMIN_EMAIL', $config['admin_email']);
+
+// Tentativa de conexão com o banco de dados MySQL usando PDO
+try {
+    // Configuração para depuração no InfinityFree (remover em produção final)
+    if (!$is_local) {
+        // Gravar log de erro para depuração no servidor
+        $log_file = __DIR__ . '/db_connection.log';
+        error_log(date('Y-m-d H:i:s') . " Tentando conexão com: " . DB_SERVER . ", " . DB_NAME . ", " . DB_USERNAME, 3, $log_file);
+    }
+    
+    $dsn = "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+    $conn = new PDO($dsn, DB_USERNAME, DB_PASSWORD, $options);
+    
+    // Criar tabela de usuários se não existir
+    $sql_users = "CREATE TABLE IF NOT EXISTS usuarios (
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        nome VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        senha VARCHAR(255) NOT NULL,
+        data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reset_token VARCHAR(64) DEFAULT NULL,
+        reset_expiry DATETIME DEFAULT NULL,
+        ativo BOOLEAN DEFAULT TRUE
+    )";
+    
+    $conn->exec($sql_users);
+    
+    // Criar tabela de artigos se não existir
+    $sql_articles = "CREATE TABLE IF NOT EXISTS artigos (
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        titulo VARCHAR(255) NOT NULL,
+        conteudo TEXT NOT NULL,
+        categoria VARCHAR(50) NOT NULL,
+        imagem VARCHAR(255),
+        id_usuario INT NOT NULL,
+        data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        data_publicacao TIMESTAMP NULL,
+        status ENUM('pendente', 'aprovado', 'rejeitado', 'rascunho') DEFAULT 'pendente',
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+    )";
+    
+    $conn->exec($sql_articles);
+    
+    // Criar tabela de comentários se não existir
+    $sql_comments = "CREATE TABLE IF NOT EXISTS comentarios (
+        id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        id_artigo INT NOT NULL,
+        id_usuario INT NOT NULL,
+        comentario TEXT NOT NULL,
+        data_comentario TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status ENUM('pendente', 'aprovado', 'rejeitado') DEFAULT 'aprovado',
+        FOREIGN KEY (id_artigo) REFERENCES artigos(id) ON DELETE CASCADE,
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE
+    )";
+    
+    $conn->exec($sql_comments);
+    
+    // Criar tabela de imagens de artigos se não existir
+    $sql_images = "CREATE TABLE IF NOT EXISTS imagens_artigos (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        artigo_id INT NOT NULL,
+        caminho VARCHAR(255) NOT NULL,
+        ordem INT DEFAULT 0,
+        descricao TEXT,
+        data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (artigo_id) REFERENCES artigos(id) ON DELETE CASCADE
+    )";
+    
+    $conn->exec($sql_images);
+    
+} catch (PDOException $e) {
+    $error_message = "ERRO: " . $e->getMessage();
+    
+    if (!$is_local) {
+        // Em produção, registra o erro, mas exibe mensagem amigável
+        $log_file = __DIR__ . '/db_connection.log';
+        error_log(date('Y-m-d H:i:s') . " " . $error_message, 3, $log_file);
+        
+        // Tenta criar uma conexão mysqli como fallback
+        $mysqli_conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        if ($mysqli_conn) {
+            mysqli_set_charset($mysqli_conn, "utf8mb4");
+            $conn = $mysqli_conn; // Usar mysqli como fallback
+        } else {
+            // Se ambas falham, apenas log
+            error_log(date('Y-m-d H:i:s') . " Fallback mysqli também falhou: " . mysqli_connect_error(), 3, $log_file);
+        }
+    } else {
+        // Em local, exibe o erro
+        echo $error_message;
+    }
+}
+
+// Carrega o adaptador de compatibilidade mysqli/PDO
+require_once __DIR__ . '/db_adapter.php';
+?>

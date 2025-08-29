@@ -2,12 +2,15 @@
 // Iniciar a sessão para poder acessar as variáveis de sessão
 session_start();
 
+// Definir caminho base do projeto
+define('BASE_PATH', dirname(dirname(__FILE__)) . '/');
+
 // Incluir arquivo de configuração para conexão com o banco de dados
-require_once "../backend/config.php";
+require_once BASE_PATH . "backend/config.php";
 ?>
 <?php
 // Incluir arquivo com funções do cabeçalho
-require_once 'includes/cabecalho_helper.php';
+require_once __DIR__ . '/includes/cabecalho_helper.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -17,7 +20,7 @@ require_once 'includes/cabecalho_helper.php';
     <title>EntreLinhas - Jornal Digital</title>
     <meta name="description" content="EntreLinhas - Jornal digital colaborativo com notícias, artigos e textos da comunidade.">
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/images/jornal.png">
+    <link rel="icon" type="image/png" href="<?php echo rtrim(dirname($_SERVER['PHP_SELF']), '/PAGES') . '/assets/images/jornal.png'; ?>">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts -->

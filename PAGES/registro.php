@@ -78,8 +78,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Fechar conexão
-    mysqli_close($conn);
+    // Com PDO não é necessário fechar a conexão explicitamente
 }
 ?>
 

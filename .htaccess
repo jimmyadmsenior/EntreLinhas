@@ -1,3 +1,4 @@
-# Configuração mínima
 RewriteEngine On
-Options -Indexes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ PAGES/index.php [L]
