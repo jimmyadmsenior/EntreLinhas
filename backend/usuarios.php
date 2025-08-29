@@ -2,8 +2,8 @@
 // Funções para gerenciamento de usuários
 
 /**
- * Registra um novo usuário
- * @param mysqli $conn Conexão com o banco de dados
+ * Registra um novo usuário (versão PDO)
+ * @param PDO $conn Conexão com o banco de dados
  * @param array $usuario Dados do usuário (nome, email, senha)
  * @return array Resultado do registro com status e mensagem
  */
@@ -26,46 +26,42 @@ function registrarUsuario($conn, $usuario) {
         return $resultado;
     }
     
-    // Verificar se o email já existe
-    $sql = "SELECT id FROM usuarios WHERE email = ?";
-    
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "s", $usuario['email']);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_store_result($stmt);
+    try {
+        // Verificar se o email já existe
+        $sql = "SELECT id FROM usuarios WHERE email = :email";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $usuario['email'], PDO::PARAM_STR);
+        $stmt->execute();
         
-        if (mysqli_stmt_num_rows($stmt) > 0) {
+        if ($stmt->rowCount() > 0) {
             $resultado['mensagem'] = "Este e-mail já está em uso.";
-            mysqli_stmt_close($stmt);
             return $resultado;
         }
         
-        mysqli_stmt_close($stmt);
-    }
-    
-    // Criptografar a senha
-    $senha_hash = password_hash($usuario['senha'], PASSWORD_DEFAULT);
-    
-    // Inserir o novo usuário no banco de dados
-    $sql = "INSERT INTO usuarios (nome, email, senha, data_cadastro) VALUES (?, ?, ?, NOW())";
-    
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "sss", $usuario['nome'], $usuario['email'], $senha_hash);
+        // Criptografar a senha
+        $senha_hash = password_hash($usuario['senha'], PASSWORD_DEFAULT);
         
-        if (mysqli_stmt_execute($stmt)) {
+        // Inserir o novo usuário no banco de dados
+        $sql = "INSERT INTO usuarios (nome, email, senha, data_cadastro) VALUES (:nome, :email, :senha, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':nome', $usuario['nome'], PDO::PARAM_STR);
+        $stmt->bindParam(':email', $usuario['email'], PDO::PARAM_STR);
+        $stmt->bindParam(':senha', $senha_hash, PDO::PARAM_STR);
+        
+        if ($stmt->execute()) {
             $resultado['status'] = true;
             $resultado['mensagem'] = "Cadastro realizado com sucesso!";
-            $resultado['usuario_id'] = mysqli_insert_id($conn);
+            $resultado['usuario_id'] = $conn->lastInsertId();
             
             // Enviar e-mail de boas-vindas
             enviarEmailBoasVindas($usuario['nome'], $usuario['email']);
         } else {
             $resultado['mensagem'] = "Erro ao registrar usuário. Por favor, tente novamente.";
         }
-        
-        mysqli_stmt_close($stmt);
-    } else {
+    } catch (PDOException $e) {
         $resultado['mensagem'] = "Erro no sistema. Por favor, tente novamente mais tarde.";
+        // Para depuração, não use em produção:
+        // error_log("Erro ao registrar usuário: " . $e->getMessage());
     }
     
     return $resultado;

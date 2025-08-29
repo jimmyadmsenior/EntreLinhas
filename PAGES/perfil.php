@@ -41,32 +41,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $email_err = "Por favor, insira um e-mail.";
         } else {
             // Prepare uma declaração select
-            $sql = "SELECT id FROM usuarios WHERE email = ? AND id != ?";
+            $sql = "SELECT id FROM usuarios WHERE email = :email AND id != :id";
             
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                // Vincular variáveis à declaração preparada como parâmetros
-                mysqli_stmt_bind_param($stmt, "si", $param_email, $param_id);
+            try {
+                $stmt = $conn->prepare($sql);
                 
-                // Definir parâmetros
+                // Definir e vincular parâmetros
                 $param_email = trim($_POST["email"]);
                 $param_id = $_SESSION["id"];
+                $stmt->bindParam(":email", $param_email, PDO::PARAM_STR);
+                $stmt->bindParam(":id", $param_id, PDO::PARAM_INT);
                 
-                // Tentar executar a declaração preparada
-                if (mysqli_stmt_execute($stmt)) {
-                    /* armazenar resultado */
-                    mysqli_stmt_store_result($stmt);
-                    
-                    if (mysqli_stmt_num_rows($stmt) == 1) {
-                        $email_err = "Este e-mail já está em uso.";
-                    } else {
-                        $email = trim($_POST["email"]);
-                    }
+                // Executar a declaração preparada
+                $stmt->execute();
+                
+                // Verificar se email já está em uso
+                if ($stmt->rowCount() == 1) {
+                    $email_err = "Este e-mail já está em uso.";
                 } else {
-                    echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+                    $email = trim($_POST["email"]);
                 }
-
-                // Fechar declaração
-                mysqli_stmt_close($stmt);
+            } catch(PDOException $e) {
+                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
             }
         }
         
@@ -74,28 +70,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($nome_err) && empty($email_err)) {
             
             // Prepare uma declaração de atualização
-            $sql = "UPDATE usuarios SET nome = ?, email = ? WHERE id = ?";
+            $sql = "UPDATE usuarios SET nome = :nome, email = :email WHERE id = :id";
             
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                // Vincular variáveis à declaração preparada como parâmetros
-                mysqli_stmt_bind_param($stmt, "ssi", $param_nome, $param_email, $param_id);
+            try {
+                $stmt = $conn->prepare($sql);
                 
-                // Definir parâmetros
-                $param_nome = $nome;
-                $param_email = $email;
-                $param_id = $_SESSION["id"];
+                // Definir e vincular parâmetros
+                $stmt->bindParam(":nome", $nome, PDO::PARAM_STR);
+                $stmt->bindParam(":email", $email, PDO::PARAM_STR);
+                $stmt->bindParam(":id", $_SESSION["id"], PDO::PARAM_INT);
                 
-                // Tentar executar a declaração preparada
-                if (mysqli_stmt_execute($stmt)) {
+                // Executar a declaração preparada
+                if ($stmt->execute()) {
                     // Atualizar as variáveis de sessão
                     $_SESSION["nome"] = $nome;
                     $_SESSION["email"] = $email;
                 } else {
                     echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
                 }
-
-                // Fechar declaração
-                mysqli_stmt_close($stmt);
+            } catch(PDOException $e) {
+                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
             }
         }
     } elseif (isset($_POST["alterar_senha"])) {
@@ -105,37 +99,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $senha_atual_err = "Por favor, insira sua senha atual.";
         } else {
             // Verificar se a senha atual está correta
-            $sql = "SELECT senha FROM usuarios WHERE id = ?";
+            $sql = "SELECT senha FROM usuarios WHERE id = :id";
             
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                // Vincular variáveis à declaração preparada como parâmetros
-                mysqli_stmt_bind_param($stmt, "i", $param_id);
+            try {
+                $stmt = $conn->prepare($sql);
                 
-                // Definir parâmetros
-                $param_id = $_SESSION["id"];
+                // Vincular parâmetro
+                $stmt->bindParam(":id", $_SESSION["id"], PDO::PARAM_INT);
                 
-                // Tentar executar a declaração preparada
-                if (mysqli_stmt_execute($stmt)) {
-                    // Armazenar resultado
-                    mysqli_stmt_store_result($stmt);
+                // Executar a consulta
+                $stmt->execute();
+                
+                // Verificar se o usuário existe
+                if ($stmt->rowCount() == 1) {
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $hashed_password = $row["senha"];
                     
-                    // Verificar se o usuário existe
-                    if (mysqli_stmt_num_rows($stmt) == 1) {
-                        // Vincular variáveis de resultado
-                        mysqli_stmt_bind_result($stmt, $hashed_password);
-                        
-                        if (mysqli_stmt_fetch($stmt)) {
-                            if (!password_verify($_POST["senha_atual"], $hashed_password)) {
-                                $senha_atual_err = "A senha atual está incorreta.";
-                            }
-                        }
+                    if (!password_verify($_POST["senha_atual"], $hashed_password)) {
+                        $senha_atual_err = "A senha atual está incorreta.";
                     }
-                } else {
-                    echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
                 }
-
-                // Fechar declaração
-                mysqli_stmt_close($stmt);
+            } catch(PDOException $e) {
+                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
             }
         }
         
@@ -162,55 +147,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($senha_atual_err) && empty($nova_senha_err) && empty($confirmar_senha_err)) {
             
             // Prepare uma declaração de atualização
-            $sql = "UPDATE usuarios SET senha = ? WHERE id = ?";
+            $sql = "UPDATE usuarios SET senha = :senha WHERE id = :id";
             
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                // Vincular variáveis à declaração preparada como parâmetros
-                mysqli_stmt_bind_param($stmt, "si", $param_senha, $param_id);
+            try {
+                $stmt = $conn->prepare($sql);
                 
-                // Definir parâmetros
+                // Definir e vincular parâmetros
                 $param_senha = password_hash($nova_senha, PASSWORD_DEFAULT);
-                $param_id = $_SESSION["id"];
+                $stmt->bindParam(":senha", $param_senha, PDO::PARAM_STR);
+                $stmt->bindParam(":id", $_SESSION["id"], PDO::PARAM_INT);
                 
-                // Tentar executar a declaração preparada
-                if (mysqli_stmt_execute($stmt)) {
+                // Executar a declaração preparada
+                if ($stmt->execute()) {
                     // Senha atualizada com sucesso
                     $senha_atualizada = true;
                 } else {
                     echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
                 }
-
-                // Fechar declaração
-                mysqli_stmt_close($stmt);
+            } catch(PDOException $e) {
+                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
             }
         }
     }
 }
 
 // Buscar informações do usuário
-$sql = "SELECT nome, email FROM usuarios WHERE id = ?";
-if ($stmt = mysqli_prepare($conn, $sql)) {
-    // Vincular variáveis à declaração preparada como parâmetros
-    mysqli_stmt_bind_param($stmt, "i", $param_id);
+$sql = "SELECT nome, email FROM usuarios WHERE id = :id";
+try {
+    $stmt = $conn->prepare($sql);
     
-    // Definir parâmetros
-    $param_id = $_SESSION["id"];
+    // Vincular parâmetro
+    $stmt->bindParam(":id", $_SESSION["id"], PDO::PARAM_INT);
     
-    // Tentar executar a declaração preparada
-    if (mysqli_stmt_execute($stmt)) {
-        // Armazenar resultado
-        mysqli_stmt_bind_result($stmt, $db_nome, $db_email);
-        
-        if (mysqli_stmt_fetch($stmt)) {
-            $nome = $db_nome;
-            $email = $db_email;
-        }
-    } else {
-        echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+    // Executar a declaração preparada
+    $stmt->execute();
+    
+    // Obter resultado
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $nome = $row["nome"];
+        $email = $row["email"];
     }
-    
-    // Fechar declaração
-    mysqli_stmt_close($stmt);
+} catch(PDOException $e) {
+    echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
 }
 ?>
 
@@ -357,15 +335,16 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
                 
                 // Verificar se o usuário já tem uma foto de perfil
                 $foto_perfil = null;
-                $sql_foto = "SELECT imagem_base64 FROM fotos_perfil WHERE id_usuario = ?";
-                if ($stmt_foto = mysqli_prepare($conn, $sql_foto)) {
-                    mysqli_stmt_bind_param($stmt_foto, "i", $_SESSION["id"]);
-                    mysqli_stmt_execute($stmt_foto);
-                    mysqli_stmt_bind_result($stmt_foto, $imagem_base64);
-                    if (mysqli_stmt_fetch($stmt_foto)) {
-                        $foto_perfil = $imagem_base64;
+                $sql_foto = "SELECT imagem_base64 FROM fotos_perfil WHERE id_usuario = :id_usuario";
+                try {
+                    $stmt_foto = $conn->prepare($sql_foto);
+                    $stmt_foto->bindParam(":id_usuario", $_SESSION["id"], PDO::PARAM_INT);
+                    $stmt_foto->execute();
+                    if ($row = $stmt_foto->fetch(PDO::FETCH_ASSOC)) {
+                        $foto_perfil = $row["imagem_base64"];
                     }
-                    mysqli_stmt_close($stmt_foto);
+                } catch(PDOException $e) {
+                    // Em caso de erro, continua sem a foto de perfil
                 }
                 ?>
                 
@@ -419,6 +398,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
 </html>
 
 <?php
-// Fechar conexão
-mysqli_close($conn);
+// Com PDO não é necessário fechar a conexão explicitamente
+// A conexão será fechada automaticamente quando o script terminar
+// $pdo = null; // Opcional: liberar a conexão explicitamente
 ?>

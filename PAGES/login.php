@@ -35,70 +35,65 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validar credenciais
     if(empty($email_err) && empty($senha_err)){
         // Preparar uma declaração select
-        $sql = "SELECT id, nome, email, senha, tipo FROM usuarios WHERE email = ?";
+        $sql = "SELECT id, nome, email, senha, tipo FROM usuarios WHERE email = :email";
         
-        if($stmt = mysqli_prepare($conn, $sql)){
-            // Vincular variáveis à declaração preparada como parâmetros
-            mysqli_stmt_bind_param($stmt, "s", $param_email);
+        try {
+            $stmt = $conn->prepare($sql);
             
-            // Definir parâmetros
-            $param_email = $email;
+            // Definir e vincular parâmetros
+            $stmt->bindParam(":email", $email, PDO::PARAM_STR);
             
-            // Tentar executar a declaração preparada
-            if(mysqli_stmt_execute($stmt)){
-                // Armazenar resultado
-                mysqli_stmt_store_result($stmt);
+            // Executar a consulta
+            $stmt->execute();
+            
+            // Verificar se o e-mail existe, se sim, verificar a senha
+            if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $id = $row["id"];
+                $nome = $row["nome"];
+                $email = $row["email"];
+                $hashed_password = $row["senha"];
+                $tipo = $row["tipo"];
                 
-                // Verificar se o e-mail existe, se sim, verificar a senha
-                if(mysqli_stmt_num_rows($stmt) == 1){                    
-                    // Vincular variáveis de resultado
-                    mysqli_stmt_bind_result($stmt, $id, $nome, $email, $hashed_password, $tipo);
+                if(password_verify($senha, $hashed_password)) {
+                    // Senha está correta, iniciar uma nova sessão
+                    session_start();
                     
-                    if(mysqli_stmt_fetch($stmt)){
-                        if(password_verify($senha, $hashed_password)){
-                            // Senha está correta, iniciar uma nova sessão
-                            session_start();
-                            
-                            // Armazenar dados em variáveis de sessão
-                            $_SESSION["loggedin"] = true;
-                            $_SESSION["id"] = $id;
-                            $_SESSION["nome"] = $nome;
-                            $_SESSION["email"] = $email;
-                            $_SESSION["tipo"] = $tipo;
-                            
-                            // Definir cookies para JavaScript localStorage
-                            setcookie("userLoggedIn", "true", time() + 86400, "/");
-                            setcookie("userName", $nome, time() + 86400, "/");
-                            setcookie("userEmail", $email, time() + 86400, "/");
-                            setcookie("userType", $tipo, time() + 86400, "/");
-                            setcookie("userId", $id, time() + 86400, "/");
-                            
-                            // Redirecionar usuário com base no tipo de conta
-                            if ($tipo === "admin") {
-                                header("location: admin_dashboard.php");
-                            } else {
-                                header("location: ../index.php");
-                            }
-                        } else{
-                            // Senha não é válida, exibir mensagem de erro genérica
-                            $login_err = "E-mail ou senha inválidos.";
-                        }
+                    // Armazenar dados em variáveis de sessão
+                    $_SESSION["loggedin"] = true;
+                    $_SESSION["id"] = $id;
+                    $_SESSION["nome"] = $nome;
+                    $_SESSION["email"] = $email;
+                    $_SESSION["tipo"] = $tipo;
+                    
+                    // Definir cookies para JavaScript localStorage
+                    setcookie("userLoggedIn", "true", time() + 86400, "/");
+                    setcookie("userName", $nome, time() + 86400, "/");
+                    setcookie("userEmail", $email, time() + 86400, "/");
+                    setcookie("userType", $tipo, time() + 86400, "/");
+                    setcookie("userId", $id, time() + 86400, "/");
+                    
+                    // Redirecionar usuário com base no tipo de conta
+                    if ($tipo === "admin") {
+                        header("location: admin_dashboard.php");
+                    } else {
+                        header("location: ../index.php");
                     }
-                } else{
-                    // E-mail não existe, exibir mensagem de erro genérica
+                } else {
+                    // Senha não é válida, exibir mensagem de erro genérica
                     $login_err = "E-mail ou senha inválidos.";
                 }
-            } else{
-                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+            } else {
+                // E-mail não existe, exibir mensagem de erro genérica
+                $login_err = "E-mail ou senha inválidos.";
             }
-
-            // Fechar declaração
-            mysqli_stmt_close($stmt);
+        } catch (PDOException $e) {
+            echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+            // Para depuração apenas, não use em produção:
+            // error_log("Erro no login: " . $e->getMessage());
         }
     }
     
-    // Fechar conexão
-    mysqli_close($conn);
+    // Com PDO, não é necessário fechar a conexão explicitamente
 }
 ?>
 
@@ -225,7 +220,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <p>&copy; 2025 EntreLinhas - SESI Salto. Todos os direitos reservados.</p>
         </div>
     </footer>
-
+            
     <!-- JavaScript -->
     <script src="../assets/js/main.js"></script>
     <!-- Script personalizado para a página de login -->

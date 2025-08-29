@@ -19,27 +19,43 @@ $stats = [
 ];
 
 // Total de artigos
-$result = mysqli_query($conn, "SELECT COUNT(*) as total FROM artigos");
-if ($row = mysqli_fetch_assoc($result)) {
-    $stats["total_artigos"] = $row["total"];
+try {
+    $result = $conn->query("SELECT COUNT(*) as total FROM artigos");
+    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $stats["total_artigos"] = $row["total"];
+    }
+} catch (PDOException $e) {
+    error_log("Erro ao buscar total de artigos: " . $e->getMessage());
 }
 
 // Artigos pendentes
-$result = mysqli_query($conn, "SELECT COUNT(*) as total FROM artigos WHERE status = 'pendente'");
-if ($row = mysqli_fetch_assoc($result)) {
-    $stats["artigos_pendentes"] = $row["total"];
+try {
+    $result = $conn->query("SELECT COUNT(*) as total FROM artigos WHERE status = 'pendente'");
+    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $stats["artigos_pendentes"] = $row["total"];
+    }
+} catch (PDOException $e) {
+    error_log("Erro ao buscar artigos pendentes: " . $e->getMessage());
 }
 
 // Total de usuários
-$result = mysqli_query($conn, "SELECT COUNT(*) as total FROM usuarios");
-if ($row = mysqli_fetch_assoc($result)) {
-    $stats["total_usuarios"] = $row["total"];
+try {
+    $result = $conn->query("SELECT COUNT(*) as total FROM usuarios");
+    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $stats["total_usuarios"] = $row["total"];
+    }
+} catch (PDOException $e) {
+    error_log("Erro ao buscar total de usuários: " . $e->getMessage());
 }
 
 // Comentários pendentes
-$result = mysqli_query($conn, "SELECT COUNT(*) as total FROM comentarios WHERE status = 'pendente'");
-if ($row = mysqli_fetch_assoc($result)) {
-    $stats["comentarios_pendentes"] = $row["total"];
+try {
+    $result = $conn->query("SELECT COUNT(*) as total FROM comentarios WHERE status = 'pendente'");
+    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $stats["comentarios_pendentes"] = $row["total"];
+    }
+} catch (PDOException $e) {
+    error_log("Erro ao buscar comentários pendentes: " . $e->getMessage());
 }
 
 // Tentar obter a foto de perfil do usuário
@@ -53,8 +69,8 @@ if (function_exists('obter_foto_perfil') || (!function_exists('obter_foto_perfil
 
 // Artigos recentes
 $artigos_recentes = [];
-$result = mysqli_query($conn, "SELECT a.id, a.titulo, a.conteudo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
-while ($row = mysqli_fetch_assoc($result)) {
+$result = $conn->query("SELECT a.id, a.titulo, a.conteudo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
+while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
     // Criar um resumo do conteúdo (primeiros 100 caracteres)
     $row['resumo'] = mb_substr(strip_tags($row['conteudo']), 0, 100) . '...';
     unset($row['conteudo']); // Remove o conteúdo completo
@@ -62,7 +78,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 // Fechar conexão
-mysqli_close($conn);
+// Com PDO não é necessário fechar a conexão explicitamente
+// $conn = null; // Opcional
 ?>
 
 <!DOCTYPE html>
