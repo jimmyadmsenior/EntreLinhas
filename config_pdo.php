@@ -1,5 +1,5 @@
 <?php
-// Arquivo de configuração do banco de dados para InfinityFree
+// Arquivo de configuração do banco de dados usando PDO para InfinityFree
 define('DB_SERVER', 'localhost'); // Importante: Use 'localhost' quando estiver no servidor
 define('DB_USERNAME', 'if0_39798697');  
 define('DB_PASSWORD', 'xKIcJzBS13BB50t');      
@@ -18,10 +18,10 @@ try {
     // Configurar para retornar resultados como arrays associativos
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     
-    // Para compatibilidade com código existente
-    $conn = $pdo;
-    
 } catch (PDOException $e) {
     die("ERRO: Não foi possível conectar ao banco de dados. " . $e->getMessage());
 }
+
+// Para compatibilidade com código existente (opcional)
+$conn = $pdo; // Permite usar $conn nas partes do código que esperam essa variável
 ?>

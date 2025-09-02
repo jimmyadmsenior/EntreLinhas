@@ -9,15 +9,15 @@ $usuario_logado = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true
 
 // Se estiver logado, obter a foto de perfil
 $foto_perfil = null;
-if ($usuario_logado && isset($conn)) {
+if ($usuario_logado && isset($pdo)) {
     // Carregar helper se ainda não estiver carregado
-    if (!function_exists('obter_foto_perfil')) {
-        require_once dirname(__FILE__) . "/../../backend/usuario_helper.php";
+    if (!function_exists('obter_foto_perfil_pdo')) {
+        require_once dirname(__FILE__) . "/../../backend/usuario_helper_pdo.php";
     }
     
     // Obter foto de perfil
-    if (function_exists('obter_foto_perfil')) {
-        $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+    if (function_exists('obter_foto_perfil_pdo')) {
+        $foto_perfil = obter_foto_perfil_pdo($pdo, $_SESSION["id"]);
     }
 }
 

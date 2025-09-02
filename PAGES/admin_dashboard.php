@@ -1,8 +1,8 @@
 <?php
-// Incluir arquivo de gerenciamento de sessões
+// Incluir arquivo de gerenciamento de sessões e configuração PDO
 require_once "../backend/session_helper.php";
-require_once "../backend/config.php";
-require_once "../backend/db_connection_fix.php"; // Fix para problemas de conexão
+require_once "../backend/config_pdo.php";
+require_once "../backend/usuario_helper_pdo.php";
 
 // Verificar se é administrador
 if (!is_admin()) {
@@ -18,68 +18,53 @@ $stats = [
     "comentarios_pendentes" => 0
 ];
 
-// Total de artigos
 try {
-    $result = $conn->query("SELECT COUNT(*) as total FROM artigos");
-    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $stats["total_artigos"] = $row["total"];
-    }
+    // Total de artigos
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM artigos");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats["total_artigos"] = $row["total"];
+
+    // Artigos pendentes
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM artigos WHERE status = 'pendente'");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats["artigos_pendentes"] = $row["total"];
+
+    // Total de usuários
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM usuarios");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats["total_usuarios"] = $row["total"];
+
+    // Comentários pendentes
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM comentarios WHERE status = 'pendente'");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats["comentarios_pendentes"] = $row["total"];
 } catch (PDOException $e) {
-    error_log("Erro ao buscar total de artigos: " . $e->getMessage());
+    error_log("Erro ao buscar estatísticas: " . $e->getMessage());
 }
 
-// Artigos pendentes
-try {
-    $result = $conn->query("SELECT COUNT(*) as total FROM artigos WHERE status = 'pendente'");
-    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $stats["artigos_pendentes"] = $row["total"];
-    }
-} catch (PDOException $e) {
-    error_log("Erro ao buscar artigos pendentes: " . $e->getMessage());
-}
-
-// Total de usuários
-try {
-    $result = $conn->query("SELECT COUNT(*) as total FROM usuarios");
-    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $stats["total_usuarios"] = $row["total"];
-    }
-} catch (PDOException $e) {
-    error_log("Erro ao buscar total de usuários: " . $e->getMessage());
-}
-
-// Comentários pendentes
-try {
-    $result = $conn->query("SELECT COUNT(*) as total FROM comentarios WHERE status = 'pendente'");
-    if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $stats["comentarios_pendentes"] = $row["total"];
-    }
-} catch (PDOException $e) {
-    error_log("Erro ao buscar comentários pendentes: " . $e->getMessage());
-}
-
-// Tentar obter a foto de perfil do usuário
+// Obter a foto de perfil do usuário usando PDO
 $foto_perfil = null;
-if (function_exists('obter_foto_perfil') || (!function_exists('obter_foto_perfil') && file_exists(dirname(__FILE__) . "/../backend/usuario_helper.php"))) {
-    if (!function_exists('obter_foto_perfil')) {
-        require_once dirname(__FILE__) . "/../backend/usuario_helper.php";
-    }
-    $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+try {
+    $foto_perfil = obter_foto_perfil_pdo($pdo, $_SESSION["id"]);
+} catch (Exception $e) {
+    error_log("Erro ao buscar foto do perfil: " . $e->getMessage());
 }
 
 // Artigos recentes
 $artigos_recentes = [];
-$result = $conn->query("SELECT a.id, a.titulo, a.conteudo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
-while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    // Criar um resumo do conteúdo (primeiros 100 caracteres)
-    $row['resumo'] = mb_substr(strip_tags($row['conteudo']), 0, 100) . '...';
-    unset($row['conteudo']); // Remove o conteúdo completo
-    $artigos_recentes[] = $row;
+try {
+    $stmt = $pdo->query("SELECT a.id, a.titulo, a.conteudo, a.status, a.data_criacao, u.nome as autor FROM artigos a JOIN usuarios u ON a.id_usuario = u.id ORDER BY a.data_criacao DESC LIMIT 5");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Criar um resumo do conteúdo (primeiros 100 caracteres)
+        $row['resumo'] = mb_substr(strip_tags($row['conteudo']), 0, 100) . '...';
+        unset($row['conteudo']); // Remove o conteúdo completo
+        $artigos_recentes[] = $row;
+    }
+} catch (PDOException $e) {
+    error_log("Erro ao buscar artigos recentes: " . $e->getMessage());
 }
 
-// Fechar conexão
-// Com PDO não é necessário fechar a conexão explicitamente
-// $conn = null; // Opcional
+// Conexão PDO é fechada automaticamente quando o script termina
 ?>
 
 <!DOCTYPE html>

@@ -8,9 +8,9 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     exit;
 }
 
-// Incluir arquivo de configuração
-require_once "../backend/config.php";
-require_once "../backend/usuarios.php";
+// Incluir arquivo de configuração PDO
+require_once "../backend/config_pdo.php";
+require_once "../backend/usuarios_pdo.php";
 
 // Definir variáveis e inicializar com valores vazios
 $nome = $email = $senha = $confirmar_senha = "";
@@ -68,7 +68,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         ];
         
         // Registrar o usuário
-        $resultado = registrarUsuario($conn, $usuario);
+        $resultado = registrarUsuario_pdo($pdo, $usuario);
         
         if($resultado['status']){
             // Registro bem-sucedido, redirecionar para a página de login
@@ -78,7 +78,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Com PDO não é necessário fechar a conexão explicitamente
+    // Não precisamos fechar a conexão PDO explicitamente
+    // $pdo = null;
 }
 ?>
 

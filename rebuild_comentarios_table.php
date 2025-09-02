@@ -1,25 +1,21 @@
 <?php
 // Script para recriar a tabela de comentários
 
-// Incluir arquivo de configuração
-require_once "backend/config.php";
+// Incluir arquivo de configuração - usar o arquivo de configuração PDO
+require_once "config_pdo.php";
 
-// Verificar conexão
-if (!$conn) {
-    die("Conexão falhou: " . mysqli_connect_error());
-}
+try {
+    echo "Conectado com sucesso ao banco de dados.<br>";
 
-echo "Conectado com sucesso ao banco de dados.<br>";
+    // Desativar verificação de chaves estrangeiras temporariamente
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
 
-// Desativar verificação de chaves estrangeiras temporariamente
-mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
-
-// Dropar a tabela comentarios se existir
-$sql = "DROP TABLE IF EXISTS comentarios";
-if (mysqli_query($conn, $sql)) {
+    // Dropar a tabela comentarios se existir
+    $sql = "DROP TABLE IF EXISTS comentarios";
+    $pdo->exec($sql);
     echo "Tabela comentarios removida com sucesso.<br>";
-} else {
-    echo "Erro ao remover tabela: " . mysqli_error($conn) . "<br>";
+} catch (PDOException $e) {
+    die("Erro ao remover tabela: " . $e->getMessage() . "<br>");
 }
 
 // Recriar a tabela comentarios
@@ -34,17 +30,19 @@ $sql = "CREATE TABLE comentarios (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 )";
 
-if (mysqli_query($conn, $sql)) {
+try {
+    $pdo->exec($sql);
     echo "Tabela comentarios criada com sucesso.<br>";
-} else {
-    echo "Erro ao criar tabela: " . mysqli_error($conn) . "<br>";
+    
+    // Reativar verificação de chaves estrangeiras
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
+    
+    // Conexão PDO é fechada automaticamente ao final do script
+    // ou pode ser explicitamente fechada:
+    $pdo = null;
+    
+    echo "Processo concluído.";
+} catch (PDOException $e) {
+    echo "Erro ao criar tabela: " . $e->getMessage() . "<br>";
 }
-
-// Reativar verificação de chaves estrangeiras
-mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 1");
-
-// Fechar conexão
-mysqli_close($conn);
-
-echo "Processo concluído.";
 ?>

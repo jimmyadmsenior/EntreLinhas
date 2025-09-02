@@ -8,8 +8,10 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     exit;
 }
 
-// Incluir arquivo de configuração
-require_once "../backend/config.php";
+// Incluir arquivo de configuração PDO
+require_once "../config_pdo.php";
+// Incluir funções auxiliares PDO
+require_once "../pdo_helper.php";
 
 // Definir variáveis e inicializar com valores vazios
 $email = $senha = "";
@@ -34,27 +36,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     // Validar credenciais
     if(empty($email_err) && empty($senha_err)){
-        // Preparar uma declaração select
-        $sql = "SELECT id, nome, email, senha, tipo FROM usuarios WHERE email = :email";
-        
         try {
-            $stmt = $conn->prepare($sql);
+            // Preparar uma declaração select
+            $sql = "SELECT id, nome, email, senha, tipo FROM usuarios WHERE email = ?";
             
-            // Definir e vincular parâmetros
-            $stmt->bindParam(":email", $email, PDO::PARAM_STR);
-            
-            // Executar a consulta
-            $stmt->execute();
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$email]);
             
             // Verificar se o e-mail existe, se sim, verificar a senha
-            if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $id = $row["id"];
-                $nome = $row["nome"];
-                $email = $row["email"];
-                $hashed_password = $row["senha"];
-                $tipo = $row["tipo"];
+            if($stmt->rowCount() == 1){
+                // Obter os dados do usuário
+                $row = $stmt->fetch();
+                $id = $row['id'];
+                $nome = $row['nome'];
+                $email = $row['email'];
+                $hashed_password = $row['senha'];
+                $tipo = $row['tipo'];
                 
-                if(password_verify($senha, $hashed_password)) {
+                if(password_verify($senha, $hashed_password)){
                     // Senha está correta, iniciar uma nova sessão
                     session_start();
                     
@@ -152,159 +151,95 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo '<div class="alert alert-danger">' . $login_err . '</div>';
             }        
             ?>
-            
-            <form id="login-form">
-                <div class="alert hidden" id="alert-container"></div>
-                
+
+            <form id="login-form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                 <div class="form-group">
                     <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" value="<?php echo $email; ?>" required>
-                    <div class="error-message" id="email-error"></div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" id="email" class="form-control <?php echo (!empty($email_err)) ? 'error' : ''; ?>" value="<?php echo $email; ?>">
+                    </div>
+                    <?php if(!empty($email_err)) { ?>
+                        <span class="error-message"><?php echo $email_err; ?></span>
+                    <?php } ?>
                 </div>
                 
                 <div class="form-group">
                     <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="senha" required>
-                    <div class="error-message" id="senha-error"></div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="senha" id="senha" class="form-control <?php echo (!empty($senha_err)) ? 'error' : ''; ?>">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <?php if(!empty($senha_err)) { ?>
+                        <span class="error-message"><?php echo $senha_err; ?></span>
+                    <?php } ?>
                 </div>
                 
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="remember" name="remember">
-                        Lembrar de mim
-                    </label>
+                    <div class="checkbox">
+                        <input type="checkbox" name="remember" id="remember">
+                        <label for="remember">Lembrar de mim</label>
+                    </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-full" id="login-btn">Entrar</button>
+                <div class="form-group">
+                    <button type="submit" id="login-btn" class="btn btn-primary btn-full">
+                        Entrar
+                    </button>
+                </div>
+                
+                <div class="form-links">
+                    <a href="forgot_password.php">Esqueceu a senha?</a>
+                    <span class="separator">|</span>
+                    <a href="register.php">Criar uma conta</a>
+                </div>
             </form>
-            
-            <p class="text-center mt-3">
-                <a href="esqueci-senha.php">Esqueci minha senha</a>
-            </p>
-            
-            <p class="text-center mt-1">
-                Não tem uma conta? <a href="cadastro.php">Cadastre-se agora</a>
-            </p>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>EntreLinhas</h3>
-                <p>Um jornal digital colaborativo onde vozes diversas se encontram para compartilhar conhecimento, histórias e experiências.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Links Rápidos</h3>
-                <ul class="footer-links">
-                    <li><a href="index.html">Início</a></li>
-                    <li><a href="artigos.html">Artigos</a></li>
-                    <li><a href="sobre.html">Sobre</a></li>
-                    <li><a href="escola.html">A Escola</a></li>
-                    <li><a href="contato.html">Contato</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contato</h3>
-                <ul class="footer-links">
-                    <li><i class="fas fa-envelope"></i> jimmycastilho555@gmail.com</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Rua Israel, 100 - Jardim Panorama, Salto - SP</li>
-                    <li><i class="fas fa-phone"></i> (11) 4029-8635</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 EntreLinhas - SESI Salto. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-            
-    <!-- JavaScript -->
-    <script src="../assets/js/main.js"></script>
-    <!-- Script personalizado para a página de login -->
-    <script src="../assets/js/login-page.js"></script>
-    <link rel="stylesheet" href="../assets/css/alerts.css">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('login-form');
-            const alertContainer = document.getElementById('alert-container');
-            const loginBtn = document.getElementById('login-btn');
+            // Função para alternar visibilidade da senha
+            window.togglePasswordVisibility = function() {
+                const passwordInput = document.getElementById('senha');
+                const icon = document.querySelector('.password-toggle i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            };
             
-            function showAlert(message, type) {
-                alertContainer.textContent = message;
-                alertContainer.className = `alert ${type}`;
+            // Mostrar alerta personalizado
+            function showAlert(message, type = 'success') {
+                const alertBox = document.createElement('div');
+                alertBox.className = `alert ${type === 'success' ? 'alert-success' : 'alert-danger'} fade-in`;
+                alertBox.innerHTML = message;
                 
-                // Scroll to alert
-                alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const container = document.querySelector('.form-container');
+                container.insertBefore(alertBox, document.getElementById('login-form'));
                 
-                // Hide after 5 seconds
                 setTimeout(() => {
-                    alertContainer.className = 'alert hidden';
-                }, 5000);
+                    alertBox.classList.add('fade-out');
+                    setTimeout(() => alertBox.remove(), 500);
+                }, 3000);
             }
             
-            function clearFormErrors() {
-                document.getElementById('email-error').textContent = '';
-                document.getElementById('senha-error').textContent = '';
-            }
+            // Ajax login
+            const loginForm = document.getElementById('login-form');
+            const loginBtn = document.getElementById('login-btn');
             
             if (loginForm) {
                 loginForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    clearFormErrors();
-                    
-                    // Obter dados do formulário
-                    const formData = new FormData(loginForm);
-                    formData.set('senha', document.getElementById('senha').value);
-                    
-                    // Alterar estado do botão
-                    loginBtn.disabled = true;
-                    loginBtn.textContent = 'Entrando...';
-                    
-                    // Fazer requisição AJAX
-                    fetch('../backend/login_debug.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Login bem-sucedido
-                            showAlert(data.message || 'Login realizado com sucesso!', 'success');
-                            
-                            // Salvar dados do usuário no localStorage
-                            // Criar objeto com os dados do usuário para o localStorage
-                            const userData = {
-                                nome: data.user_name || '',
-                                email: data.user_email || '',
-                                tipo: data.user_type || '',
-                                id: data.user_id || ''
-                            };
-                            
-                            // Chamar a função do script login-page.js
-                            if (window.saveUserData) {
-                                window.saveUserData(userData);
-                            }
-                            
-                            // Redirecionar após um breve delay
-                            setTimeout(() => {
-                                window.location.href = data.redirect || 'index.html';
-                            }, 1000);
-                        } else {
-                            // Login falhou
-                            showAlert(data.message || 'Erro ao realizar login', 'error');
-                            loginBtn.disabled = false;
-                            loginBtn.textContent = 'Entrar';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro:', error);
-                        showAlert('Erro ao conectar com o servidor', 'error');
-                        loginBtn.disabled = false;
-                        loginBtn.textContent = 'Entrar';
-                    });
+                    // O formulário será enviado normalmente, não usando AJAX para manter simplicidade
                 });
             }
         });
