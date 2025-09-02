@@ -83,38 +83,36 @@ function obter_foto_perfil($conn, $usuario_id) {
             }
         }
         
-        // Criar uma nova conexão (ignorando a que foi passada)
-        $new_conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        if (!$new_conn) {
-            error_log(\'Falha ao conectar ao banco de dados: \' . mysqli_connect_error());
+        // Criar uma nova conexão PDO (ignorando a que foi passada)
+        try {
+            $new_conn = new PDO("mysql:host=".DB_SERVER.";dbname=".DB_NAME.";charset=utf8mb4", DB_USERNAME, DB_PASSWORD);
+            $new_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            error_log(\'Falha ao conectar ao banco de dados: \' . $e->getMessage());
             return null;
         }
-        
-        // Configurar charset
-        mysqli_set_charset($new_conn, "utf8mb4");
         
         // Fazer a consulta com a nova conexão
         $sql_foto = "SELECT imagem_base64 FROM fotos_perfil WHERE id_usuario = ?";
         
-        if ($stmt_foto = mysqli_prepare($new_conn, $sql_foto)) {
-            mysqli_stmt_bind_param($stmt_foto, "i", $usuario_id);
-            mysqli_stmt_execute($stmt_foto);
-            mysqli_stmt_bind_result($stmt_foto, $imagem_base64);
+        try {
+            $stmt_foto = $new_conn->prepare($sql_foto);
+            $stmt_foto->bindParam(1, $usuario_id, PDO::PARAM_INT);
+            $stmt_foto->execute();
+            $result = $stmt_foto->fetch(PDO::FETCH_ASSOC);
             
-            if (mysqli_stmt_fetch($stmt_foto)) {
-                $foto_perfil = $imagem_base64;
+            if ($result) {
+                $foto_perfil = $result["imagem_base64"];
             }
             
-            mysqli_stmt_close($stmt_foto);
+            $stmt_foto = null; // Libera o statement
         }
     } catch (Exception $e) {
         error_log(\'Erro ao obter foto de perfil: \' . $e->getMessage());
     }
     
-    // Sempre fechar a conexão que criamos
-    if ($new_conn) {
-        mysqli_close($new_conn);
-    }
+    // Conexão PDO é fechada automaticamente quando a variável sai de escopo
+    $new_conn = null; // Explicitamente limpa a referência
     
     return $foto_perfil;
 }';
