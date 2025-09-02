@@ -1,10 +1,10 @@
 <?php
 // Arquivo de configuração do banco de dados para InfinityFree
-// IMPORTANTE: Atualize esses valores com suas próprias credenciais do InfinityFree
-define('DB_SERVER', 'sql309.infinityfree.com'); // Substitua pelo servidor MySQL fornecido
-define('DB_USERNAME', 'if0_35610247'); // Substitua pelo seu nome de usuário MySQL
-define('DB_PASSWORD', 'sua_senha_aqui'); // Substitua pela sua senha MySQL
-define('DB_NAME', 'if0_35610247_entrelinhas'); // Substitua pelo nome do seu banco de dados
+// Configurado com as credenciais atualizadas
+define('DB_SERVER', 'sql302.infinityfree.com'); // Servidor SQL atualizado
+define('DB_USERNAME', 'if0_39798697'); // Nome de usuário atualizado
+define('DB_PASSWORD', 'jimmysenai123'); // Senha atualizada
+define('DB_NAME', 'if0_39798697_entrelinhas'); // Nome do banco atualizado
 
 // Email do administrador que receberá as notificações
 define('ADMIN_EMAIL', 'jimmycastilho555@gmail.com');

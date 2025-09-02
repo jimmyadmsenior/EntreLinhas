@@ -19,7 +19,7 @@ require_once 'includes/cabecalho_helper_pdo.php';
     <title>EntreLinhas - Jornal Digital</title>
     <meta name="description" content="EntreLinhas - Jornal digital colaborativo com notícias, artigos e textos da comunidade.">
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/images/jornal.png">
+    <link rel="icon" type="image/png" href="<?php echo rtrim(dirname($_SERVER['PHP_SELF']), '/PAGES') . '/assets/images/jornal.png'; ?>">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts -->

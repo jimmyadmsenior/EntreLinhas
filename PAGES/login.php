@@ -77,19 +77,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     } else {
                         header("location: ../index.php");
                     }
-                } else{
+                } else {
                     // Senha não é válida, exibir mensagem de erro genérica
                     $login_err = "E-mail ou senha inválidos.";
                 }
-            } else{
+            } else {
                 // E-mail não existe, exibir mensagem de erro genérica
                 $login_err = "E-mail ou senha inválidos.";
             }
         } catch (PDOException $e) {
-            $login_err = "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
-            error_log("Erro de login: " . $e->getMessage());
+            echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+            // Para depuração apenas, não use em produção:
+            // error_log("Erro no login: " . $e->getMessage());
         }
     }
+    
+    // Com PDO, não é necessário fechar a conexão explicitamente
 }
 ?>
 
