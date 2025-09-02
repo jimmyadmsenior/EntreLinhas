@@ -9,19 +9,21 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['tipo'] !== 'admin') {
     exit;
 }
 
-require_once "../backend/config.php";
+require_once "../backend/config_pdo.php";
 
 // Obter estatísticas básicas
-$total_artigos = 0;
-$result = mysqli_query($conn, "SELECT COUNT(*) as total FROM artigos");
-if ($row = mysqli_fetch_assoc($result)) {
+try {
+    $total_artigos = 0;
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM artigos");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_artigos = $row['total'];
-}
 
-$total_usuarios = 0;
-$result = mysqli_query($conn, "SELECT COUNT(*) as total FROM usuarios");
-if ($row = mysqli_fetch_assoc($result)) {
+    $total_usuarios = 0;
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM usuarios");
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_usuarios = $row['total'];
+} catch (PDOException $e) {
+    error_log("Erro ao obter estatísticas: " . $e->getMessage());
 }
 ?>
 

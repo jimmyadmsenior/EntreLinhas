@@ -8,13 +8,13 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit;
 }
 
-// Incluir arquivo de configuração e helper de usuário
-require_once "../backend/config.php";
-require_once "../backend/db_connection_fix.php"; // Incluir o fix de conexão
-require_once "../backend/usuario_helper.php";
+// Incluir arquivo de configuração PDO e helpers
+require_once "../backend/config_pdo.php";
+require_once "../backend/usuario_helper_pdo.php";
+require_once "../backend/artigos_pdo.php";
 
 // Obter a foto de perfil do usuário
-$foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+$foto_perfil = obter_foto_perfil_pdo($pdo, $_SESSION["id"]);
 
 // Definir variáveis e inicializar com valores vazios
 $titulo = $conteudo = $categoria = "";
@@ -82,36 +82,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verificar erros antes de inserir no banco de dados
     if (empty($titulo_err) && empty($conteudo_err) && empty($categoria_err) && empty($imagem_err)) {
         
-        // Preparar declaração de inserção
-        $sql = "INSERT INTO artigos (titulo, conteudo, id_usuario, categoria, imagem, status) VALUES (?, ?, ?, ?, ?, 'pendente')";
-        
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            // Vincular variáveis à instrução preparada como parâmetros
-            mysqli_stmt_bind_param($stmt, "sssss", $param_titulo, $param_conteudo, $param_usuario_id, $param_categoria, $param_imagem);
+        try {
+            // Preparar declaração de inserção com PDO
+            $sql = "INSERT INTO artigos (titulo, conteudo, id_usuario, categoria, imagem, status) VALUES (:titulo, :conteudo, :id_usuario, :categoria, :imagem, 'pendente')";
+            
+            $stmt = $pdo->prepare($sql);
             
             // Definir parâmetros
-            $param_titulo = $titulo;
-            $param_conteudo = $conteudo;
-            $param_usuario_id = $_SESSION["id"];
-            $param_categoria = $categoria;
-            $param_imagem = $imagem_path;
+            $stmt->bindParam(":titulo", $titulo, PDO::PARAM_STR);
+            $stmt->bindParam(":conteudo", $conteudo, PDO::PARAM_STR);
+            $stmt->bindParam(":id_usuario", $_SESSION["id"], PDO::PARAM_INT);
+            $stmt->bindParam(":categoria", $categoria, PDO::PARAM_STR);
+            $stmt->bindParam(":imagem", $imagem_path, PDO::PARAM_STR);
             
             // Tentar executar a declaração preparada
-            if (mysqli_stmt_execute($stmt)) {
+            if ($stmt->execute()) {
                 // Redirecionar para a página de sucesso
                 header("location: envio-sucesso.html");
                 exit();
             } else {
                 echo "Algo deu errado. Por favor, tente novamente mais tarde.";
             }
-            
-            // Fechar declaração
-            mysqli_stmt_close($stmt);
+        } catch (PDOException $e) {
+            echo "Erro: " . $e->getMessage();
+            error_log("Erro ao enviar artigo: " . $e->getMessage());
         }
     }
-    
-    // Fechar conexão
-    mysqli_close($conn);
 }
 ?>
 

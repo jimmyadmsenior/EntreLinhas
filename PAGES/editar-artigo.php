@@ -8,10 +8,10 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit;
 }
 
-// Incluir arquivo de configuração
-require_once "../backend/config.php";
-require_once "../backend/artigos.php";
-require_once "../backend/usuarios.php";
+// Incluir arquivo de configuração PDO e helpers
+require_once "../backend/config_pdo.php";
+require_once "../backend/artigos_pdo.php";
+require_once "../backend/usuario_helper_pdo.php";
 
 // Verificar se o ID do artigo foi fornecido
 if(!isset($_GET["id"]) || empty($_GET["id"])){
@@ -22,16 +22,16 @@ if(!isset($_GET["id"]) || empty($_GET["id"])){
 $artigo_id = (int)$_GET["id"];
 
 // Obter dados do artigo
-$artigo = obterArtigo($conn, $artigo_id);
+$artigo = obterArtigo_pdo($pdo, $artigo_id);
 
 // Verificar se o artigo existe e se o usuário é o autor ou um administrador
-if(!$artigo || ($artigo['usuario_id'] != $_SESSION["id"] && !isAdmin($conn, $_SESSION["id"]))){
+if(!$artigo || ($artigo['id_usuario'] != $_SESSION["id"] && !isAdmin_pdo($pdo, $_SESSION["id"]))){
     header("location: perfil.php");
     exit;
 }
 
 // Verificar se o artigo pode ser editado (apenas se estiver pendente)
-$pode_editar = ($artigo['status'] == 'pendente' || isAdmin($conn, $_SESSION["id"]));
+$pode_editar = ($artigo['status'] == 'pendente' || isAdmin_pdo($pdo, $_SESSION["id"]));
 
 // Definir variáveis e inicializar com valores
 $titulo = $artigo['titulo'];
@@ -70,7 +70,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $pode_editar){
     $imagem = $imagem_atual; // Manter a imagem atual por padrão
     
     if(isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK){
-        $resultado_upload = processarUploadImagem($_FILES['imagem']);
+        $resultado_upload = processarUploadImagem_pdo($_FILES['imagem']);
         
         if($resultado_upload['status']){
             $imagem = $resultado_upload['caminho_relativo'];
@@ -97,25 +97,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $pode_editar){
         ];
         
         // Editar o artigo
-        $resultado = editarArtigo($conn, $artigo_atualizado, $_SESSION["id"]);
+        $resultado = editarArtigo_pdo($pdo, $artigo_id, $titulo, $conteudo, $categoria, $imagem, $_SESSION["id"]);
         
-        if($resultado['status']){
-            $message = $resultado['mensagem'];
+        if($resultado){
+            $message = "Artigo atualizado com sucesso!";
             
             // Atualizar dados do artigo após edição
-            $artigo = obterArtigo($conn, $artigo_id);
+            $artigo = obterArtigo_pdo($pdo, $artigo_id);
             $titulo = $artigo['titulo'];
             $conteudo = $artigo['conteudo'];
             $categoria = $artigo['categoria'];
             $imagem_atual = $artigo['imagem'];
         } else {
-            $message = $resultado['mensagem'];
+            $message = "Erro ao atualizar o artigo. Por favor, tente novamente.";
         }
     }
 }
 
-// Fechar conexão
-mysqli_close($conn);
+// Conexão PDO é fechada automaticamente ao final do script
 ?>
 
 <!DOCTYPE html>

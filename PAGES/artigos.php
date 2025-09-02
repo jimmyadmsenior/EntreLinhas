@@ -2,9 +2,9 @@
 // Iniciar a sessão para poder acessar as variáveis de sessão
 session_start();
 
-// Incluir arquivo de configuração para conexão com o banco de dados
-require_once "../backend/config.php";
-require_once "../backend/db_connection_fix.php"; // Fix para problemas de conexão
+// Incluir arquivo de configuração PDO para conexão com o banco de dados
+require_once "../config_pdo.php";
+require_once "../pdo_helper.php";
 
 // Processar filtros
 $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : '';
@@ -16,11 +16,17 @@ $inicio = ($pagina - 1) * $por_pagina;
 
 // Construir a consulta SQL com os filtros
 $where_clause = "WHERE a.status = 'aprovado'";
+$params = []; // Array para parâmetros PDO
+
 if (!empty($categoria)) {
-    $where_clause .= " AND a.titulo LIKE '%" . mysqli_real_escape_string($conn, $categoria) . "%'";
+    $where_clause .= " AND a.titulo LIKE ?";
+    $params[] = "%" . $categoria . "%";
 }
 if (!empty($busca)) {
-    $where_clause .= " AND (a.titulo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%' OR a.conteudo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%' OR a.resumo LIKE '%" . mysqli_real_escape_string($conn, $busca) . "%')";
+    $where_clause .= " AND (a.titulo LIKE ? OR a.conteudo LIKE ? OR a.resumo LIKE ?)";
+    $params[] = "%" . $busca . "%";
+    $params[] = "%" . $busca . "%";
+    $params[] = "%" . $busca . "%";
 }
 
 // Determinar a ordenação
@@ -29,42 +35,65 @@ if ($ordem == 'antigos') {
     $order_clause = "ORDER BY a.data_criacao ASC";
 } elseif ($ordem == 'titulo') {
     $order_clause = "ORDER BY a.titulo ASC";
-} elseif ($ordem == 'comentarios') {
-    $order_clause = "ORDER BY comentarios DESC";
+} elseif ($ordem == 'popularidade') {
+    $order_clause = "ORDER BY visualizacoes DESC";
 }
 
-// Consultar o número total de artigos com os filtros aplicados
-$count_sql = "SELECT COUNT(*) as total 
-              FROM artigos a 
-              $where_clause";
-$count_result = mysqli_query($conn, $count_sql);
-$total_rows = mysqli_fetch_assoc($count_result)['total'];
-$total_paginas = ceil($total_rows / $por_pagina);
+// Consulta para contar o total de artigos (para paginação)
+$sql_count = "SELECT COUNT(*) as total FROM artigos a {$where_clause}";
+$stmt_count = $pdo->prepare($sql_count);
+$stmt_count->execute($params);
+$total_artigos = $stmt_count->fetch(PDO::FETCH_ASSOC)['total'];
 
-// Consultar os artigos com os filtros aplicados
+// Calcular o número total de páginas
+$total_paginas = ceil($total_artigos / $por_pagina);
 
-$sql = "SELECT a.id, a.titulo, LEFT(a.conteudo, 150) as resumo, a.data_criacao as data_publicacao, 
-        a.categoria, a.imagem as imagem_capa, u.nome as autor, 
-        (SELECT COUNT(*) FROM comentarios c WHERE c.artigo_id = a.id) as comentarios 
-        FROM artigos a 
-        JOIN usuarios u ON a.id_usuario = u.id 
+// Garantir que a página atual está dentro dos limites
+$pagina = max(1, min($pagina, $total_paginas));
+$inicio = ($pagina - 1) * $por_pagina;
 
-        $where_clause 
-        $order_clause 
-        LIMIT $inicio, $por_pagina";
-$result = mysqli_query($conn, $sql);
+// Consulta para obter os artigos da página atual
+$sql_artigos = "SELECT a.*, 
+                u.nome as autor_nome, 
+                u.id as autor_id,
+                (SELECT COUNT(*) FROM comentarios c WHERE c.id_artigo = a.id) as total_comentarios,
+                (SELECT imagem_base64 FROM imagens_artigos WHERE id_artigo = a.id ORDER BY ordem ASC LIMIT 1) as imagem_principal
+                FROM artigos a 
+                LEFT JOIN usuarios u ON a.id_autor = u.id 
+                {$where_clause} 
+                {$order_clause}
+                LIMIT {$inicio}, {$por_pagina}";
 
-// Consultar categorias para o filtro
-$categorias_sql = "SELECT DISTINCT 'Artigo' as categoria FROM artigos WHERE status = 'aprovado' ORDER BY 1";
-$categorias_result = mysqli_query($conn, $categorias_sql);
+try {
+    $stmt_artigos = $pdo->prepare($sql_artigos);
+    $stmt_artigos->execute($params);
+    $artigos = $stmt_artigos->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro ao buscar artigos: " . $e->getMessage();
+    $artigos = [];
+}
+
+// Consulta para obter todas as categorias para o filtro
+$sql_categorias = "SELECT DISTINCT categoria FROM artigos WHERE status = 'aprovado' ORDER BY categoria";
+try {
+    $stmt_categorias = $pdo->query($sql_categorias);
+    $categorias = $stmt_categorias->fetchAll(PDO::FETCH_COLUMN);
+} catch (PDOException $e) {
+    echo "Erro ao buscar categorias: " . $e->getMessage();
+    $categorias = [];
+}
+
+// Incluir arquivo com funções do cabeçalho versão PDO
+require_once 'includes/cabecalho_helper_pdo.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artigos - EntreLinhas</title>
-    <meta name="description" content="Leia os mais recentes artigos publicados no jornal EntreLinhas.">
+    <meta name="description" content="Explore nossa coleção de artigos no EntreLinhas.">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="../assets/images/jornal.png">
     <!-- Font Awesome -->
@@ -75,335 +104,209 @@ $categorias_result = mysqli_query($conn, $categorias_sql);
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/articles.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">
     <style>
-        .filters {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background-color: var(--bg-light);
+        .filter-container {
+            background-color: #f8f9fa;
+            padding: 15px;
             border-radius: 8px;
-            box-shadow: var(--shadow-light);
-            transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+            margin-bottom: 25px;
         }
-        
-        .dark-mode .filters {
-            background-color: var(--card-bg-dark);
-            box-shadow: var(--shadow-dark);
-        }
-        
-        .filters-row {
+        .filter-form {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 10px;
         }
-        
         .filter-group {
             flex: 1;
             min-width: 200px;
         }
-        
-        .filter-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .filter-group select,
-        .filter-group input[type="text"] {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 1rem;
-        }
-        
-        .filter-group select:focus,
-        .filter-group input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        
-        .filter-buttons {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        
-        .filter-buttons button {
-            padding: 0.5rem 1rem;
-        }
-        
-        .filter-info {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        
         .pagination {
             display: flex;
             justify-content: center;
-            margin-top: 2rem;
-            list-style-type: none;
-            padding: 0;
+            margin: 30px 0;
         }
-        
-        .pagination li {
-            margin: 0 0.25rem;
-        }
-        
-        .pagination a,
-        .pagination span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .pagination a, .pagination span {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border: 1px solid #ddd;
+            color: var(--primary);
             text-decoration: none;
-            color: var(--text-color);
-            font-weight: 600;
-            transition: all 0.2s ease;
+            border-radius: 4px;
+            transition: background-color 0.3s;
         }
-        
         .pagination a:hover {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
+            background-color: #f1f1f1;
         }
-        
         .pagination .active {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
+            border: 1px solid var(--primary);
         }
-        
         .pagination .disabled {
-            opacity: 0.5;
+            color: #ddd;
             pointer-events: none;
+        }
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
+    <!-- Cabeçalho -->
+    <?php echo gerar_cabecalho($pdo, 'artigos.php'); ?>
 
-    <!-- Header -->
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <a href="../index.php">EntreLinhas</a>
-            </div>
-            
-            <ul class="nav-links">
-                <li><a href="../index.php">Início</a></li>
-                <li><a href="artigos.php" class="active">Artigos</a></li>
-                <li><a href="sobre.php">Sobre</a></li>
-                <li><a href="escola.php">A Escola</a></li>
-                <li><a href="contato.php">Contato</a></li>
-            </ul>
-            
-            <div class="nav-buttons">
-                <?php if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
-                    <!-- Menu dropdown do usuário -->
-                    <div class="user-menu">
-                        <div class="user-name">
-                            <span class="avatar-container">
-                                <?php 
-                                // Tentar obter a foto de perfil
-                                $foto_perfil = null;
-                                if (isset($conn)) {
-                                    // Carregar helper se ainda não estiver carregado
-                                    if (!function_exists('obter_foto_perfil')) {
-                                        require_once dirname(__FILE__) . "/../backend/usuario_helper.php";
-                                    }
-                                    
-                                    // Obter foto de perfil
-                                    if (function_exists('obter_foto_perfil')) {
-                                        $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
-                                    }
-                                }
-                                
-                                if ($foto_perfil): 
-                                ?>
-                                    <img src="<?php echo $foto_perfil; ?>" alt="Foto de perfil" class="user-avatar">
+    <!-- Main Content -->
+    <main class="main-content container">
+        <h1 class="page-title">Artigos</h1>
+        
+        <!-- Filtros -->
+        <div class="filter-container">
+            <form class="filter-form" method="get">
+                <div class="filter-group">
+                    <label for="categoria">Categoria</label>
+                    <select name="categoria" id="categoria" class="form-control">
+                        <option value="">Todas as categorias</option>
+                        <?php foreach ($categorias as $cat): ?>
+                            <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $categoria === $cat ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($cat); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="ordem">Ordenar por</label>
+                    <select name="ordem" id="ordem" class="form-control">
+                        <option value="recentes" <?php echo $ordem === 'recentes' ? 'selected' : ''; ?>>Mais recentes</option>
+                        <option value="antigos" <?php echo $ordem === 'antigos' ? 'selected' : ''; ?>>Mais antigos</option>
+                        <option value="titulo" <?php echo $ordem === 'titulo' ? 'selected' : ''; ?>>Título (A-Z)</option>
+                        <option value="popularidade" <?php echo $ordem === 'popularidade' ? 'selected' : ''; ?>>Popularidade</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="busca">Buscar</label>
+                    <input type="text" name="busca" id="busca" class="form-control" placeholder="Pesquisar artigos..." value="<?php echo htmlspecialchars($busca); ?>">
+                </div>
+                
+                <div class="filter-group" style="display: flex; align-items: flex-end;">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <?php if (!empty($categoria) || !empty($busca) || $ordem !== 'recentes'): ?>
+                        <a href="artigos.php" class="btn btn-outline" style="margin-left: 10px;">Limpar filtros</a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+        
+        <?php if (count($artigos) > 0): ?>
+            <!-- Lista de Artigos -->
+            <div class="articles">
+                <?php foreach ($artigos as $artigo): ?>
+                    <article class="article-card fade-in">
+                        <a href="artigo.php?id=<?php echo $artigo['id']; ?>" class="article-link">
+                            <div class="image-container">
+                                <?php if (!empty($artigo['imagem_principal'])): ?>
+                                    <img src="data:image/jpeg;base64,<?php echo $artigo['imagem_principal']; ?>" alt="<?php echo htmlspecialchars($artigo['titulo']); ?>" class="article-image">
                                 <?php else: ?>
-                                    <i class="fas fa-user"></i>
+                                    <img src="../assets/images/artigo-default.jpg" alt="Imagem padrão" class="article-image">
                                 <?php endif; ?>
-                            </span>
-                            <?php echo htmlspecialchars($_SESSION["nome"]); ?> <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown-menu" id="user-dropdown-menu">
-                            <a href="perfil.php" class="dropdown-link"><i class="fas fa-id-card"></i> Meu Perfil</a>
-                            <a href="meus-artigos.php" class="dropdown-link"><i class="fas fa-newspaper"></i> Meus Artigos</a>
-                            <a href="enviar-artigo.php" class="dropdown-link"><i class="fas fa-edit"></i> Enviar Artigo</a>
-                            <?php if (isset($_SESSION["tipo"]) && $_SESSION["tipo"] === 'admin'): ?>
-                                <a href="admin_dashboard.php" class="dropdown-link"><i class="fas fa-cogs"></i> Painel de Admin</a>
-                            <?php endif; ?>
-                            <a href="logout.php" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <!-- Links de login e cadastro -->
-                    <a href="login.php" class="btn btn-secondary">Entrar</a>
-                    <a href="registro.php" class="btn btn-primary">Cadastrar</a>
-                <?php endif; ?>
-                
-                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar modo escuro">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
+                            </div>
+                            <div class="article-content">
+                                <h2><?php echo htmlspecialchars($artigo['titulo']); ?></h2>
+                                <p class="article-excerpt"><?php echo htmlspecialchars(substr($artigo['resumo'], 0, 100)) . '...'; ?></p>
+                                <div class="article-meta">
+                                    <span class="article-author">Por <?php echo htmlspecialchars($artigo['autor_nome']); ?></span>
+                                    <span class="article-date"><?php echo date('d/m/Y', strtotime($artigo['data_criacao'])); ?></span>
+                                </div>
+                                <div class="article-stats">
+                                    <span class="article-views"><i class="fas fa-eye"></i> <?php echo $artigo['visualizacoes']; ?></span>
+                                    <span class="article-comments"><i class="fas fa-comment"></i> <?php echo $artigo['total_comentarios']; ?></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                <?php endforeach; ?>
             </div>
-        </nav>
-    </header>
-
-
-    <main>
-        <section class="articles-section">
-            <div class="container">
-                <div class="section-header">
-                    <h1>Artigos</h1>
-                    <p>Explore os artigos publicados no EntreLinhas</p>
-                </div>
-                
-                <div class="filters">
-                    <form action="artigos.php" method="GET">
-                        <div class="filters-row">
-                            <div class="filter-group">
-                                <label for="categoria">Categoria</label>
-                                <select id="categoria" name="categoria">
-                                    <option value="">Todas as categorias</option>
-                                    <?php 
-                                    while ($cat = mysqli_fetch_assoc($categorias_result)) {
-                                        $selected = ($categoria == $cat['categoria']) ? 'selected' : '';
-                                        echo '<option value="' . htmlspecialchars($cat['categoria']) . '" ' . $selected . '>' . htmlspecialchars($cat['categoria']) . '</option>';
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            
-                            <div class="filter-group">
-                                <label for="ordem">Ordenar por</label>
-                                <select id="ordem" name="ordem">
-                                    <option value="recentes" <?php if ($ordem == 'recentes') echo 'selected'; ?>>Mais recentes</option>
-                                    <option value="antigos" <?php if ($ordem == 'antigos') echo 'selected'; ?>>Mais antigos</option>
-                                    <option value="titulo" <?php if ($ordem == 'titulo') echo 'selected'; ?>>Título (A-Z)</option>
-                                    <option value="comentarios" <?php if ($ordem == 'comentarios') echo 'selected'; ?>>Mais comentados</option>
-                                </select>
-                            </div>
-                            
-                            <div class="filter-group">
-                                <label for="busca">Buscar</label>
-                                <input type="text" id="busca" name="busca" placeholder="Pesquisar artigos..." value="<?php echo htmlspecialchars($busca); ?>">
-                            </div>
-                            
-                            <div class="filter-group filter-buttons">
-                                <button type="submit" class="btn btn-primary">Filtrar</button>
-                                <a href="artigos.php" class="btn btn-secondary">Limpar filtros</a>
-                            </div>
-                        </div>
-                    </form>
-                    
-                    <div class="filter-info">
-                        <?php 
-                        echo "Exibindo $total_rows artigo(s) ";
-                        if (!empty($categoria) || !empty($busca)) {
-                            echo "filtrado(s) ";
-                            if (!empty($categoria)) {
-                                echo "por categoria \"" . htmlspecialchars($categoria) . "\" ";
-                            }
-                            if (!empty($busca)) {
-                                echo "contendo \"" . htmlspecialchars($busca) . "\" ";
-                            }
-                        }
-                        ?>
-                    </div>
-                </div>
-                
-                <div class="articles-grid">
-                    <?php
-                    if (mysqli_num_rows($result) > 0) {
-                        while ($artigo = mysqli_fetch_assoc($result)) {
-                            // Formatar a data
-                            $data = date("d/m/Y", strtotime($artigo['data_publicacao']));
-                            
-                            // Imagem padrão se não houver imagem
-                            $imagem = !empty($artigo['imagem_capa']) 
-                                    ? $artigo['imagem_capa'] 
-                                    : "../assets/images/jornal.png";
-                                    
-                            echo '
-                            <article class="article-card">
-                                <div class="article-img">
-                                    <img src="' . htmlspecialchars($imagem) . '" alt="' . htmlspecialchars($artigo['titulo']) . '">
-                                    <span class="category">' . htmlspecialchars($artigo['categoria']) . '</span>
-                                </div>
-                                <div class="article-content">
-                                    <h3><a href="artigo.php?id=' . $artigo['id'] . '">' . htmlspecialchars($artigo['titulo']) . '</a></h3>
-                                    <p class="article-meta">
-                                        <span class="author">Por ' . htmlspecialchars($artigo['autor']) . '</span>
-                                        <span class="date">' . $data . '</span>
-                                        <span class="comments"><i class="fas fa-comment"></i> ' . $artigo['comentarios'] . '</span>
-                                    </p>
-                                    <p class="excerpt">' . htmlspecialchars($artigo['resumo']) . '</p>
-                                    <a href="artigo.php?id=' . $artigo['id'] . '" class="read-more">Ler mais</a>
-                                </div>
-                            </article>';
-                        }
-                    } else {
-                        echo '<div class="no-articles"><p>Nenhum artigo encontrado com os filtros aplicados.</p></div>';
-                    }
-                    ?>
-                </div>
-                
-                <?php if ($total_paginas > 1): ?>
-                <ul class="pagination">
+            
+            <!-- Paginação -->
+            <?php if ($total_paginas > 1): ?>
+                <div class="pagination">
                     <?php if ($pagina > 1): ?>
-                        <li><a href="?pagina=1<?php echo !empty($categoria) ? "&categoria=$categoria" : ""; echo !empty($busca) ? "&busca=$busca" : ""; echo !empty($ordem) ? "&ordem=$ordem" : ""; ?>"><i class="fas fa-angle-double-left"></i></a></li>
-                        <li><a href="?pagina=<?php echo $pagina-1; echo !empty($categoria) ? "&categoria=$categoria" : ""; echo !empty($busca) ? "&busca=$busca" : ""; echo !empty($ordem) ? "&ordem=$ordem" : ""; ?>"><i class="fas fa-angle-left"></i></a></li>
+                        <a href="?pagina=1<?php echo !empty($categoria) ? '&categoria=' . urlencode($categoria) : ''; ?><?php echo !empty($busca) ? '&busca=' . urlencode($busca) : ''; ?><?php echo '&ordem=' . urlencode($ordem); ?>">&laquo; Primeira</a>
+                        <a href="?pagina=<?php echo $pagina - 1; ?><?php echo !empty($categoria) ? '&categoria=' . urlencode($categoria) : ''; ?><?php echo !empty($busca) ? '&busca=' . urlencode($busca) : ''; ?><?php echo '&ordem=' . urlencode($ordem); ?>">&lsaquo; Anterior</a>
                     <?php else: ?>
-                        <li class="disabled"><span><i class="fas fa-angle-double-left"></i></span></li>
-                        <li class="disabled"><span><i class="fas fa-angle-left"></i></span></li>
+                        <span class="disabled">&laquo; Primeira</span>
+                        <span class="disabled">&lsaquo; Anterior</span>
                     <?php endif; ?>
                     
                     <?php
-                    $start = max(1, $pagina - 2);
-                    $end = min($start + 4, $total_paginas);
-                    $start = max(1, $end - 4);
+                    // Determinar quais páginas mostrar
+                    $inicio_pag = max(1, $pagina - 2);
+                    $fim_pag = min($total_paginas, $pagina + 2);
                     
-                    for ($i = $start; $i <= $end; $i++) {
+                    // Garantir que mostramos pelo menos 5 botões de página se possível
+                    if ($fim_pag - $inicio_pag < 4) {
+                        if ($inicio_pag == 1) {
+                            $fim_pag = min($total_paginas, 5);
+                        } elseif ($fim_pag == $total_paginas) {
+                            $inicio_pag = max(1, $total_paginas - 4);
+                        }
+                    }
+                    
+                    // Mostrar as páginas
+                    for ($i = $inicio_pag; $i <= $fim_pag; $i++) {
                         if ($i == $pagina) {
-                            echo '<li><span class="active">' . $i . '</span></li>';
+                            echo '<span class="active">' . $i . '</span>';
                         } else {
-                            echo '<li><a href="?pagina=' . $i . (!empty($categoria) ? "&categoria=$categoria" : "") . (!empty($busca) ? "&busca=$busca" : "") . (!empty($ordem) ? "&ordem=$ordem" : "") . '">' . $i . '</a></li>';
+                            echo '<a href="?pagina=' . $i . (!empty($categoria) ? '&categoria=' . urlencode($categoria) : '') . (!empty($busca) ? '&busca=' . urlencode($busca) : '') . '&ordem=' . urlencode($ordem) . '">' . $i . '</a>';
                         }
                     }
                     ?>
                     
                     <?php if ($pagina < $total_paginas): ?>
-                        <li><a href="?pagina=<?php echo $pagina+1; echo !empty($categoria) ? "&categoria=$categoria" : ""; echo !empty($busca) ? "&busca=$busca" : ""; echo !empty($ordem) ? "&ordem=$ordem" : ""; ?>"><i class="fas fa-angle-right"></i></a></li>
-                        <li><a href="?pagina=<?php echo $total_paginas; echo !empty($categoria) ? "&categoria=$categoria" : ""; echo !empty($busca) ? "&busca=$busca" : ""; echo !empty($ordem) ? "&ordem=$ordem" : ""; ?>"><i class="fas fa-angle-double-right"></i></a></li>
+                        <a href="?pagina=<?php echo $pagina + 1; ?><?php echo !empty($categoria) ? '&categoria=' . urlencode($categoria) : ''; ?><?php echo !empty($busca) ? '&busca=' . urlencode($busca) : ''; ?><?php echo '&ordem=' . urlencode($ordem); ?>">Próxima &rsaquo;</a>
+                        <a href="?pagina=<?php echo $total_paginas; ?><?php echo !empty($categoria) ? '&categoria=' . urlencode($categoria) : ''; ?><?php echo !empty($busca) ? '&busca=' . urlencode($busca) : ''; ?><?php echo '&ordem=' . urlencode($ordem); ?>">Última &raquo;</a>
                     <?php else: ?>
-                        <li class="disabled"><span><i class="fas fa-angle-right"></i></span></li>
-                        <li class="disabled"><span><i class="fas fa-angle-double-right"></i></span></li>
+                        <span class="disabled">Próxima &rsaquo;</span>
+                        <span class="disabled">Última &raquo;</span>
                     <?php endif; ?>
-                </ul>
-                <?php endif; ?>
+                </div>
+            <?php endif; ?>
+            
+        <?php else: ?>
+            <!-- Mensagem quando não há resultados -->
+            <div class="no-results">
+                <h2>Nenhum artigo encontrado</h2>
+                <p>Não encontramos artigos que correspondam aos seus critérios de busca.</p>
+                <p>Tente ajustar os filtros ou <a href="artigos.php">veja todos os artigos</a>.</p>
             </div>
-        </section>
+        <?php endif; ?>
     </main>
 
     <?php include 'includes/footer.php'; ?>
-
-    <!-- JavaScript -->
-
-    <script src="../assets/js/auth-cookies.js"></script>
-    <script src="../assets/js/verificar-sincronizar-login.js"></script>
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/user-menu.js"></script>
-    <script src="../assets/js/dropdown-menu.js"></script>
-    <script src="../assets/js/header-nav.js"></script>
-
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar componentes
+            const filterForm = document.querySelector('.filter-form');
+            
+            // Função para auto-submit do formulário quando os selects mudam
+            const categoria = document.getElementById('categoria');
+            const ordem = document.getElementById('ordem');
+            
+            if (categoria && ordem) {
+                [categoria, ordem].forEach(element => {
+                    element.addEventListener('change', function() {
+                        filterForm.submit();
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

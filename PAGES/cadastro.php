@@ -2,8 +2,8 @@
 // Iniciar sessão
 session_start();
 
-// Incluir arquivo de configuração
-require_once "../backend/config.php";
+// Incluir arquivo de configuração PDO
+require_once "../backend/config_pdo.php";
 
 // Definir variáveis e inicializar com valores vazios
 $nome = $email = $senha = $confirmar_senha = "";
@@ -23,31 +23,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty(trim($_POST["email"]))) {
         $email_err = "Por favor, insira um e-mail.";
     } else {
-        // Prepare uma declaração select
-        $sql = "SELECT id FROM usuarios WHERE email = ?";
-        
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            // Vincular variáveis à declaração preparada como parâmetros
-            mysqli_stmt_bind_param($stmt, "s", $param_email);
+        try {
+            // Preparar uma consulta select
+            $sql = "SELECT id FROM usuarios WHERE email = ?";
             
-            // Definir parâmetros
+            $stmt = $pdo->prepare($sql);
+            
+            // Definir parâmetros e executar
             $param_email = trim($_POST["email"]);
+            $stmt->execute([$param_email]);
             
-            // Tentar executar a declaração preparada
-            if (mysqli_stmt_execute($stmt)) {
-                /* armazenar resultado */
-                mysqli_stmt_store_result($stmt);
-                
-                if (mysqli_stmt_num_rows($stmt) == 1) {
-                    $email_err = "Este e-mail já está em uso.";
-                } else {
-                    $email = trim($_POST["email"]);
-                }
+            // Verificar se o email já existe
+            if ($stmt->rowCount() == 1) {
+                $email_err = "Este e-mail já está em uso.";
             } else {
-                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+                $email = trim($_POST["email"]);
             }
-
-            // Fechar declaração
+        } catch(PDOException $e) {
+            echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+            error_log("Erro no cadastro (verificação de email): " . $e->getMessage());
+        }
             mysqli_stmt_close($stmt);
         }
     }
@@ -74,34 +69,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verificar erros de entrada antes de inserir no banco de dados
     if (empty($nome_err) && empty($email_err) && empty($senha_err) && empty($confirmar_senha_err)) {
         
-        // Prepare uma declaração de inserção
-        $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
-         
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            // Vincular variáveis à declaração preparada como parâmetros
-            mysqli_stmt_bind_param($stmt, "sss", $param_nome, $param_email, $param_senha);
+        try {
+            // Preparar uma declaração de inserção
+            $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+            
+            $stmt = $pdo->prepare($sql);
             
             // Definir parâmetros
             $param_nome = $nome;
             $param_email = $email;
             $param_senha = password_hash($senha, PASSWORD_DEFAULT); // Cria um hash de senha
             
-            // Tentar executar a declaração preparada
-            if (mysqli_stmt_execute($stmt)) {
+            // Executar a declaração preparada
+            if ($stmt->execute([$param_nome, $param_email, $param_senha])) {
                 // Redirecionar para a página de sucesso de cadastro
                 header("location: cadastro-sucesso.html");
                 exit();
-            } else {
-                echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
             }
-
-            // Fechar declaração
-            mysqli_stmt_close($stmt);
+        } catch(PDOException $e) {
+            echo "Ops! Algo deu errado. Por favor, tente novamente mais tarde.";
+            error_log("Erro no cadastro (inserção): " . $e->getMessage());
         }
     }
     
-    // Fechar conexão
-    mysqli_close($conn);
+    // Conexão PDO é fechada automaticamente ao final do script
 }
 ?>
 

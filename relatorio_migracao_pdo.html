@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Relatório de Migração para PDO</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #333; }
+        .stats { background-color: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .progress-bar { 
+            background-color: #f0f0f0; 
+            height: 20px; 
+            border-radius: 10px; 
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress { 
+            height: 100%; 
+            background-color: #4CAF50; 
+            text-align: center; 
+            line-height: 20px; 
+            color: white; 
+            transition: width 0.5s;
+        }
+        .warning { color: #dc3545; }
+        .success { color: #28a745; }
+        .info { color: #17a2b8; }
+        .section { margin: 30px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.6em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            color: #fff;
+        }
+        .badge-success { background-color: #28a745; }
+        .badge-danger { background-color: #dc3545; }
+        .badge-warning { background-color: #ffc107; color: #212529; }
+        .badge-info { background-color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Migração para PDO</h1>
+    <p>Este relatório mostra o status da migração de mysqli para PDO no projeto.</p>
+    
+    <div class='stats section'>
+        <h2>Estatísticas Gerais</h2>
+        <p><strong>Total de arquivos PHP:</strong> 312</p>
+        <p><strong>Arquivos usando mysqli:</strong> 117 (37.5%)</p>
+        <p><strong>Arquivos usando PDO:</strong> 46 (14.7%)</p>
+        
+        <h3>Progresso da Migração:</h3>
+        <div class='progress-bar'>
+            <div class='progress' style='width: 62.5%;'>62.5%</div>
+        </div>
+    </div>
+    
+    <div class='section'>
+        <h2>Arquivos de Configuração</h2>
+        <table>
+            <tr>
+                <th>Arquivo</th>
+                <th>Existe</th>
+                <th>Usa mysqli</th>
+                <th>Usa PDO</th>
+                <th>Status</th>
+            </tr><tr>
+        <td>config.php</td>
+        <td>Não</td>
+        <td>Não</td>
+        <td>Não</td>
+        <td><span class="badge badge-warning">Não encontrado</span></td>
+    </tr><tr>
+        <td>config_infinityfree.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">PDO</span></td>
+    </tr><tr>
+        <td>config_pdo.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">PDO</span></td>
+    </tr><tr>
+        <td>backend/config.php</td>
+        <td>Sim</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td><span class="badge badge-danger">mysqli</span></td>
+    </tr><tr>
+        <td>backend/config_infinityfree.php</td>
+        <td>Sim</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td><span class="badge badge-danger">mysqli</span></td>
+    </tr><tr>
+        <td>backend/config_pdo.php</td>
+        <td>Não</td>
+        <td>Não</td>
+        <td>Não</td>
+        <td><span class="badge badge-warning">Não encontrado</span></td>
+    </tr></table>
+    </div>
+    
+    <div class='section'>
+        <h2>Arquivos Importantes</h2>
+        <p>Esta seção mostra o status dos arquivos mais importantes do projeto que provavelmente precisam de acesso ao banco de dados.</p>
+        
+        <table>
+            <tr>
+                <th>Arquivo</th>
+                <th>Existe</th>
+                <th>Usa mysqli</th>
+                <th>Usa PDO</th>
+                <th>Status</th>
+            </tr><tr>
+        <td>PAGES/login.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>backend/process_login.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>PAGES/artigos.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>PAGES/artigo.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>PAGES/enviar-artigo.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>PAGES/index.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>PAGES/register.php</td>
+        <td>Não</td>
+        <td>Não</td>
+        <td>Não</td>
+        <td><span class="badge badge-warning">Não encontrado</span></td>
+    </tr><tr>
+        <td>PAGES/meus-artigos.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr><tr>
+        <td>PAGES/admin_dashboard.php</td>
+        <td>Sim</td>
+        <td>Não</td>
+        <td>Sim</td>
+        <td><span class="badge badge-success">Migrado para PDO</span></td>
+    </tr></table>
+    </div>
+    
+    <div class='section'>
+        <h2>Arquivos que ainda usam mysqli</h2><p class='warning'>Os seguintes arquivos ainda contêm funções mysqli e precisam ser migrados:</p>
+        <table>
+            <tr>
+                <th>Arquivo</th>
+                <th>Funções mysqli encontradas</th>
+            </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\adicionar_admins.php</td>
+            <td>mysqli_prepare (5)<br>mysqli_stmt (23)<br>mysqli_error (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\adicionar_artigo_feira_profissoes.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_error (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\adicionar_resumo.php</td>
+            <td>mysqli_query (3)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\adicionar_resumo_simples.php</td>
+            <td>mysqli_query (5)<br>mysqli_fetch (1)<br>mysqli_error (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\atualizar_admin.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\artigos.php</td>
+            <td>mysqli_query (2)<br>mysqli_fetch (5)<br>mysqli_prepare (9)<br>mysqli_stmt (31)<br>mysqli_real_escape_string (6)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\atualizar_tabela_imagens.php</td>
+            <td>mysqli_query (2)<br>mysqli_fetch (1)<br>mysqli_error (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\auth-bridge.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (7)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\comentarios.php</td>
+            <td>mysqli_fetch (8)<br>mysqli_prepare (12)<br>mysqli_stmt (54)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\config.local.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\config.php</td>
+            <td>mysqli_connect (2)<br>mysqli_query (5)<br>mysqli_error (5)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\config.prod.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\config_infinityfree.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\db_connection_fix.php</td>
+            <td>mysqli_connect (2)<br>mysqli_prepare (1)<br>mysqli_stmt (5)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\imagens_artigos.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (1)<br>mysqli_prepare (5)<br>mysqli_stmt (18)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\initialize_db.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\initialize_fotos_perfil.php</td>
+            <td>mysqli_query (1)<br>mysqli_error (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\login_debug.php</td>
+            <td>mysqli_connect (1)<br>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_error (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\processar_foto_perfil.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_error (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\processar_imagem.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (6)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\processar_status.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\process_registro.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_close (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\teste_db.php</td>
+            <td>mysqli_connect (1)<br>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_error (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\usuarios.php</td>
+            <td>mysqli_fetch (6)<br>mysqli_prepare (14)<br>mysqli_stmt (64)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\backend\usuario_helper.php</td>
+            <td>mysqli_connect (2)<br>mysqli_prepare (1)<br>mysqli_stmt (5)<br>mysqli_close (1)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\corrigir_admin_final.php</td>
+            <td>mysqli_connect (1)<br>mysqli_query (5)<br>mysqli_fetch (3)<br>mysqli_error (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\corrigir_login.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (1)<br>mysqli_prepare (4)<br>mysqli_stmt (16)<br>mysqli_error (4)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\corrigir_sessao_admin.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (6)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\criar_admin.php</td>
+            <td>mysqli_query (2)<br>mysqli_error (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\criar_admins.php</td>
+            <td>mysqli_prepare (3)<br>mysqli_stmt (12)<br>mysqli_error (2)<br>mysqli_close (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\criar_admin_garantido.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (3)<br>mysqli_stmt (13)<br>mysqli_error (2)<br>mysqli_close (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\artigos.php</td>
+            <td>mysqli_query (2)<br>mysqli_fetch (5)<br>mysqli_prepare (9)<br>mysqli_stmt (31)<br>mysqli_real_escape_string (6)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\atualizar_tabela_imagens.php</td>
+            <td>mysqli_query (2)<br>mysqli_fetch (1)<br>mysqli_error (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\auth-bridge.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (7)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\comentarios.php</td>
+            <td>mysqli_fetch (8)<br>mysqli_prepare (12)<br>mysqli_stmt (54)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\config.local.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\config.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\config.prod.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\config_infinityfree.php</td>
+            <td>mysqli_connect (2)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\db_connection_fix.php</td>
+            <td>mysqli_connect (2)<br>mysqli_prepare (1)<br>mysqli_stmt (5)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\imagens_artigos.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (1)<br>mysqli_prepare (5)<br>mysqli_stmt (18)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\initialize_db.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\initialize_fotos_perfil.php</td>
+            <td>mysqli_query (1)<br>mysqli_error (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\login_debug.php</td>
+            <td>mysqli_connect (1)<br>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_error (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\processar_foto_perfil.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_error (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\processar_imagem.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (6)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\processar_status.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\process_login.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\process_registro.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_close (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\usuarios.php</td>
+            <td>mysqli_fetch (6)<br>mysqli_prepare (14)<br>mysqli_stmt (64)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\backend\usuario_helper.php</td>
+            <td>mysqli_connect (2)<br>mysqli_prepare (1)<br>mysqli_stmt (5)<br>mysqli_close (1)<br>mysqli_set_charset (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\admin.php</td>
+            <td>mysqli_query (5)<br>mysqli_fetch (5)<br>mysqli_prepare (2)<br>mysqli_stmt (6)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\admin_basico.php</td>
+            <td>mysqli_query (2)<br>mysqli_fetch (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\admin_dashboard.php</td>
+            <td>mysqli_query (5)<br>mysqli_fetch (5)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\admin_dashboard_novo.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\admin_simples.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (3)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\artigo.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\artigos.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (3)<br>mysqli_real_escape_string (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\auth-bridge.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\cadastro.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\corrigir_admin_dashboard.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\deletar_imagem.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (7)<br>mysqli_error (4)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\editar-artigo.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\enviar-artigo-temp.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\enviar-artigo.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\esqueci-senha.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\gerenciar_imagens.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (7)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\get_profile_image.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (5)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\index.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\index_xampp.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\login.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\meus-artigos.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (4)<br>mysqli_error (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\perfil.php</td>
+            <td>mysqli_prepare (6)<br>mysqli_stmt (28)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\recuperar-senha.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\redefinir-senha.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\registro.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\reset_admin_password.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\deploy_infinityfree\PAGES\visualizar_imagem.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\diagnostico.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_error (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\diagnostico_completo.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (2)<br>mysqli_prepare (1)<br>mysqli_stmt (2)<br>mysqli_error (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\diagnostico_login.php</td>
+            <td>mysqli_connect (1)<br>mysqli_query (3)<br>mysqli_fetch (2)<br>mysqli_prepare (5)<br>mysqli_stmt (28)<br>mysqli_error (7)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\diagnostico_sistema.php</td>
+            <td>mysqli_connect (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\exemplo_migracao_pdo.php</td>
+            <td>mysqli_connect (2)<br>mysqli_query (4)<br>mysqli_fetch (3)<br>mysqli_prepare (2)<br>mysqli_stmt (7)<br>mysqli_error (3)<br>mysqli_close (1)<br>mysqli_set_charset (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\inicializar_db_cli.php</td>
+            <td>mysqli_connect (1)<br>mysqli_query (2)<br>mysqli_error (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\listar_admins.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\login_automatico.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\login_tester.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_error (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\admin.php</td>
+            <td>mysqli_query (5)<br>mysqli_fetch (5)<br>mysqli_prepare (2)<br>mysqli_stmt (6)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\admin_dashboard_novo.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\admin_simples.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (3)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\auth-bridge.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\cadastro.php</td>
+            <td>mysqli_stmt (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\corrigir_admin_dashboard.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\deletar_imagem.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (7)<br>mysqli_error (4)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\enviar-artigo-temp.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\esqueci-senha.php</td>
+            <td>mysqli_prepare (2)<br>mysqli_stmt (8)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\gerenciar_imagens.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (2)<br>mysqli_stmt (7)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\get_profile_image.php</td>
+            <td>mysqli_prepare (1)<br>mysqli_stmt (5)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\index_xampp.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\perfil.php</td>
+            <td>mysqli_prepare (6)<br>mysqli_stmt (28)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\recuperar-senha.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\redefinir-senha.php</td>
+            <td>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\reset_admin_password.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\teste_login.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (7)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\PAGES\visualizar_imagem.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\pdo_helper.php</td>
+            <td>mysqli_query (4)<br>mysqli_fetch (3)<br>mysqli_real_escape_string (1)<br>mysqli_affected_rows (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\reset_admin_password.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_error (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\reset_admin_senha.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (3)<br>mysqli_stmt (11)<br>mysqli_error (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\resolver_admin_final.php</td>
+            <td>mysqli_query (2)<br>mysqli_fetch (2)<br>mysqli_prepare (1)<br>mysqli_stmt (2)<br>mysqli_error (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\solucao_artigos.php</td>
+            <td>mysqli_query (2)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\status_migracao_pdo.php</td>
+            <td>mysqli_connect (2)<br>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (1)<br>mysqli_real_escape_string (1)<br>mysqli_error (1)<br>mysqli_close (1)<br>mysqli_set_charset (1)<br>mysqli_affected_rows (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\testar_login.php</td>
+            <td>mysqli_query (1)<br>mysqli_fetch (2)<br>mysqli_prepare (3)<br>mysqli_stmt (11)<br>mysqli_error (1)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\verificar_deploy.php</td>
+            <td>mysqli_query (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\verificar_migracao_pdo.php</td>
+            <td>mysqli_connect (1)<br>mysqli_query (1)<br>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (1)<br>mysqli_real_escape_string (1)<br>mysqli_error (1)<br>mysqli_close (1)<br>mysqli_set_charset (1)<br>mysqli_affected_rows (1)<br>mysqli_insert_id (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\verificar_tabela.php</td>
+            <td>mysqli_query (3)<br>mysqli_fetch (2)<br>mysqli_close (1)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\verificar_tabelas.php</td>
+            <td>mysqli_query (6)<br>mysqli_fetch (2)<br>mysqli_error (4)<br></td>
+        </tr><tr>
+            <td>C:\Users\User\Documents\EntreLinhas\verificar_usuario.php</td>
+            <td>mysqli_fetch (1)<br>mysqli_prepare (1)<br>mysqli_stmt (3)<br>mysqli_error (2)<br></td>
+        </tr></table>
+    </div>
+    
+    <div class='section'>
+        <h2>Próximos Passos</h2>
+        <ol>
+            <li>Migrar os arquivos importantes restantes para PDO</li>
+            <li>Garantir que todos os arquivos incluam config_pdo.php em vez de config.php</li>
+            <li>Testar todas as funcionalidades para garantir que a migração não causou problemas</li>
+            <li>Considerar a remoção dos arquivos mysqli antigos após confirmar que tudo funciona corretamente</li>
+        </ol>
+    </div>
+    
+    <footer>
+        <p>Relatório gerado em: 02/09/2025 22:33:44</p>
+    </footer>
+</body>
+</html>

@@ -3,15 +3,14 @@
 session_start();
 
 // Incluir arquivo de configuração e auxiliares
-require_once "../backend/config.php";
-require_once "../backend/db_connection_fix.php"; // Fix para problemas de conexão
-require_once "../backend/artigos.php";
-require_once "../backend/comentarios.php";
-require_once "../backend/usuario_helper.php";
+require_once "../backend/config_pdo.php";
+require_once "../backend/artigos_pdo.php";
+require_once "../backend/comentarios_pdo.php";
+require_once "../backend/usuario_helper_pdo.php";
 
 // Obter a foto de perfil do usuário logado (se existir)
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    $foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+    $foto_perfil = obter_foto_perfil_pdo($pdo, $_SESSION["id"]);
 }
 
 // Verificar se o ID do artigo foi fornecido
@@ -23,7 +22,7 @@ if(!isset($_GET["id"]) || empty($_GET["id"])){
 $artigo_id = (int)$_GET["id"];
 
 // Obter dados do artigo
-$artigo = obterArtigo($conn, $artigo_id);
+$artigo = obterArtigo_pdo($pdo, $artigo_id);
 
 // Verificar se o artigo existe e está aprovado (ou se o usuário é o autor ou admin)
 $usuario_pode_ver = false;
@@ -37,7 +36,7 @@ if($artigo) {
             $usuario_pode_ver = true;
         } 
         // Ou se é um administrador
-        else if(isAdmin($conn, $_SESSION["id"])) {
+        else if(isAdmin_pdo($pdo, $_SESSION["id"])) {
             $usuario_pode_ver = true;
         }
     }
@@ -55,7 +54,7 @@ if(!$artigo || !$usuario_pode_ver) {
 }
 
 // Obter comentários do artigo
-$comentarios = listarComentarios($conn, $artigo_id);
+$comentarios = listarComentarios_pdo($pdo, $artigo_id);
 
 // Processar envio de comentário
 $comment_message = "";
@@ -69,7 +68,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["comentario"]) && isset(
             'conteudo' => $conteudo
         ];
         
-        // Desabilitado: $resultado = adicionarComentario($conn, $comentario);
+        // Desabilitado: $resultado = adicionarComentario_pdo($pdo, $comentario);
         $resultado['status'] = false;
         
         if($resultado['status']){
@@ -545,6 +544,6 @@ $data_formatada = date('d/m/Y', strtotime($artigo['data_criacao']));
 </html>
 
 <?php
-// Agora podemos fechar a conexão com segurança
-mysqli_close($conn);
+// Não precisamos fechar a conexão PDO explicitamente, ela será fechada quando a variável sair de escopo
+// $pdo = null;
 ?>

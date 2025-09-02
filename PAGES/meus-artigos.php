@@ -12,31 +12,28 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 }
 
 // Incluir arquivo de configuração e helper de usuário
-require_once "../backend/config.php";
-require_once "../backend/usuario_helper.php";
+require_once "../backend/config_pdo.php";
+require_once "../backend/usuario_helper_pdo.php";
+require_once "../backend/artigos_pdo.php";
 
 // Obter a foto de perfil do usuário
-$foto_perfil = obter_foto_perfil($conn, $_SESSION["id"]);
+$foto_perfil = obter_foto_perfil_pdo($pdo, $_SESSION["id"]);
 
-// Consultar os artigos do usuário
-$sql = "SELECT id, titulo, categoria, data_criacao, status FROM artigos WHERE id_usuario = ? ORDER BY data_criacao DESC";
+// Consultar os artigos do usuário usando o PDO
 $result = null;
 $erro_consulta = null;
 
-if ($stmt = mysqli_prepare($conn, $sql)) {
-    // Vincular variáveis à declaração preparada como parâmetros
-    mysqli_stmt_bind_param($stmt, "i", $_SESSION["id"]);
+try {
+    // Definir filtros para listar apenas artigos do usuário
+    $filtros = [
+        'id_usuario' => $_SESSION["id"]
+    ];
     
-    // Tentar executar a declaração preparada
-    if (mysqli_stmt_execute($stmt)) {
-        // Armazenar resultado
-        $result = mysqli_stmt_get_result($stmt);
-    } else {
-        $erro_consulta = "Erro ao consultar artigos: " . mysqli_error($conn);
-    }
+    // Usar a função auxiliar para obter os artigos
+    $artigos = listarArtigos_pdo($pdo, $filtros, 100, 1);
     
-    // Fechar declaração
-    mysqli_stmt_close($stmt);
+} catch (PDOException $e) {
+    $erro_consulta = "Erro ao consultar artigos: " . $e->getMessage();
 }
 ?>
 
@@ -153,9 +150,9 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
                 </div>
             <?php endif; ?>
             
-            <?php if ($result && mysqli_num_rows($result) > 0): ?>
+            <?php if (!empty($artigos)): ?>
                 <div class="article-list">
-                    <?php while ($row = mysqli_fetch_array($result)): ?>
+                    <?php foreach ($artigos as $row): ?>
                         <div class="article-item">
                             <h3><a href="artigo.php?id=<?php echo $row['id']; ?>"><?php echo htmlspecialchars($row['titulo']); ?></a></h3>
                             
@@ -211,7 +208,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
                                 <?php endif; ?>
                             </div>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </div>
             <?php else: ?>
                 <div class="empty-state">
@@ -280,6 +277,6 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
 </html>
 
 <?php
-// Fechar conexão
-mysqli_close($conn);
+// Não precisamos fechar a conexão PDO explicitamente, ela será fechada quando a variável sair de escopo
+// $pdo = null;
 ?>

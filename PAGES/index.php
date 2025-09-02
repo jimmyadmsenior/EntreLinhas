@@ -2,12 +2,14 @@
 // Iniciar a sessão para poder acessar as variáveis de sessão
 session_start();
 
-// Incluir arquivo de configuração para conexão com o banco de dados
-require_once "../backend/config.php";
+// Incluir arquivo de configuração PDO para conexão com o banco de dados
+require_once "../config_pdo.php";
+// Incluir funções auxiliares PDO
+require_once "../pdo_helper.php";
 ?>
 <?php
-// Incluir arquivo com funções do cabeçalho
-require_once 'includes/cabecalho_helper.php';
+// Incluir arquivo com funções do cabeçalho versão PDO
+require_once 'includes/cabecalho_helper_pdo.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -35,7 +37,7 @@ require_once 'includes/cabecalho_helper.php';
 
     <?php 
     // Gerar o cabeçalho com o menu
-    echo gerar_cabecalho($conn, 'index.php');
+    echo gerar_cabecalho($pdo, 'index.php');
     ?>
 
     <!-- Hero Section -->
