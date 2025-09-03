@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Simples - EntreLinhas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login EntreLinhas - Versão Simples</h1>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <button type="submit">Entrar</button>
+        </form>
+        
+        <div id="result-message" style="display: none;" class="result"></div>
+        
+        <div class="info">
+            <h3>Usuários de teste:</h3>
+            <p>Admin: admin@exemplo.com / admin123</p>
+            <p>Usuário: usuario@exemplo.com / usuario123</p>
+        </div>
+    </div>
+
+    <script>
+    // Função para executar quando o documento estiver carregado
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Página de login simples carregada');
+        
+        // Verificar se localStorage está disponível
+        try {
+            localStorage.setItem('test', 'test');
+            localStorage.removeItem('test');
+            console.log('localStorage está funcionando');
+        } catch(e) {
+            alert('Erro: localStorage não está disponível! ' + e.message);
+        }
+        
+        // Configurar o formulário de login
+        const loginForm = document.getElementById('login-form');
+        const resultMessage = document.getElementById('result-message');
+        
+        console.log('Formulário encontrado:', loginForm ? 'Sim' : 'Não');
+        
+        // Usuários de teste
+        const users = [
+            { email: 'admin@exemplo.com', senha: 'admin123', nome: 'Administrador', tipo: 'admin', id: '1' },
+            { email: 'usuario@exemplo.com', senha: 'usuario123', nome: 'Usuário Teste', tipo: 'usuario', id: '2' }
+        ];
+        
+        if (!loginForm) {
+            alert('Erro crítico: Formulário de login não encontrado!');
+            console.error('Formulário com ID "login-form" não encontrado no documento');
+            return;
+        }
+        
+        // Definir o manipulador de evento de envio do formulário
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Formulário enviado');
+            
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            if (!emailInput || !passwordInput) {
+                console.error('Campos de email ou senha não encontrados');
+                alert('Erro: Não foi possível encontrar os campos do formulário');
+                return;
+            }
+            
+            const email = emailInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+            
+            console.log('Email fornecido:', email);
+            
+            // Procurar o usuário
+            const user = users.find(u => u.email === email && u.senha === password);
+            
+            if (user) {
+                // Login bem-sucedido
+                try {
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userName', user.nome);
+                    localStorage.setItem('userEmail', user.email);
+                    localStorage.setItem('userType', user.tipo);
+                    localStorage.setItem('userId', user.id);
+                    
+                    resultMessage.textContent = 'Login bem-sucedido! Dados salvos:';
+                    resultMessage.innerHTML += '<pre>' + JSON.stringify({
+                        userLoggedIn: localStorage.getItem('userLoggedIn'),
+                        userName: localStorage.getItem('userName'),
+                        userEmail: localStorage.getItem('userEmail'),
+                        userType: localStorage.getItem('userType'),
+                        userId: localStorage.getItem('userId')
+                    }, null, 2) + '</pre>';
+                    resultMessage.className = 'result success';
+                    resultMessage.style.display = 'block';
+                    
+                    // Redirecionar para index.html
+                    setTimeout(function() {
+                        alert('Login bem-sucedido! Redirecionando para a página inicial...');
+                        window.location.href = 'index.html';
+                    }, 1500);
+                    
+                } catch (error) {
+                    resultMessage.textContent = 'Erro ao salvar dados: ' + error.message;
+                    resultMessage.className = 'result error';
+                    resultMessage.style.display = 'block';
+                }
+            } else {
+                // Login falhou
+                resultMessage.textContent = 'Email ou senha incorretos. Por favor, tente novamente.';
+                resultMessage.className = 'result error';
+                resultMessage.style.display = 'block';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

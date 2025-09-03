@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depuração JavaScript - EntreLinhas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .log-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+        }
+        .info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+        }
+        .warning {
+            color: #856404;
+            background-color: #fff3cd;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .status-box {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Depuração JavaScript - EntreLinhas</h1>
+        
+        <div>
+            <button id="test-login">Testar Login</button>
+            <button id="clear-storage">Limpar localStorage</button>
+            <button id="clear-log">Limpar Log</button>
+        </div>
+        
+        <div class="status-box">
+            <h3>Status do localStorage:</h3>
+            <pre id="local-storage-data">Carregando...</pre>
+        </div>
+        
+        <div class="log-container" id="log-container">
+            <div class="log-entry info">Sistema iniciado. Aguardando operações...</div>
+        </div>
+    </div>
+    
+    <script>
+    // Sobrescrever console.log e outros métodos para exibir na página
+    (function() {
+        const oldLog = console.log;
+        const oldError = console.error;
+        const oldWarn = console.warn;
+        const logContainer = document.getElementById('log-container');
+        
+        console.log = function() {
+            // Chamar o método original
+            oldLog.apply(console, arguments);
+            
+            // Adicionar ao container de log
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = Array.from(arguments).join(' ');
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+        
+        console.error = function() {
+            // Chamar o método original
+            oldError.apply(console, arguments);
+            
+            // Adicionar ao container de log
+            const entry = document.createElement('div');
+            entry.className = 'log-entry error';
+            entry.textContent = 'ERRO: ' + Array.from(arguments).join(' ');
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+        
+        console.warn = function() {
+            // Chamar o método original
+            oldWarn.apply(console, arguments);
+            
+            // Adicionar ao container de log
+            const entry = document.createElement('div');
+            entry.className = 'log-entry warning';
+            entry.textContent = 'AVISO: ' + Array.from(arguments).join(' ');
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const testLoginBtn = document.getElementById('test-login');
+        const clearStorageBtn = document.getElementById('clear-storage');
+        const clearLogBtn = document.getElementById('clear-log');
+        const localStorageData = document.getElementById('local-storage-data');
+        const logContainer = document.getElementById('log-container');
+        
+        // Atualizar exibição do localStorage
+        updateLocalStorageDisplay();
+        
+        // Definir usuários de teste
+        const users = [
+            { email: 'admin@exemplo.com', senha: 'admin123', nome: 'Administrador', tipo: 'admin', id: '1' },
+            { email: 'usuario@exemplo.com', senha: 'usuario123', nome: 'Usuário Teste', tipo: 'usuario', id: '2' }
+        ];
+        
+        // Testar login
+        testLoginBtn.addEventListener('click', function() {
+            console.log('Iniciando teste de login');
+            
+            // Testar com usuário admin
+            const testUser = users[0];
+            
+            try {
+                console.log(`Tentando login com ${testUser.email}`);
+                
+                // Salvar dados do usuário no localStorage
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userName', testUser.nome);
+                localStorage.setItem('userEmail', testUser.email);
+                localStorage.setItem('userType', testUser.tipo);
+                localStorage.setItem('userId', testUser.id);
+                
+                console.log('Dados salvos no localStorage com sucesso');
+                updateLocalStorageDisplay();
+                
+                // Verificar se os dados foram realmente salvos
+                const saved = localStorage.getItem('userLoggedIn');
+                console.log(`Verificação pós-salvamento: userLoggedIn = ${saved}`);
+                
+                if (saved === 'true') {
+                    console.log('Login simulado com sucesso!');
+                } else {
+                    console.error('Falha ao salvar dados no localStorage');
+                }
+            } catch (error) {
+                console.error('Erro durante o teste de login:', error.message);
+            }
+        });
+        
+        // Limpar localStorage
+        clearStorageBtn.addEventListener('click', function() {
+            try {
+                localStorage.clear();
+                console.log('localStorage foi limpo!');
+                updateLocalStorageDisplay();
+            } catch (error) {
+                console.error('Erro ao limpar localStorage:', error.message);
+            }
+        });
+        
+        // Limpar log
+        clearLogBtn.addEventListener('click', function() {
+            logContainer.innerHTML = '<div class="log-entry info">Log limpo. Aguardando operações...</div>';
+        });
+        
+        function updateLocalStorageDisplay() {
+            try {
+                let data = '';
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    data += `${key}: ${value}\n`;
+                }
+                
+                localStorageData.textContent = data || 'Nenhum dado encontrado';
+            } catch (error) {
+                localStorageData.textContent = `Erro ao acessar localStorage: ${error.message}`;
+                console.error('Erro ao atualizar exibição do localStorage:', error.message);
+            }
+        }
+        
+        console.log('Sistema de depuração inicializado');
+    });
+    </script>
+    
+    <!-- Scripts principais -->
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header-nav.js"></script>
+</body>
+</html>

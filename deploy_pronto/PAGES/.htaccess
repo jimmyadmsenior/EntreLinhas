@@ -1,0 +1,18 @@
+# Redirecionar páginas HTML para suas versões em PHP
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redirecionamentos específicos
+    RewriteRule ^sobre.html$ sobre.php [R=301,L]
+    RewriteRule ^contato.html$ contato.php [R=301,L]
+    RewriteRule ^artigos.html$ artigos.php [R=301,L]
+</IfModule>
+
+# Configurações de acesso
+Options +FollowSymLinks -Indexes
+
+# Permitir acesso a todos os arquivos PHP
+<FilesMatch "\.php$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>

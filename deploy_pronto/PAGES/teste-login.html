@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Login - EntreLinhas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .debug-section {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .debug-item {
+            margin-bottom: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+        .btn-info {
+            background-color: #2196F3;
+        }
+        pre {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        .user-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .user-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Teste de Login - EntreLinhas</h1>
+
+        <div class="debug-section">
+            <h2>Estado atual do localStorage:</h2>
+            <div id="ls-status"></div>
+            
+            <hr>
+            <h2>Ações de teste:</h2>
+            <button class="btn" onclick="simularLogin('admin@exemplo.com', 'admin123')">Login como Admin</button>
+            <button class="btn" onclick="simularLogin('usuario@exemplo.com', 'usuario123')">Login como Usuário</button>
+            <button class="btn btn-danger" onclick="limparDados()">Limpar Login</button>
+            <button class="btn btn-info" onclick="atualizarStatus()">Atualizar Status</button>
+            <hr>
+            <h2>Usuários registrados no localStorage:</h2>
+            <ul id="user-list" class="user-list">
+                <li>Carregando...</li>
+            </ul>
+        </div>
+        
+        <div class="debug-section">
+            <h2>Links para testar:</h2>
+            <ul>
+                <li><a href="index.html">Página Inicial</a> - Verificar se o menu do usuário aparece após login</li>
+                <li><a href="login.html">Página de Login</a></li>
+                <li><a href="cadastro.html">Página de Cadastro</a></li>
+                <li><a href="index.html" onclick="localStorage.setItem('userLoggedIn', 'true'); localStorage.setItem('userName', 'Teste'); localStorage.setItem('userType', 'usuario'); localStorage.setItem('userId', '99'); return confirm('Login automático definido! Continuar para a página inicial?');">Forçar login e ir para Inicial</a> (define valores no localStorage)</li>
+            </ul>
+        </div>
+        
+        <div class="debug-section">
+            <h2>Scripts carregados nesta página:</h2>
+            <ul>
+                <li>Não carrega nenhum script do EntreLinhas para evitar interferências</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+    // Função para atualizar o status do localStorage
+    function atualizarStatus() {
+        const lsStatus = document.getElementById('ls-status');
+        lsStatus.innerHTML = '';
+        
+        // Verificar se localStorage está disponível
+        if (typeof localStorage === 'undefined') {
+            lsStatus.innerHTML = '<p>localStorage não está disponível neste navegador!</p>';
+            return;
+        }
+        
+        try {
+            const loggedIn = localStorage.getItem('userLoggedIn');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+            
+            lsStatus.innerHTML += '<div class="debug-item"><strong>Logado:</strong> ' + (loggedIn === 'true' ? 'Sim' : 'Não') + '</div>';
+            lsStatus.innerHTML += '<div class="debug-item"><strong>Nome:</strong> ' + (userName || 'N/A') + '</div>';
+            lsStatus.innerHTML += '<div class="debug-item"><strong>Email:</strong> ' + (userEmail || 'N/A') + '</div>';
+            lsStatus.innerHTML += '<div class="debug-item"><strong>Tipo:</strong> ' + (userType || 'N/A') + '</div>';
+            lsStatus.innerHTML += '<div class="debug-item"><strong>ID:</strong> ' + (userId || 'N/A') + '</div>';
+            
+            // Mostrar todos os itens do localStorage
+            lsStatus.innerHTML += '<h3>Conteúdo completo:</h3>';
+            let allItems = '<pre>';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                allItems += key + ': ' + value + '\n';
+            }
+            allItems += '</pre>';
+            lsStatus.innerHTML += allItems;
+            
+            // Atualizar lista de usuários
+            atualizarListaUsuarios();
+            
+        } catch (e) {
+            lsStatus.innerHTML = '<p>Erro ao acessar localStorage: ' + e.message + '</p>';
+        }
+    }
+    
+    // Função para atualizar a lista de usuários
+    function atualizarListaUsuarios() {
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = '';
+        
+        try {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<li>Nenhum usuário registrado</li>';
+                return;
+            }
+            
+            users.forEach(user => {
+                userList.innerHTML += `
+                    <li>
+                        <strong>Nome:</strong> ${user.nome}<br>
+                        <strong>Email:</strong> ${user.email}<br>
+                        <strong>Tipo:</strong> ${user.tipo}<br>
+                        <strong>ID:</strong> ${user.id}<br>
+                        <button class="btn btn-info" onclick="simularLogin('${user.email}', '${user.senha}')">Entrar como este usuário</button>
+                    </li>
+                `;
+            });
+            
+        } catch (e) {
+            userList.innerHTML = '<li>Erro ao carregar usuários: ' + e.message + '</li>';
+        }
+    }
+    
+    // Função para simular login
+    function simularLogin(email, senha) {
+        try {
+            // Usuários demo
+            const demoUsers = [
+                { 
+                    email: 'admin@exemplo.com', 
+                    senha: 'admin123', 
+                    nome: 'Administrador',
+                    tipo: 'admin',
+                    id: '1'
+                },
+                { 
+                    email: 'usuario@exemplo.com', 
+                    senha: 'usuario123', 
+                    nome: 'Usuário Teste',
+                    tipo: 'usuario',
+                    id: '2'
+                }
+            ];
+            
+            // Obter usuários registrados
+            const registeredUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            const allUsers = [...demoUsers, ...registeredUsers];
+            
+            // Verificar usuário
+            const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase() && u.senha === senha);
+            
+            if (user) {
+                // Login bem-sucedido
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userName', user.nome);
+                localStorage.setItem('userEmail', user.email);
+                localStorage.setItem('userType', user.tipo);
+                localStorage.setItem('userId', user.id);
+                
+                alert('Login simulado com sucesso como ' + user.nome);
+                atualizarStatus();
+            } else {
+                alert('Falha ao simular login: Usuário não encontrado');
+            }
+        } catch (e) {
+            alert('Erro ao simular login: ' + e.message);
+        }
+    }
+    
+    // Função para limpar dados de login
+    function limparDados() {
+        localStorage.removeItem('userLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userId');
+        
+        alert('Dados de login removidos com sucesso!');
+        atualizarStatus();
+    }
+    
+    // Inicializar ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+        atualizarStatus();
+    });
+    </script>
+</body>
+</html>

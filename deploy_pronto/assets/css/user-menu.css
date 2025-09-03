@@ -1,0 +1,122 @@
+/* Estilos para o menu do usuário */
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    margin-right: 1rem;
+}
+
+.user-menu:hover, .user-menu.active {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.dark-mode .user-menu:hover, .dark-mode .user-menu.active {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.user-name i {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+/* Estilo para o avatar do usuário no menu */
+.avatar-container {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.user-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    max-width: 24px; /* Garantir que não exceda o tamanho */
+    max-height: 24px; /* Garantir que não exceda o tamanho */
+}
+
+.user-menu.active .user-name i {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 200px;
+    background-color: var(--card-bg-light);
+    border-radius: 4px;
+    box-shadow: var(--shadow-light);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+}
+
+.dark-mode .dropdown-menu {
+    background-color: var(--card-bg-dark);
+    box-shadow: var(--shadow-dark);
+}
+
+.user-menu.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: background-color 0.2s ease;
+}
+
+.dark-mode .dropdown-menu a {
+    color: var(--text-light);
+}
+
+.dropdown-menu a:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.dark-mode .dropdown-menu a:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.dropdown-menu a:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.dropdown-menu a:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+/* Ajustes responsivos para o menu do usuário */
+@media (max-width: 768px) {
+    .user-menu {
+        margin-right: 0.5rem;
+    }
+    
+    .dropdown-menu {
+        width: 180px;
+    }
+}

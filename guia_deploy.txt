@@ -1,0 +1,55 @@
+# Guia Passo a Passo para Deploy no InfinityFree
+
+## Entendendo o processo:
+
+1. **Desenvolvimento Local**:
+   - Seu projeto está em: `C:\Users\User\Documents\EntreLinhas`
+   - Este é seu ambiente de desenvolvimento/trabalho
+
+2. **Preparação para Upload**:
+   - O script `preparar_upload.bat` cria uma pasta `deploy_pronto`
+   - Todos os arquivos necessários são copiados e configurados nesta pasta
+
+3. **Upload para o Servidor**:
+   - O servidor InfinityFree usa uma pasta chamada `/htdocs` como raiz do site
+   - Você precisa enviar os arquivos da pasta `deploy_pronto` para a pasta `/htdocs` no servidor
+
+## Passos para Deploy:
+
+### 1. Preparar os Arquivos
+- Dê um duplo clique no arquivo `preparar_upload.bat`
+- Aguarde o script terminar de preparar os arquivos
+
+### 2. Configurar o FileZilla
+- Abra o FileZilla
+- Digite os seguintes dados de conexão:
+  * Host: ftpupload.net
+  * Usuário: if0_39798697
+  * Senha: jimmysena123
+  * Porta: 21
+- Clique em "Conexão Rápida"
+
+### 3. Fazer o Upload
+- No painel DIREITO (servidor):
+  * Navegue até a pasta `/htdocs`
+- No painel ESQUERDO (local):
+  * Navegue até `C:\Users\User\Documents\EntreLinhas\deploy_pronto`
+- Selecione todos os arquivos e pastas na pasta `deploy_pronto`
+- Arraste todos os arquivos para o painel direito (pasta `/htdocs`)
+- Aguarde o upload terminar
+
+### 4. Verificar o Site
+- Acesse: [https://entrelinhas.infinityfreeapp.com](https://entrelinhas.infinityfreeapp.com)
+- Verifique se tudo está funcionando corretamente
+
+## Observações Importantes:
+
+1. A pasta `/htdocs` no servidor é a raiz do seu site - todos os arquivos precisam estar lá para funcionar
+2. No seu computador, você pode trabalhar em qualquer pasta (como a pasta Documentos)
+3. A pasta `deploy_pronto` é apenas uma pasta temporária para organizar os arquivos antes do upload
+4. Você não precisa (e não deve) criar uma pasta `htdocs` dentro da pasta `/htdocs` no servidor
+
+Se encontrar problemas:
+- Verifique se a configuração do banco de dados está correta
+- Verifique se todos os arquivos foram enviados corretamente
+- Verifique as permissões das pastas (especialmente `/htdocs/uploads`)
